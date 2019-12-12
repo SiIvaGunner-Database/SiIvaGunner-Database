@@ -28,11 +28,15 @@ header {
   font-size: 32px;
   color: #BBBBBB;
   padding-left: 16px;
+  /*
   border: 2px solid yellow;
+  //*/
 }
 
 #nav {
+  /*
   border: 2px solid red;
+  //*/
 }
 
 #nav ul {
@@ -48,7 +52,7 @@ header {
 }
 
 #nav li a {
-  color: white;
+  color: #f8f8f8;
   text-align: center;
   padding: 16px;
   text-decoration: none;
@@ -61,7 +65,10 @@ header {
 #main {
   padding: 16px;
   flex-grow: 1;
+  background-color: #f8f8f8;
+  /*
   border: 2px solid green;
+  //*/
 }
 
 #database {
@@ -69,23 +76,26 @@ header {
 }
 
 #generator {
-  display: none;
+
 }
 
 #report {
-  display: none;
+
 }
 
 hr {
   color: #BBBBBB;
   margin: 0;
   border-top: 0;
-  border-width: 1.2px;
+  border-width: 1.4px;
   border-style: solid;
 }
 
 footer {
   color: #BBBBBB;
   text-align: center;
+  background-color: #f8f8f8;
+  /*
   border: 2px solid blue;
+  //*/
 }
