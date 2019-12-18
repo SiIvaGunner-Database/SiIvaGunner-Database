@@ -9,12 +9,7 @@
   <body>
     <?php include("nav.html"); ?>
     <div id="main">
-      <div id="report">
-        <form>
-          <input type = "text" id = "textBox" placeholder="Search database"/>
-          <input type = "button" id = "submitBtn" onClick="formSubmit()" value = "Submit"/>
-        </form>
-      </div>
+      Work in progress.
     </div>
     <?php include("footer.html"); ?>
   </body>

@@ -9,12 +9,11 @@
   <body>
     <?php include("nav.html"); ?>
     <div id="main">
-      <div id="generator">
-        <form>
-          <input type = "text" id = "textBox" placeholder="Search database"/>
-          <input type = "button" id = "submitBtn" onClick="formSubmit()" value = "Submit"/>
-        </form>
-      </div>
+      <input type = "text" id = "textBox" placeholder = "Video ID"/>
+      <input type = "button" id = "submitBtn" onclick = "formSubmit()" value = "Submit">
+      <button onclick = "copyTemplate()">Copy</button>
+      <textarea readonly id = "template" rows = "20"></textarea>
+      <div id = "thumbnail"></div>
     </div>
     <?php include("footer.html"); ?>
   </body>
