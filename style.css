@@ -31,6 +31,9 @@ a {
 
 textarea {
   width: 100%;
+}
+
+#template {
   border: none;
   background-color: inherit;
 }
