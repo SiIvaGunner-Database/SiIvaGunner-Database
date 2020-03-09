@@ -21,8 +21,11 @@ body {
 header {
   padding-left: 16px;
   font-size: 32px;
-  color: #BBBBBB;
   /* border: 2px solid yellow; */
+}
+
+#headerLink {
+  color: #BBBBBB;
 }
 
 a {

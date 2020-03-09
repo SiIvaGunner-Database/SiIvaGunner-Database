@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>SiIvaGunner Database</title>
-    <link rel="shortcut icon" type="image/png" href="gadget.png"/>
+    <link rel="shortcut icon" type="image/png" href="images/gadget.png"/>
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="script.js"></script>
   </head>
