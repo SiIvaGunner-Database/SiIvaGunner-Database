@@ -84,20 +84,6 @@ function updateList()
     else
       row++;
 
-    // Start temporary code.
-
-    var results = YouTube.Videos.list('snippet,contentDetails', { id: uploadsSheet.getRange(row, 3).getValue(), maxResults: 1, type: 'video'});
-
-    results.items.forEach(function(item)
-                          {
-                            var length = item.contentDetails.duration.toString();
-                            var description = item.snippet.description.toString().replace(/\r/g, "").replace(/\n/g, "NEWLINE");
-                            uploadsSheet.getRange(row, 5).setValue(length);
-                            uploadsSheet.getRange(row, 6).setValue(description);
-                          });
-
-    // End temporary code.
-
     var originalTitle = uploadsSheet.getRange(row, 1).getValue();
     var encodedTitle = format(originalTitle);
     var url = "https://siivagunner.fandom.com/wiki/" + encodedTitle;
