@@ -84,6 +84,19 @@ function updateList()
     else
       row++;
 
+    if (summarySheet.getRange(row, 6).getValue() == "")
+    {
+      var results = YouTube.Videos.list('snippet,contentDetails', { id: uploadsSheet.getRange(row, 3).getValue(), maxResults: 1, type: 'video'});
+
+      results.items.forEach(function(item)
+                            {
+                              var length = item.contentDetails.duration.toString();
+                              var description = item.snippet.description.toString().replace(/\r/g, "").replace(/\n/g, "NEWLINE");
+                              uploadsSheet.getRange(row, 5).setValue(length);
+                              uploadsSheet.getRange(row, 6).setValue(description);
+                            });
+    }
+
     var originalTitle = uploadsSheet.getRange(row, 1).getValue();
     var encodedTitle = format(originalTitle);
     var url = "https://siivagunner.fandom.com/wiki/" + encodedTitle;
@@ -213,6 +226,44 @@ function format(str)
   str = str.replace(/\​\|\​_/g, 'L');
   str = str.replace(/\|/g, '∣');
   return encodeURIComponent(str);
+}
+
+function getVidDetails()
+{
+  var vidId = "jk2GapV9_LA";
+  var channelId = "UC9ecwl3FTG66jIKA9JRDtmg"
+  var results = YouTube.Channels.list('contentDetails', {id: channelId});
+
+  for (var i in results.items)
+  {
+    // Get the uploads playlist ID.
+    var item = results.items[i];
+    var uploadsPlaylistId = item.contentDetails.relatedPlaylists.uploads;
+    var playlistResponse = YouTube.PlaylistItems.list('snippet,contentDetails', {playlistId: uploadsPlaylistId, videoId: vidId});
+
+    for (var j = 0; j < playlistResponse.items.length; j++)
+    {
+      var playlistItem = playlistResponse.items[j];
+      var publishDate = playlistItem.snippet.publishedAt;
+
+      if (publishDate.length == 20)
+        publishDate = publishDate.replace("Z", ".000Z");
+
+      var results = YouTube.Videos.list('snippet,contentDetails', { id: vidId, maxResults: 1, type: 'video'});
+
+      results.items.forEach(function(item)
+                            {
+                              var originalTitle = item.snippet.title;
+                              var encodedTitle = format(originalTitle);
+                              var url = "https://siivagunner.fandom.com/wiki/" + encodedTitle;
+                              var urlRow = '=HYPERLINK("' + url + '", "' + originalTitle.replace(/"/g, '""') +'")';
+                              var nameRow = '=HYPERLINK("https://www.youtube.com/watch?v=' + vidId + '", "' + vidId + '")';
+                              var length = item.contentDetails.duration.toString();
+                              var description = item.snippet.description.toString().replace(/\r/g, "").replace(/\n/g, "NEWLINE");
+                              Logger.log("\n" + urlRow + "\n" + nameRow + "\n" + publishDate + "\n" + length + "\n" + description);
+                            });
+    }
+  }
 }
 
 function formatTester()
