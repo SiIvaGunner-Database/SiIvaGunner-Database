@@ -38,7 +38,7 @@ function addNewVideos()
         uploadsSheet.getRange(row, 3).setFormula('=HYPERLINK("https://www.youtube.com/watch?v=' + id + '", "' + id + '")');
         uploadsSheet.getRange(row, 4).setValue(publishDate);
         uploadsSheet.getRange(row, 6).setValue(description);
-        uploadsSheet.getRange(row, 7).setValue("Normal");
+        uploadsSheet.getRange(row, 7).setValue("Public");
         uploadsSheet.getRange(row, 8).setValue("1");
 
         var results = YouTube.Videos.list('contentDetails',{id: id, maxResults: 1, type: 'video'});
@@ -57,6 +57,10 @@ function addNewVideos()
   }
   var lastUpdatedRow = summarySheet.getRange("E2").getValue();
   summarySheet.getRange("E2").setValue(lastUpdatedRow + newRipCount);
+  lastUpdatedRow = summarySheet.getRange("E3").getValue();
+  summarySheet.getRange("E3").setValue(lastUpdatedRow + newRipCount);
+  lastUpdatedRow = summarySheet.getRange("E4").getValue();
+  summarySheet.getRange("E4").setValue(lastUpdatedRow + newRipCount);
   Logger.log("New rips: " + newRipCount);
 }
 
@@ -64,51 +68,57 @@ function addNewVideos()
 function updateList()
 {
   var startTime = new Date();
+  var currentHour = Utilities.formatDate(new Date(), "UTC", "HH");
+
+  if (currentHour < 22)
+    var recentUpdateRanges = ["E2", "F2"];
+  else if (currentHour == 22)
+    var recentUpdateRanges = ["E3", "F3"];
+  else if (currentHour == 23)
+    var recentUpdateRanges = ["E4", "F4"];
 
   uploadsSheet.getRange("A2:I19000").sort({column: 4, ascending: false});
   addNewVideos();
   uploadsSheet.getRange("A2:I19000").sort({column: 4, ascending: false});
 
-  var changedToYes = [];
   var currentTotal = summarySheet.getRange("B1").getValue();
-  var row = summarySheet.getRange("E2").getValue();
+  var row = summarySheet.getRange(recentUpdateRanges[0]).getValue();
   var ready = true;
 
   for (var i = 2; i < 21; i++)
-  {
     updateRow(i);
-  }
 
   while (ready)
   {
     if (row == currentTotal + 1)
-      row = 22;
-    else
+    {
+      if (currentHour < 22)
+        row = 22;
+      else
+        row = 2;
+    } else
       row++;
 
-    updateRow(row);
-    summarySheet.getRange("E2").setValue(row);
+    if (currentHour < 22)
+      updateRow(row);
+    else if (currentHour == 22)
+      updateVideoStatus(row);
+    else if (currentHour == 23)
+      updateDescTitleStatus(row);
 
-    // Check if the script timer has passed a specified time limit.
     var currentTime = new Date();
     var currentTimeUtc = Utilities.formatDate(new Date(), "UTC", "MM/dd/yy HH:mm:ss");
-    summarySheet.getRange("F2").setValue(currentTimeUtc);
+    summarySheet.getRange(recentUpdateRanges[0]).setValue(row);
+    summarySheet.getRange(recentUpdateRanges[1]).setValue(currentTimeUtc);
 
+    // Check if the script timer has passed a specified time limit.
     if (currentTime.getTime() - startTime.getTime() > (10 * 60 * 500)) // 5 minutes
     {
-      if (changedToYes.length > 0 || errorLog.length > 0)
+      if (errorLog.length > 0)
       {
-        var emailAddress = 'a.k.zamboni@gmail.com';
-        var subject = 'List of Uploads Update';
-        var beginning = '';
-        var end = '';
-
-        if (changedToYes.length > 0)
-          beginning = changedToYes.length + ' rips were changed to yes.\n\t' + changedToYes.toString().replace(/,/g, '\n\t') + '\n\n';
-        if (errorLog.length > 0)
-          end = errorLog.length + ' errors occured.\n' + errorLog.toString().replace(/,/g, '\n\n');
-
-        var message = beginning + end;
+        var emailAddress = "a.k.zamboni@gmail.com";
+        var subject = "List of Uploads Alert";
+        var message = "There are " + errorLog.length + " new alerts.\n\n" + errorLog.toString().replace(/,/g, "\n\n");
 
         MailApp.sendEmail(emailAddress, subject, message);
         Logger.log("Email successfully sent. " + message);
@@ -120,6 +130,11 @@ function updateList()
 
 function updateRow(row)
 {
+  // Start temporary code.
+  var date = uploadsSheet.getRange(row, 4).getValue();
+  uploadsSheet.getRange(row, 4).setValue(date.replace(/.000Z/g, "Z"));
+  // End temporary code.
+
   var originalTitle = uploadsSheet.getRange(row, 1).getValue();
   var encodedTitle = format(originalTitle);
   var url = "https://siivagunner.fandom.com/wiki/" + encodedTitle;
@@ -147,12 +162,10 @@ function updateRow(row)
   }
   else if (oldStatus != newStatus && newStatus == "Yes") // The rip needs an article
   {
-    changedToYes.push(originalTitle);
     Logger.log("Add to playlist: " + originalTitle);
     YouTube.PlaylistItems.insert({snippet: {playlistId: playlistId, resourceId: {kind: "youtube#video", videoId: id}}}, "snippet");
   }
-
-  Logger.log("Row " + row + ": " + originalTitle);
+  Logger.log("Row " + row + ": " + originalTitle + " (" + oldStatus + ", " + newStatus + ")");
 }
 
 // Check if the rip has a wiki article.
@@ -167,7 +180,6 @@ function updateWikiStatus(row, url, originalTitle, id, newRip)
   } catch (e)
   {
     e = e.toString().replace(/\n\n/g, "\n");
-    Logger.log(e + "\n" + url);
     if (e.indexOf("404") != -1)
     {
       uploadsSheet.getRange(row, 1).setFormula('=HYPERLINK("' + url + '", "' + originalTitle.replace(/"/g, '""') +'")');
@@ -188,22 +200,103 @@ function updateWikiStatus(row, url, originalTitle, id, newRip)
         uploadsSheet.getRange(row, 2).setValue("Unknown");
 
       if (e.indexOf("Address unavailable") == -1)
+      {
+        Logger.log(e + "\n" + url);
         errorLog.push(e + "\n[" + url + "]")
+      }
     }
   }
 }
 
-/* TO DO
-function updateVideoStatus() {}
-function updateDescTitleStatus() {}
-*/
-
-function createTrigger()
+function updateVideoStatus(row)
 {
-  ScriptApp.newTrigger("updateList")
-  .timeBased()
-  .everyMinutes(30)
-  .create();
+  var title = uploadsSheet.getRange(row, 1).getValue();
+  var vidId = uploadsSheet.getRange(row, 3).getValue();
+  var currentStatus = uploadsSheet.getRange(row, 7).getValue();
+  var url = "https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v=" + vidId + "&format=json";
+
+  try
+  {
+    var response = UrlFetchApp.fetch(url).getResponseCode();
+    uploadsSheet.getRange(row, 7).setValue("Public");
+  } catch (e)
+  {
+    e = e.toString().replace(/\n\n/g, "\n");
+    if (e.indexOf("404") != -1)
+    {
+      if (currentStatus != "Deleted")
+        errorLog.push(title + " has been deleted.");
+
+      uploadsSheet.getRange(row, 7).setValue("Deleted");
+    }
+    else if (e.indexOf("401") != -1)
+    {
+      if (currentStatus != "Private")
+        errorLog.push(title + " has been privated.");
+
+      uploadsSheet.getRange(row, 7).setValue("Private");
+    }
+    else
+    {
+      if (uploadsSheet.getRange(row, 7).getValue() == "")
+        uploadsSheet.getRange(row, 7).setValue("Unknown");
+
+      if (e.indexOf("Address unavailable") == -1)
+      {
+        Logger.log(e + "\n" + url);
+        errorLog.push(e + "\n[" + url + "]");
+      }
+    }
+  }
+  Logger.log("Row " + row + ": " + title + " (" + response + ")");
+}
+
+function updateDescTitleStatus(row)
+{
+  var sheetTitle = uploadsSheet.getRange(row, 1).getValue();
+  var videoStatus = uploadsSheet.getRange(row, 7).getValue();
+
+  if (videoStatus == "Public" || videoStatus == "Normal")
+  {
+    var sheetDesc = uploadsSheet.getRange(row, 6).getValue();
+    var vidTitle = "";
+    var vidDesc = "";
+    var vidId = uploadsSheet.getRange(row, 3).getValue();
+    var change = false;
+
+    try
+    {
+      var results = YouTube.Videos.list('snippet', {id: vidId, maxResults: 1, type: 'video'});
+      results.items.forEach(function(item)
+                            {
+                              vidTitle = item.snippet.title;
+                              vidDesc = item.snippet.description.toString().replace(/\r/g, "").replace(/\n/g, "NEWLINE");
+                            });
+    } catch(e)
+    {
+      e = e.toString().replace(/\n\n/g, "\n");
+      Logger.log(e + "\n" + vidId);
+      errorLog.push(e + "\n[" + vidId + "]");
+    }
+
+    if (sheetTitle != vidTitle)
+    {
+      change = true;
+      var url = "https://siivagunner.fandom.com/wiki/" + format(vidTitle);
+      var urlRow = '=HYPERLINK("' + url + '", "' + vidTitle.replace(/"/g, '""') +'")';
+      uploadsSheet.getRange(row, 1).setFormula(urlRow);
+      errorLog.push("[" + url + "]\nOLD TITLE:\n" + sheetTitle + "\nNEW TITLE:\n" + vidTitle);
+    }
+
+    if (sheetDesc != vidDesc)
+    {
+      change = true;
+      var url = "https://siivagunner.fandom.com/wiki/" + format(vidTitle);
+      uploadsSheet.getRange(row, 6).setValue(vidDesc);
+      errorLog.push("[" + url + "]\nOLD DESCRIPTION:\n" + sheetDesc + "\nNEW DESCRIPTION:\n" + vidDesc);
+    }
+  }
+  Logger.log("Row " + row + ": " + sheetTitle + " (" + change + ")");
 }
 
 function format(str)
@@ -273,24 +366,19 @@ function checkForMissingRips()
 
 function getVidDetails(vidId)
 {
+  //vidId = "VB3s9_k_fUI"; // unlisted
   var results = YouTube.Channels.list('contentDetails', {id: channelId});
 
   for (var i in results.items)
   {
-    var item = results.items[i];
-    var uploadsPlaylistId = item.contentDetails.relatedPlaylists.uploads;
+    var uploadsPlaylistId = results.items[i].contentDetails.relatedPlaylists.uploads;
     var playlistResponse = YouTube.PlaylistItems.list('snippet,contentDetails', {playlistId: uploadsPlaylistId, videoId: vidId});
     Logger.log(vidId + "\t" + playlistResponse.items.length);
 
     for (var j = 0; j < playlistResponse.items.length; j++)
     {
-      var playlistItem = playlistResponse.items[j];
-      var publishDate = playlistItem.snippet.publishedAt;
-
-      if (publishDate.length == 20)
-        publishDate = publishDate.replace("Z", ".000Z");
-
-      var results = YouTube.Videos.list('snippet,contentDetails', { id: vidId, maxResults: 1, type: 'video'});
+      var publishDate = playlistResponse.items[j].snippet.publishedAt.replace(/.000Z/g, "Z");
+      var results = YouTube.Videos.list('snippet,contentDetails', {id: vidId, maxResults: 1, type: 'video'});
 
       results.items.forEach(function(item)
                             {
@@ -305,6 +393,14 @@ function getVidDetails(vidId)
                             });
     }
   }
+}
+
+function createTrigger()
+{
+  ScriptApp.newTrigger("updateList")
+  .timeBased()
+  .everyMinutes(30)
+  .create();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
