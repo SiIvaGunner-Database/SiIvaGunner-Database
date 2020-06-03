@@ -5,8 +5,8 @@ Coat: #BBBBBB
 */
 
 html {
-  padding-left: 96px;
-  padding-right: 96px;
+  padding-left: 182px;
+  padding-right: 182px;
   height: 100%;
 }
 
@@ -41,7 +41,7 @@ textarea {
   background-color: inherit;
 }
 
-img {
+#thumbnail img {
    width: 320px;
    height: 180px;
 }
@@ -90,7 +90,7 @@ hr {
 }
 
 footer {
-  padding: 2px;
+  padding: 8px 0 4px 0;
   text-align: center;
   background-color: #f8f8f8;
   /* border: 2px solid blue; */
