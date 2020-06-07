@@ -70,11 +70,11 @@ function updateList()
   var startTime = new Date();
   var currentHour = Utilities.formatDate(new Date(), "UTC", "HH");
 
-  if (currentHour < 22)
+  if (currentHour < 20)
     var recentUpdateRanges = ["E2", "F2"];
-  else if (currentHour == 22)
+  else if (currentHour < 22)
     var recentUpdateRanges = ["E3", "F3"];
-  else if (currentHour == 23)
+  else if (currentHour < 24)
     var recentUpdateRanges = ["E4", "F4"];
 
   uploadsSheet.getRange("A2:I19000").sort({column: 4, ascending: false});
@@ -92,18 +92,18 @@ function updateList()
   {
     if (row == currentTotal + 1)
     {
-      if (currentHour < 22)
+      if (currentHour < 20)
         row = 22;
       else
         row = 2;
     } else
       row++;
 
-    if (currentHour < 22)
+    if (currentHour < 20)
       updateRow(row);
-    else if (currentHour == 22)
+    else if (currentHour < 22)
       updateVideoStatus(row);
-    else if (currentHour == 23)
+    else if (currentHour < 24)
       updateDescTitleStatus(row);
 
     var currentTime = new Date();
@@ -118,10 +118,10 @@ function updateList()
       {
         var emailAddress = "a.k.zamboni@gmail.com";
         var subject = "List of Uploads Alert";
-        var message = "There are " + errorLog.length + " new alerts.\n\n" + errorLog.toString().replace(/,/g, "\n\n");
+        var message = "There are " + errorLog.length + " new alerts.\n\n" + errorLog.join("\n\n");
 
         MailApp.sendEmail(emailAddress, subject, message);
-        Logger.log("Email successfully sent. " + message);
+        Logger.log("Email successfully sent.\n" + message);
       }
       ready = false;
     }
@@ -130,11 +130,6 @@ function updateList()
 
 function updateRow(row)
 {
-  // Start temporary code.
-  var date = uploadsSheet.getRange(row, 4).getValue();
-  uploadsSheet.getRange(row, 4).setValue(date.replace(/.000Z/g, "Z"));
-  // End temporary code.
-
   var originalTitle = uploadsSheet.getRange(row, 1).getValue();
   var encodedTitle = format(originalTitle);
   var url = "https://siivagunner.fandom.com/wiki/" + encodedTitle;
@@ -282,18 +277,18 @@ function updateDescTitleStatus(row)
     if (sheetTitle != vidTitle)
     {
       change = true;
-      var url = "https://siivagunner.fandom.com/wiki/" + format(vidTitle);
+      var url = "[https://siivagunner.fandom.com/wiki/" + format(sheetTitle) + "]\n[https://siivagunner.fandom.com/wiki/" + format(vidTitle) + "]";
       var urlRow = '=HYPERLINK("' + url + '", "' + vidTitle.replace(/"/g, '""') +'")';
       uploadsSheet.getRange(row, 1).setFormula(urlRow);
-      errorLog.push("[" + url + "]\nOLD TITLE:\n" + sheetTitle + "\nNEW TITLE:\n" + vidTitle);
+      errorLog.push(url + "\nOLD TITLE:\n" + sheetTitle + "\nNEW TITLE:\n" + vidTitle);
     }
 
     if (sheetDesc != vidDesc)
     {
       change = true;
-      var url = "https://siivagunner.fandom.com/wiki/" + format(vidTitle);
+      var url = "[https://siivagunner.fandom.com/wiki/" + format(vidTitle) + "]";
       uploadsSheet.getRange(row, 6).setValue(vidDesc);
-      errorLog.push("[" + url + "]\nOLD DESCRIPTION:\n" + sheetDesc + "\nNEW DESCRIPTION:\n" + vidDesc);
+      errorLog.push(url + "\nOLD DESCRIPTION:\n" + sheetDesc + "\nNEW DESCRIPTION:\n" + vidDesc);
     }
   }
   Logger.log("Row " + row + ": " + sheetTitle + " (" + change + ")");
@@ -306,6 +301,7 @@ function format(str)
   str = str.replace(/#/g, '');
   str = str.replace(/\​\|\​_/g, 'L');
   str = str.replace(/\|/g, '∣');
+  str = str.replace(/Nigga/g, 'N----');
   return encodeURIComponent(str);
 }
 
