@@ -28,7 +28,7 @@
         <label>Please describe the problem you encountered.</label>
         <textarea id = "desc" rows = 10></textarea>
       </div>
-      <input type = "button" id = "submitBtn" onclick = "fileReport()" value = "Submit">
+      <input type = "button" id = "submitBtn" onclick = "report()" value = "Submit">
       <p id = "response"></p>
     </div>
     <?php include("footer.html"); ?>
