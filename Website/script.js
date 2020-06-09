@@ -1,6 +1,18 @@
 var appUrl = "https://script.google.com/macros/s/AKfycbzm47208rTvNpu2pa-vhqdT53k9_F1l0j47nqlJOw/exec";
 var reay = false;
 
+document.onkeydown = logKey;
+
+function logKey(e) {
+  if (e.code == "Enter" && document.getElementById("inputText").value != "")
+    document.getElementById("submitBtn").click();
+}
+
+function search()
+{
+
+}
+
 function copyTemplate()
 {
   var copyText = document.getElementById("template");
@@ -13,7 +25,7 @@ function copyTemplate()
 
 function generateTemplate()
 {
-  var id = document.getElementById("textBox").value;
+  var id = document.getElementById("inputText").value;
   id = id.replace("{\"\":\"", "").replace("\"}", "").replace("&feature=youtu.be", "").replace(/&.*/, "").replace(/h.*=/, "");
   var url = appUrl + "?type=template&id=" + id;
 

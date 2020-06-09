@@ -8,29 +8,29 @@
   </head>
   <body>
     <?php include("nav.html"); ?>
-    <div id="main">
+    <main>
       <div>
         <label>What page did you encounter a problem on?</label>
-        <br />
-        <select id = "page">
-          <option value = "database">Database Search</option>
-          <option value = "generator">Template Generator</option>
+        <br/>
+        <select id="page">
+          <option value="database">Database Search</option>
+          <option value="generator">Template Generator</option>
         </select>
       </div>
-      <br />
+      <br/>
       <div>
-        <label>What is the URL or ID that caused the problem?</label>
-        <br />
-        <input type = "text" id = "id" placeholder = "URL or ID" required/>
+        <label>What did you enter when the problem occurred?</label>
+        <br/>
+        <input type="text" id="id" placeholder="Enter title, URL, or ID" required/>
       </div>
-      <br />
+      <br/>
       <div>
-        <label>Please describe the problem you encountered.</label>
-        <textarea id = "desc" rows = 10></textarea>
+        <label>Optionally, please describe the problem you encountered.</label>
+        <textarea id="desc" rows=10></textarea>
       </div>
-      <input type = "button" id = "submitBtn" onclick = "report()" value = "Submit">
-      <p id = "response"></p>
-    </div>
+      <button onclick="report()">Submit</button>
+      <p id="response"></p>
+    </main>
     <?php include("footer.html"); ?>
   </body>
 </html>

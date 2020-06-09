@@ -8,13 +8,13 @@
   </head>
   <body>
     <?php include("nav.html"); ?>
-    <div id="main">
-      <input type = "text" id = "textBox" placeholder = "Video ID"/>
-      <input type = "button" id = "submitBtn" onclick = "generateTemplate()" value = "Submit">
-      <button onclick = "copyTemplate()">Copy</button>
-      <textarea readonly id = "template"></textarea>
-      <div id = "thumbnail"></div>
-    </div>
+    <main>
+      <input type="text" id="inputText" placeholder="Enter URL or ID"/>
+      <button id="submitBtn" onclick="generateTemplate()">Submit</button>
+      <button onclick="copyTemplate()">Copy</button>
+      <textarea readonly id="template"></textarea>
+      <div id="thumbnail"></div>
+    </main>
     <?php include("footer.html"); ?>
   </body>
 </html>

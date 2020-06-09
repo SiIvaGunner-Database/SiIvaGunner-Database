@@ -5,8 +5,7 @@ Coat: #BBBBBB
 */
 
 html {
-  padding-left: 182px;
-  padding-right: 182px;
+  padding: 0 240px;
   height: 100%;
 }
 
@@ -21,19 +20,76 @@ body {
 header {
   padding-left: 16px;
   font-size: 32px;
-  /* border: 2px solid yellow; */
+}
+
+nav ul {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  list-style-type: none;
+  background-color: #BBBBBB;
+}
+
+nav li {
+  float: left;
+}
+
+nav li a {
+  padding: 0 16px;
+  text-align: center;
+  text-decoration: none;
+  color: #f8f8f8;
+}
+
+nav li a:hover {
+  background-color: #999999;
 }
 
 #headerLink {
   color: #BBBBBB;
 }
 
+main {
+  padding: 16px;
+  flex-grow: 1;
+  color: #999999;
+  background-color: #f8f8f8;
+}
+
+footer {
+  padding-top: 6px;
+  text-align: center;
+  background-color: #BBBBBB;
+}
+
 a {
   text-decoration: none;
 }
 
+button {
+  cursor: pointer;
+}
+
 textarea {
   width: 100%;
+}
+
+#video {
+  float: left;
+  border: 2px solid red;
+}
+
+#videoInfo {
+  float: left;
+  min-width: 426px;
+  max-width: calc(100% - 560px - 8px);
+  border: 2px solid blue;
+}
+
+#videoDesc {
+  clear: left;
+  max-width: 560px;
+  border: 2px solid green;
 }
 
 #template {
@@ -46,52 +102,39 @@ textarea {
    height: 180px;
 }
 
-#nav {
-  /* border: 2px solid red; */
+#searchContainer {
 }
 
-#nav ul {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  list-style-type: none;
-  background-color: #BBBBBB;
+.searchBtn {
+  background-image: url("images/search.png");
+  background-repeat: no-repeat;
+  background-color: inherit;
+  background-size: 21px 22px;
+  margin-top: 2px;
+  float: right;
+  height: 22px;
+  width: 21px;
+  border: none;
 }
 
-#nav li {
-  float: left;
+@media only screen and (max-width: 1024px) {
+  html {
+    padding: 0 120px;
+  }
+
+  iframe {
+    width: 426px;
+    height: 240px;
+  }
+
+  #videoInfo {
+    max-width: calc(100% - 426px - 8px);
+  }
 }
 
-#nav li a {
-  padding: 16px;
-  text-align: center;
-  text-decoration: none;
-  color: #f8f8f8;
-}
-
-#nav li a:hover {
-  background-color: #999999;
-}
-
-#main {
-  padding: 16px;
-  flex-grow: 1;
-  color: #999999;
-  background-color: #f8f8f8;
-  /* border: 2px solid green; */
-}
-
-hr {
-  margin: 0;
-  border-top: 0;
-  border-width: 1px;
-  border-style: solid;
-  color: #BBBBBB;
-}
-
-footer {
-  padding: 8px 0 4px 0;
-  text-align: center;
-  background-color: #f8f8f8;
-  /* border: 2px solid blue; */
+/* For mobile viewing */
+@media only all and (max-width: 768px) {
+  html {
+    padding: 0;
+  }
 }

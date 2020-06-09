@@ -8,9 +8,12 @@
   </head>
   <body>
     <?php include("nav.html"); ?>
-    <div id="main">
-      Work in progress.
-    </div>
+    <main>
+      <div id="searchContainer">
+        <input type="text" id="inputText" class="textBox" placeholder="Search by video title or ID"/>
+        <button id="submitBtn" class="searchBtn" onclick="search()"></button>
+      </div>
+    </main>
     <?php include("footer.html"); ?>
   </body>
 </html>
