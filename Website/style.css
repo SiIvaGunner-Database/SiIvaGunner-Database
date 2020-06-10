@@ -1,7 +1,10 @@
 /*
 Skin: #ECBCA7
-Tie: #104381
+Tie:  #104381
 Coat: #BBBBBB
+
+Light:#f8f8f8
+Dark: #999999
 */
 
 html {
@@ -75,21 +78,19 @@ textarea {
 }
 
 #video {
+  margin: 4px 4px 0 0;
   float: left;
-  border: 2px solid red;
 }
 
 #videoInfo {
   float: left;
   min-width: 426px;
   max-width: calc(100% - 560px - 8px);
-  border: 2px solid blue;
 }
 
 #videoDesc {
   clear: left;
   max-width: 560px;
-  border: 2px solid green;
 }
 
 #template {
@@ -103,6 +104,11 @@ textarea {
 }
 
 #searchContainer {
+  padding-top: 2.4px;
+}
+
+.searchBox {
+  float: left;
 }
 
 .searchBtn {
@@ -110,8 +116,8 @@ textarea {
   background-repeat: no-repeat;
   background-color: inherit;
   background-size: 21px 22px;
-  margin-top: 2px;
-  float: right;
+  margin-left: 2px;
+  float: left;
   height: 22px;
   width: 21px;
   border: none;
