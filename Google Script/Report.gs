@@ -1,17 +1,17 @@
-function fileReport(page, id, desc) {
+function fileReport(page, id, desc)
+{
   var date = new Date();
 
-  var timestamp = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var row = timestamp.getRange("G1").getValue() + 2;
+  var reportsSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Reports");
+  var row = reportsSheet.getRange("G1").getValue() + 2;
 
   try
   {
-  timestamp.getRange(row, 1).setValue(date);
-  timestamp.getRange(row, 2).setValue(page);
-  timestamp.getRange(row, 3).setValue(id);
-  timestamp.getRange(row, 4).setValue(desc);
+    reportsSheet.getRange(row, 1).setValue(date);
+    reportsSheet.getRange(row, 2).setValue(page);
+    reportsSheet.getRange(row, 3).setValue(id);
+    reportsSheet.getRange(row, 4).setValue(desc);
 
     return "Your response has been recorded.";
-  }
-  catch (e) { return e; }
+  } catch (e) { return e; }
 }

@@ -1,9 +1,6 @@
-function buildTemplate(id)
+function buildTemplate(videoId, format)
 {
-  var description = "";
-  var videoId = id;
-
-  if (id == "")
+  if (videoId == "")
     return "Please enter a video URL or ID.";
   else if (videoId.length != 11)
     return "Invalid video URL or ID: " + videoId;
@@ -11,68 +8,95 @@ function buildTemplate(id)
   var playlistId = "";
   var uploadDate = "";
   var length = "";
-
+  var description = "";
+  var pageName = "";
+  var mix = "";
+  var track = "";
+  var simplifiedTrack = "";
   var composer = "";
   var composerLabel = "";
   var platform = "";
   var platformLabel = "";
   var ripper = "";
   var catchphrase = "";
-  var pageName = "";
-  var mix = "";
-  var track = "";
-  var simplifiedTrack = "";
   var game = "";
 
   try
   {
-    // Fetch the video details.
-    var results = YouTube.Videos.list('id,snippet,contentDetails',
-                                      {
-                                        id: videoId,
-                                        maxResults: 1,
-                                        type: 'video'
-                                      });
+    try
+    {
+      // Fetch the video details.
+      var results = YouTube.Videos.list('id,snippet,contentDetails',
+                                        {
+                                          id: videoId,
+                                          maxResults: 1,
+                                          type: 'video'
+                                        });
 
-    results.items.forEach(function(item)
-                          {
-                            pageName = item.snippet.title.toString();
-                            description = item.snippet.description.toString().replace(/\r/g, "");
-                            uploadDate = item.snippet.publishedAt.toString();
-                            length = item.contentDetails.duration.toString();
-                          });
+      Logger.log("oh no");
+
+      results.items.forEach(function(item)
+                            {
+                              pageName = item.snippet.title.toString();
+                              description = item.snippet.description.toString().replace(/\r/g, "");
+                              uploadDate = item.snippet.publishedAt.toString();
+                              length = item.contentDetails.duration.toString();
+                            });
+
+    } catch(e)
+    {
+      // In case the YouTube API quota has been passed.
+      var values = uploadsSheet.getRange(2, 3, 20).getValues();
+      var row = values.findIndex(ids => {return ids[0] == videoId});
+      if (row == -1)
+      {
+        var values = uploadsSheet.getRange(21, 3, uploadsSheet.getLastRow() - 20).getValues();
+        var row = values.findIndex(ids => {return ids[0] == videoId});
+
+        if (row == -1)
+          return "Video not found.";
+        else
+          var data = uploadsSheet.getRange(row + 21, 1, 1, 7).getValues();
+      } else
+        var data = uploadsSheet.getRange(row + 2, 1, 1, 7).getValues();
+
+      pageName = data[0][0];
+      uploadDate = data[0][3];
+      length = data[0][4];
+      description = data[0][5].replace(/NEWLINE/g, "\n");
+    }
 
     // Add labels if needed.
     if (description.indexOf("Composers: ") != -1)
     {
       description = description.replace("Composers: ", "Composer: ");
-      composerLabel = "\n|composer label= Composers";
+      composerLabel = "\n|composer label\t= Composers";
     }
     else if (description.indexOf("Composer(s): ") != -1)
     {
       description = description.replace("Composer(s): ", "Composer: ");
-      composerLabel = "\n|composer label= Composer(s)";
+      composerLabel = "\n|composer label\t= Composer(s)";
     }
     else if (description.indexOf("Arrangement: ") != -1)
     {
       description = description.replace("Arrangement: ", "Composer: ");
-      composerLabel = "\n|composer label= Arrangement";
+      composerLabel = "\n|composer label\t= Arrangement";
     }
     else if (description.indexOf("Arrangers: ") != -1)
     {
       description = description.replace("Arrangers: ", "Composer: ");
-      composerLabel = "\n|composer label= Arrangers";
+      composerLabel = "\n|composer label\t= Arrangers";
     }
     else if (description.indexOf("Composed by: ") != -1)
     {
       description = description.replace("Composed by: ", "Composer: ");
-      composerLabel = "\n|composer label= Composed by";
+      composerLabel = "\n|composer label\t= Composed by";
     }
 
     if (description.indexOf("Platforms: ") != -1)
     {
       description = description.replace("Platforms: ", "Platform: ");
-      platformLabel = "\n|platform label= Platforms";
+      platformLabel = "\n|platform label\t= Platforms";
     }
 
     // Use regular expressions to get the necessary information from the description.
@@ -85,7 +109,7 @@ function buildTemplate(id)
     else
     {
       var ripperPattern = new RegExp("Ripper: (.*)");
-      catchphrase = "\n|catchphrase= ";
+      catchphrase = "\n|catchphrase\t= ";
     }
 
     description = description.replace(/,/g, "COMMA");
@@ -97,13 +121,13 @@ function buildTemplate(id)
       ripper = ripperPattern.exec(description).toString().split(",").pop().replace(/COMMA/g, ",");
 
     if (description.indexOf("Composer: ") != -1)
-      composer = "\n|composer= " + composerPattern.exec(description).toString().split(",").pop().replace(/COMMA/g, ",");
+      composer = "\n|composer\t= " + composerPattern.exec(description).toString().split(",").pop().replace(/COMMA/g, ",");
 
     if (description.indexOf("Platform: ") != -1)
-      platform = "\n|platform= " + platformPattern.exec(description).toString().split(",").pop().replace(/COMMA/g, ",");
+      platform = "\n|platform\t= " + platformPattern.exec(description).toString().split(",").pop().replace(/COMMA/g, ",");
 
     if (description.indexOf("Please read the channel description.") == -1 && description.indexOf("\n\n") != -1)
-      catchphrase = "\n|catchphrase= " + description.split("\n\n").pop();
+      catchphrase = "\n|catchphrase\t= " + description.split("\n\n").pop();
 
     // Format the video length, adding zeroes if needed.
     for (var i = 0; i < length.length; i++)
@@ -149,35 +173,38 @@ function buildTemplate(id)
 
     // Build the template.
     var val = "{{Rip" +
-              "\n|image= " + game + ".jpg" +
+              "\n|image\t\t= " + game + ".jpg" +
               "\n" +
-              "\n|link= " + videoId +
-              "\n|playlist= " + game +
-              "\n|playlist id= " + playlistId.replace(/h.*=/, "") +
-              "\n|upload= " + uploadDate +
-              "\n|length= " + length +
-              "\n|author= " + ripper +
+              "\n|link\t\t= " + videoId +
+              "\n|playlist\t= " + game +
+              "\n|playlist id\t= " + playlistId.replace(/h.*=/, "") +
+              "\n|upload\t\t= " + uploadDate +
+              "\n|length\t\t= " + length +
+              "\n|author\t\t= " + ripper +
               "\n" +
-              "\n|album= " +
-              "\n|track= " +
+              "\n|album\t\t= " +
+              "\n|track\t\t= " +
               "\n" +
-              "\n|music= " + track +
-              /* "\n|composer= " + */ composer +
-              /* "\n|composer label= " + */ composerLabel +
-              /* "\n|platform= " + */ platform +
-              /* "\n|platform label= " + */ platformLabel +
-              /* "\n|catchphrase= " + */ catchphrase +
+              "\n|music\t\t= " + track +
+              /* "\n|composer\t= " + */ composer +
+              /* "\n|composer label\t= " + */ composerLabel +
+              /* "\n|platform\t= " + */ platform +
+              /* "\n|platform label\t= " + */ platformLabel +
+              /* "\n|catchphrase\t= " + */ catchphrase +
               "\n}}" +
               "\n\"'''" + pageName + "'''\" is a high quality rip " + mix +
               "of \"" + simplifiedTrack + "\" from ''" + game + "''." +
               "\n== Jokes ==";
 
-    Logger.log(val);
-    console.log(val);
+    if (format == "single")
+      val = val.replace(/\t\t= |\t= /g, "= ");
+    else if (format == "double")
+      val = val.replace(/\t\t= |\t= /g, " = ");
+    else if (format == "none")
+      val = val.replace(/\t\t= |\t= /g, "=");
+
   } catch(e)
   {
-    Logger.log(e);
-    console.log(e);
     return e;
   }
 

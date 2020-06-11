@@ -9,8 +9,7 @@ var errorLog = [];
 function addNewVideos()
 {
   var mostRecent = uploadsSheet.getRange("D2").getValue();
-  var currentTotal = summarySheet.getRange("B1").getValue();
-  var row = currentTotal + 2;
+  var row = uploadsSheet.getLastRow() + 1;
   var newRipCount = 0;
   var results = YouTube.Channels.list('contentDetails', {id: channelId});
 
@@ -34,6 +33,7 @@ function addNewVideos()
         var id = playlistItem.snippet.resourceId.videoId;
         var description = playlistItem.snippet.description.toString().replace(/\r/g, "").replace(/\n/g, "NEWLINE");
 
+        uploadsSheet.insertRowAfter(uploadsSheet.getLastRow());
         updateWikiStatus(row, url, originalTitle, id, true);
         uploadsSheet.getRange(row, 3).setFormula('=HYPERLINK("https://www.youtube.com/watch?v=' + id + '", "' + id + '")');
         uploadsSheet.getRange(row, 4).setValue(publishDate);
@@ -70,18 +70,17 @@ function updateList()
   var startTime = new Date();
   var currentHour = Utilities.formatDate(new Date(), "UTC", "HH");
 
-  if (currentHour < 20)
+  if (currentHour < 21)
     var recentUpdateRanges = ["E2", "F2"];
-  else if (currentHour < 22)
+  else if (currentHour < 23)
     var recentUpdateRanges = ["E3", "F3"];
   else if (currentHour < 24)
     var recentUpdateRanges = ["E4", "F4"];
 
-  uploadsSheet.getRange("A2:I19000").sort({column: 4, ascending: false});
+  uploadsSheet.getDataRange().sort({column: 4, ascending: false});
   addNewVideos();
-  uploadsSheet.getRange("A2:I19000").sort({column: 4, ascending: false});
+  uploadsSheet.getDataRange().sort({column: 4, ascending: false});
 
-  var currentTotal = summarySheet.getRange("B1").getValue();
   var row = summarySheet.getRange(recentUpdateRanges[0]).getValue();
   var ready = true;
 
@@ -90,18 +89,18 @@ function updateList()
 
   while (ready)
   {
-    if (row == currentTotal + 1)
+    if (row >= uploadsSheet.getLastRow())
     {
-      if (currentHour < 20)
+      if (currentHour < 21)
         row = 22;
       else
         row = 2;
     } else
       row++;
 
-    if (currentHour < 20)
+    if (currentHour < 21)
       updateRow(row);
-    else if (currentHour < 22)
+    else if (currentHour < 23)
       updateVideoStatus(row);
     else if (currentHour < 24)
       updateDescTitleStatus(row);
@@ -308,8 +307,7 @@ function format(str)
 // Checks to see if any uploaded rips are missing from the spreadsheet.
 function checkForMissingRips()
 {
-  var currentTotal = summarySheet.getRange("B1").getValue() + 1;
-  var range = "C2:C" + currentTotal;
+  var range = "C2:C" + uploadsSheet.getLastRow();
   var ripIds = uploadsSheet.getRange(range).getValues();
   var vidIds = [];
   var missingRips = [];
@@ -407,7 +405,6 @@ function createTrigger()
 function buildList()
 {
   var startTime = new Date();
-  var currentTotal = summarySheet.getRange("B1").getValue();
   var mostRecent = uploadsSheet.getRange("D2").getValue();
 
   var results = YouTube.Channels.list('contentDetails', {id: channelId});
@@ -427,7 +424,7 @@ function buildList()
       for (var j = 0; j < playlistResponse.items.length; j++)
       {
         row++;
-        if (row > currentTotal + 1)
+        if (row > uploadsSheet.getLastRow())
         {
           var playlistItem = playlistResponse.items[j];
           var originalTitle = playlistItem.snippet.title;
@@ -463,7 +460,7 @@ function buildList()
 
           scheduled = true;
         }
-        uploadsSheet.getRange("A2:P19000").sort({column: 4, ascending: false});
+        uploadsSheet.getDataRange().sort({column: 4, ascending: false});
         if (scheduled) break;
       }
       if (scheduled) break;
