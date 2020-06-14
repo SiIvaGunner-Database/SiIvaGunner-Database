@@ -155,7 +155,10 @@ function getUrlResponse(url, type)
         document.getElementById("template").innerHTML = response;
 
         if (response.indexOf("\n") != -1)
-          document.getElementById("thumbnail").innerHTML = "<img src=\"https://img.youtube.com/vi/" + id + "/maxresdefault.jpg\" alt=\"Thumbnail\">";
+        {
+          var thumbnailLink = "https://img.youtube.com/vi/" + id + "/maxresdefault.jpg";
+          document.getElementById("thumbnail").innerHTML = "<a target=\"_blank\" href=\"" + thumbnailLink + "\"><img src=\"" + thumbnailLink + "\" alt=\"Thumbnail\"></a>";
+        }
 
       } else if (type == "report")
         document.getElementById("response").innerHTML = response;

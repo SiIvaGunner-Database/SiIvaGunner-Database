@@ -42,12 +42,18 @@ function search(input)
     var description = data[0][5].replace(/NEWLINE/g, "\n");
     var videoStatus = data[0][6].toLowerCase();
 
-    status += "Video status: " +  videoStatus;
+    var wikiUrl = "https://siivagunner.fandom.com/wiki/" + format(videoTitle);
+    var archiveUrl = "https://web.archive.org/web/*/https://www.youtube.com/watch?v=" + videoId;
+
+    status += "Archive link: <a target=\"_blank\" href=\"" + archiveUrl + "\">Wayback Machine</a>";
+    status += "<br/>Upload date: " + uploadDate;
+    status += "<br/>Video length: " + length;
+    status += "<br/>Video status: " + videoStatus;
 
     if (wikiStatus == "No")
-      status += "\nWiki status: documented";
+      status += "<br/>Wiki status: <a target=\"_blank\" href=\"" + wikiUrl + "\">documented</a>";
     else
-      status += "\nWiki status: undocumented";
+      status += "<br/>Wiki status: <a target=\"_blank\" href=\"" + wikiUrl + "\">undocumented</a>";
 
   } catch(e)
   {
@@ -56,4 +62,3 @@ function search(input)
 
   return [videoId, status, description].join("SEPARATOR");
 }
-Z

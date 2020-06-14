@@ -21,7 +21,11 @@
         <option value="none">No spacing</option>
       </select>
       <textarea readonly id="template"></textarea>
-      <div id="thumbnail"><img src="https://img.youtube.com/vi/NzoneDE0A2o/maxresdefault.jpg" alt="Thumbnail"></div>
+      <div id="thumbnail">
+        <a target="_blank" href="https://img.youtube.com/vi/NzoneDE0A2o/maxresdefault.jpg">
+          <img src="https://img.youtube.com/vi/NzoneDE0A2o/maxresdefault.jpg" alt="Thumbnail">
+        </a>
+      </div>
     </main>
     <?php include("footer.html"); ?>
   </body>

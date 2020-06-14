@@ -3,18 +3,23 @@ Skin: #ECBCA7
 Tie:  #104381
 Coat: #BBBBBB
 
-Light:#f8f8f8
-Dark: #999999
+
+Light: #F8F8F8
+Medium:#DDDDDD
+Dark:  #BBBBBB
+Hover: #999999
+Text:  #444444
 */
 
 html {
-  padding: 0 240px;
+  padding: 0 calc((100% - 1024px)/2);
   height: 100%;
 }
 
 body {
   margin: 0;
   height: 100%;
+  width: 1024px;
   display: flex;
   flex-flow: column;
   font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
@@ -41,7 +46,7 @@ nav li a {
   padding: 0 16px;
   text-align: center;
   text-decoration: none;
-  color: #f8f8f8;
+  color: #F8F8F8;
 }
 
 nav li a:hover {
@@ -55,8 +60,8 @@ nav li a:hover {
 main {
   padding: 16px;
   flex-grow: 1;
-  color: #999999;
-  background-color: #f8f8f8;
+  color: #444444;
+  background-color: #F8F8F8;
 }
 
 footer {
@@ -75,22 +80,21 @@ button {
 
 textarea {
   width: 100%;
+  color: #444444;
 }
 
 #video {
-  margin: 4px 4px 0 0;
+  margin: 4px 8px 0 0;
   float: left;
 }
 
 #videoInfo {
+  margin: 4px 0;
   float: left;
-  min-width: 426px;
-  max-width: calc(100% - 560px - 8px);
 }
 
 #videoDesc {
   clear: left;
-  max-width: 560px;
 }
 
 #template {
@@ -99,12 +103,21 @@ textarea {
 }
 
 #thumbnail img {
-   width: 320px;
-   height: 180px;
+  height: 180px;
+  width: 320px;
 }
 
 #searchContainer {
   padding-top: 2.4px;
+}
+
+.box {
+  margin: 0 0 6px 0;
+  padding: 4px;
+  width: auto;
+  background-color: #DDDDDD;
+  border: 1px solid #444444;
+  border-radius: 4px;
 }
 
 .searchBox {
@@ -112,35 +125,32 @@ textarea {
 }
 
 .searchBtn {
-  background-image: url("images/search.png");
-  background-repeat: no-repeat;
-  background-color: inherit;
-  background-size: 21px 22px;
   margin-left: 2px;
   float: left;
   height: 22px;
   width: 21px;
+  background-image: url("images/search.png");
+  background-repeat: no-repeat;
+  background-color: inherit;
+  background-size: 21px 22px;
   border: none;
 }
 
 @media only screen and (max-width: 1024px) {
   html {
-    padding: 0 120px;
+    padding: 0;
+  }
+
+  body {
+    width: auto;
   }
 
   iframe {
-    width: 426px;
     height: 240px;
-  }
-
-  #videoInfo {
-    max-width: calc(100% - 426px - 8px);
+    width: 426px;
   }
 }
 
 /* For mobile viewing */
 @media only all and (max-width: 768px) {
-  html {
-    padding: 0;
-  }
 }
