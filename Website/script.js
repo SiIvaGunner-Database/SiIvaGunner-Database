@@ -112,7 +112,7 @@ function report()
   var desc = document.getElementById("desc").value;
 
   if (id == "")
-    document.getElementById("response").innerHTML = "Please enter the title, URL, or ID that caused the problem.";
+    document.getElementById("loadStatus").innerHTML = "Please enter the title, URL, or ID that caused the problem.";
   else
   {
     var url = appUrl + "?type=report&page=" + page  + "&id=" + id + "&desc=" + desc;
@@ -122,6 +122,8 @@ function report()
 
 function getUrlResponse(url, type)
 {
+  document.getElementById("loadStatus").innerHTML = "Loading...";
+
   if (window.XMLHttpRequest)
     var xhttp = new XMLHttpRequest(); // For modern browsers
   else
@@ -161,7 +163,10 @@ function getUrlResponse(url, type)
         }
 
       } else if (type == "report")
-        document.getElementById("response").innerHTML = response;
+        document.getElementById("loadStatus").innerHTML = response;
+
+      if (type != "report")
+        document.getElementById("loadStatus").innerHTML = "";
     }
   }
 }

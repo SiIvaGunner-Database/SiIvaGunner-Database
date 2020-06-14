@@ -125,7 +125,7 @@ textarea {
 }
 
 .searchBtn {
-  margin-left: 2px;
+  margin: 0 4px;
   float: left;
   height: 22px;
   width: 21px;

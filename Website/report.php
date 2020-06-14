@@ -29,7 +29,7 @@
         <textarea id="desc" rows=10></textarea>
       </div>
       <button onclick="report()">Submit</button>
-      <p id="response"></p>
+      <p id="loadStatus"></p>
     </main>
     <?php include("footer.html"); ?>
   </body>

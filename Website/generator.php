@@ -12,6 +12,7 @@
       <input type="text" id="inputText" placeholder="Enter URL or ID"/>
       <button id="submitBtn" onclick="generateTemplate()">Submit</button>
       <button onclick="copyTemplate()">Copy</button>
+      <span id="loadStatus"></span>
       <br/>
       Preferred formatting:
       <select id="format">

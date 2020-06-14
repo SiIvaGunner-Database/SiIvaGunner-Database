@@ -18,6 +18,7 @@
         <input type="text" id="inputText" class="searchBox" placeholder="Search by title, URL, or ID"/>
         <button id="submitBtn" class="searchBtn" onclick="search()"></button>
       </div>
+      <span id="loadStatus"></span>
       <br/>
       <div id="video">
         <iframe id="videoEmbed" width="560px" height="315px" src="https://www.youtube.com/embed/NzoneDE0A2o" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
