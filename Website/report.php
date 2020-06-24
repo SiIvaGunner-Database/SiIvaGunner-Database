@@ -1,11 +1,6 @@
 <!doctype html>
 <html>
-  <head>
-    <title>SiIvaGunner Database</title>
-    <link rel="shortcut icon" type="image/png" href="images/favicon.png"/>
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <script src="script.js"></script>
-  </head>
+  <?php include("head.php"); ?>
   <body>
     <?php include("nav.html"); ?>
     <main>
