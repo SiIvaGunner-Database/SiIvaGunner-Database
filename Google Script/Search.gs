@@ -1,5 +1,7 @@
 function search(input)
 {
+  var channelSheet = spreadsheet.getSheetByName("SiIvaGunner");
+
   if (input == "")
     return "Please enter a video title, URL, or ID.";
   else if (input.length == 11)
@@ -13,26 +15,27 @@ function search(input)
   try
   {
     if (type == "videoTitle")
-      var values = uploadsSheet.getRange(2, 1, 20).getValues();
+      var values = channelSheet.getRange(2, 1, 20).getValues();
     else
-      var values = uploadsSheet.getRange(2, 3, 20).getValues();
+      var values = channelSheet.getRange(2, 3, 20).getValues();
 
     var row = values.findIndex(ids => {return ids[0] == input});
     if (row == -1)
     {
       if (type == "videoTitle")
-        var values = uploadsSheet.getRange(21, 1, uploadsSheet.getLastRow() - 20).getValues();
+        var values = channelSheet.getRange(21, 1, channelSheet.getLastRow() - 20).getValues();
       else
-        var values = uploadsSheet.getRange(21, 3, uploadsSheet.getLastRow() - 20).getValues();
+        var values = channelSheet.getRange(21, 3, channelSheet.getLastRow() - 20).getValues();
 
       var row = values.findIndex(ids => {return ids[0] == input});
 
       if (row == -1)
         return "Video not found.";
       else
-        var data = uploadsSheet.getRange(row + 21, 1, 1, 7).getValues();
-    } else
-      var data = uploadsSheet.getRange(row + 2, 1, 1, 7).getValues();
+        var data = channelSheet.getRange(row + 21, 1, 1, 7).getValues();
+    }
+    else
+      var data = channelSheet.getRange(row + 2, 1, 1, 7).getValues();
 
     var videoTitle = data[0][0];
     var wikiStatus = data[0][1];
@@ -54,8 +57,8 @@ function search(input)
       status += "<br/>Wiki status: <a target=\"_blank\" href=\"" + wikiUrl + "\">documented</a>";
     else
       status += "<br/>Wiki status: <a target=\"_blank\" href=\"" + wikiUrl + "\">undocumented</a>";
-
-  } catch(e)
+  }
+  catch(e)
   {
     return e;
   }

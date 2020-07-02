@@ -1,5 +1,7 @@
 function buildTemplate(videoId, format)
 {
+  var channelSheet = spreadsheet.getSheetByName("SiIvaGunner");
+
   if (videoId == "")
     return "Please enter a video URL or ID.";
   else if (videoId.length != 11)
@@ -33,8 +35,6 @@ function buildTemplate(videoId, format)
                                           type: 'video'
                                         });
 
-      Logger.log("oh no");
-
       results.items.forEach(function(item)
                             {
                               pageName = item.snippet.title.toString();
@@ -42,23 +42,23 @@ function buildTemplate(videoId, format)
                               uploadDate = item.snippet.publishedAt.toString();
                               length = item.contentDetails.duration.toString();
                             });
-
-    } catch(e)
+    }
+    catch(e)
     {
       // In case the YouTube API quota has been passed.
-      var values = uploadsSheet.getRange(2, 3, 20).getValues();
+      var values = channelSheet.getRange(2, 3, 20).getValues();
       var row = values.findIndex(ids => {return ids[0] == videoId});
       if (row == -1)
       {
-        var values = uploadsSheet.getRange(21, 3, uploadsSheet.getLastRow() - 20).getValues();
+        var values = channelSheet.getRange(21, 3, channelSheet.getLastRow() - 20).getValues();
         var row = values.findIndex(ids => {return ids[0] == videoId});
 
         if (row == -1)
           return "Video not found.";
         else
-          var data = uploadsSheet.getRange(row + 21, 1, 1, 7).getValues();
-      } else
-        var data = uploadsSheet.getRange(row + 2, 1, 1, 7).getValues();
+          var data = channelSheet.getRange(row + 21, 1, 1, 7).getValues();
+      }
+      else var data = channelSheet.getRange(row + 2, 1, 1, 7).getValues();
 
       pageName = data[0][0];
       uploadDate = data[0][3];
@@ -145,7 +145,7 @@ function buildTemplate(videoId, format)
     length = length.replace("PT", "").replace("H", ":").replace("M", ":").replace("S", "");
 
     // Format the upload date.
-    uploadDate = Utilities.formatDate(new Date(uploadDate), "GMT-5", "MMMM d, yyyy");
+    uploadDate = Utilities.formatDate(new Date(uploadDate), "UTC", "MMMM d, yyyy");
 
     // Seperate the rip title into four parts: full title, song title, game title, and mix.
     pageName = pageName.split(" - ");
@@ -202,8 +202,8 @@ function buildTemplate(videoId, format)
       val = val.replace(/\t\t= |\t= /g, " = ");
     else if (format == "none")
       val = val.replace(/\t\t= |\t= /g, "=");
-
-  } catch(e)
+  }
+  catch(e)
   {
     return e;
   }

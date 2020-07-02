@@ -1,3 +1,5 @@
+var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+
 function doGet(e)
 {
   if (e.parameters.type.toString() == "search")

@@ -1,9 +1,9 @@
 function fileReport(page, id, desc)
 {
   var date = new Date();
-
-  var reportsSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Reports");
-  var row = reportsSheet.getRange("G1").getValue() + 2;
+  var reportsSheet = SpreadsheetApp.openById("1MYZFZyRzmKjyDzC9vOArkoTfXIc5aQmYcErAI4gE1bA").getSheetByName("Reports");
+  if (reportsSheet.getLastRow() != 1) reportsSheet.insertRowAfter(reportsSheet.getLastRow());
+  var row = reportsSheet.getLastRow() + 1;
 
   try
   {
@@ -12,6 +12,13 @@ function fileReport(page, id, desc)
     reportsSheet.getRange(row, 3).setValue(id);
     reportsSheet.getRange(row, 4).setValue(desc);
 
+    var emailAddress = "a.k.zamboni@gmail.com";
+    var subject = "New Report";
+    var message = "Date:       " + date + "\nPage:      " + page + "\nInput:      " + id + "\nProblem: " + desc;
+
+    MailApp.sendEmail(emailAddress, subject, message);
+
     return "Your response has been recorded.";
-  } catch (e) { return e; }
+  }
+  catch (e) { return e; }
 }
