@@ -1,4 +1,4 @@
-function search(input)
+function searchSheet(input)
 {
   var channelSheet = spreadsheet.getSheetByName("SiIvaGunner");
 
@@ -45,7 +45,7 @@ function search(input)
     var description = data[0][5].replace(/NEWLINE/g, "\n");
     var videoStatus = data[0][6].toLowerCase();
 
-    var wikiUrl = "https://siivagunner.fandom.com/wiki/" + format(videoTitle);
+    var wikiUrl = "https://siivagunner.fandom.com/wiki/" + formatWikiLink(videoTitle);
     var archiveUrl = "https://web.archive.org/web/*/https://www.youtube.com/watch?v=" + videoId;
 
     status += "Archive link: <a target=\"_blank\" href=\"" + archiveUrl + "\">Wayback Machine</a>";

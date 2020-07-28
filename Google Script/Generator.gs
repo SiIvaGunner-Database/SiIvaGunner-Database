@@ -1,4 +1,4 @@
-function buildTemplate(videoId, format)
+function generateTemplate(videoId, format)
 {
   var channelSheet = spreadsheet.getSheetByName("SiIvaGunner");
 

@@ -1,5 +1,5 @@
 // Update rip values and add missing rips.
-function updateList()
+function checkSheet()
 {
   var startTime = new Date();
   var currentDate = startTime.getDate();
@@ -64,7 +64,7 @@ function updateList()
   if (channel == "siiva" || channel == "ttgd")
   {
     for (var i = 2; i < 21; i++)
-      updateWikiStatus(i);
+      checkWikiStatus(i);
   }
 
   while (ready)
@@ -79,11 +79,11 @@ function updateList()
     else row++;
 
     if (taskId == 0)
-      updateWikiStatus(row);
+      checkWikiStatus(row);
     else if (taskId == 1)
-      updateVideoStatus(row);
+      checkVideoStatus(row);
     else if (taskId == 2)
-      updateDescTitleStatus(row);
+      checkDescTitleStatus(row);
 
     var currentTime = new Date();
     var currentTimeUtc = Utilities.formatDate(new Date(), "UTC", "MM/dd/yy HH:mm:ss");
@@ -112,7 +112,7 @@ function updateList()
     channelSheet.getDataRange().sort({column: 4, ascending: false});
     var mostRecent = channelSheet.getRange("D2").getValue();
     var row = channelSheet.getLastRow() + 1;
-    var newRipCount = 0;
+    var newVideoCount = 0;
     var results = YouTube.Channels.list('contentDetails', {id: channelId});
 
     Logger.log("Most recent upload date: " + mostRecent);
@@ -137,7 +137,7 @@ function updateList()
           if (publishDate > mostRecent)
           {
             var originalTitle = playlistItem.snippet.title;
-            var encodedTitle = format(originalTitle);
+            var encodedTitle = formatWikiLink(originalTitle);
             var url = wikiUrl + encodedTitle;
             var id = playlistItem.snippet.resourceId.videoId;
             var description = playlistItem.snippet.description.toString().replace(/\r/g, "").replace(/\n/g, "NEWLINE");
@@ -160,7 +160,7 @@ function updateList()
 
             Logger.log("Row " + row + ": " + originalTitle + " - " + publishDate);
             row++;
-            newRipCount++;
+            newVideoCount++;
             pageRipCount++;
           }
         }
@@ -178,17 +178,17 @@ function updateList()
     {
       var lastUpdatedRow = summaryRow - taskId + i;
       var lastUpdatedRowVal = summarySheet.getRange(lastUpdatedRow, 5).getValue();
-      summarySheet.getRange(lastUpdatedRow, 5).setValue(lastUpdatedRowVal + newRipCount);
+      summarySheet.getRange(lastUpdatedRow, 5).setValue(lastUpdatedRowVal + newVideoCount);
     }
 
-    Logger.log("New rips: " + newRipCount);
+    Logger.log("New rips: " + newVideoCount);
     channelSheet.getDataRange().sort({column: 4, ascending: false});
 
     // Archive all new videos
     /*
-    if (newRipCount < 3)
+    if (newVideoCount < 3)
     {
-      for (var i = 2; i < newRipCount + 2; i++)
+      for (var i = 2; i < newVideoCount + 2; i++)
       {
         Logger.log("Start archiving row " + i);
         var archiveUrl = "https://web.archive.org/save/https://www.youtube.com/watch?v=" + channelSheet.getRange(i, 3).getValue();
@@ -212,10 +212,10 @@ function updateList()
     //*/
   }
 
-  function updateWikiStatus(row)
+  function checkWikiStatus(row)
   {
     var originalTitle = channelSheet.getRange(row, 1).getValue();
-    var encodedTitle = format(originalTitle);
+    var encodedTitle = formatWikiLink(originalTitle);
     var url = wikiUrl + encodedTitle;
     var oldStatus = channelSheet.getRange(row, 2).getValue();
     var id = channelSheet.getRange(row, 3).getValue();
@@ -272,7 +272,7 @@ function updateList()
     Logger.log("Row " + row + ": " + originalTitle + " (" + oldStatus + ", " + newStatus + ")");
   }
 
-  function updateVideoStatus(row)
+  function checkVideoStatus(row)
   {
     var title = channelSheet.getRange(row, 1).getValue();
     var vidId = channelSheet.getRange(row, 3).getValue();
@@ -316,7 +316,7 @@ function updateList()
     Logger.log("Row " + row + ": " + title + " (" + response + ")");
   }
 
-  function updateDescTitleStatus(row)
+  function checkDescTitleStatus(row)
   {
     var sheetTitle = channelSheet.getRange(row, 1).getValue();
     var videoStatus = channelSheet.getRange(row, 7).getValue();
@@ -348,7 +348,7 @@ function updateList()
       if (sheetTitle != vidTitle)
       {
         change = true;
-        var url = "[" + wikiUrl + format(sheetTitle) + "]\n[" + wikiUrl + format(vidTitle) + "]";
+        var url = "[" + wikiUrl + formatWikiLink(sheetTitle) + "]\n[" + wikiUrl + formatWikiLink(vidTitle) + "]";
         var wikiHyperlink = '=HYPERLINK("' + url + '", "' + vidTitle.replace(/"/g, '""') +'")';
         channelSheet.getRange(row, 1).setFormula(wikiHyperlink);
         errorLog.push(url + "\nOLD TITLE:\n" + sheetTitle + "\nNEW TITLE:\n" + vidTitle);
@@ -357,7 +357,7 @@ function updateList()
       if (sheetDesc != vidDesc)
       {
         change = true;
-        var url = "[" + wikiUrl + format(vidTitle) + "]";
+        var url = "[" + wikiUrl + formatWikiLink(vidTitle) + "]";
         channelSheet.getRange(row, 6).setValue(vidDesc);
         errorLog.push(url + "\nOLD DESCRIPTION:\n" + sheetDesc + "\nNEW DESCRIPTION:\n" + vidDesc);
       }
@@ -366,16 +366,16 @@ function updateList()
   }
 }
 
-function updateListTrigger()
+function checkSheetTrigger()
 {
-  ScriptApp.newTrigger("updateList")
+  ScriptApp.newTrigger("checkSheet")
   .timeBased()
   .everyMinutes(30)
   .create();
 }
 
 // Checks to see if any public uploaded rips are missing from the spreadsheet.
-function checkList()
+function checkPublicVideos()
 {
   var channelSheet = spreadsheet.getSheetByName("SiIvaGunner");
   var channelId = "UC9ecwl3FTG66jIKA9JRDtmg";
@@ -424,7 +424,7 @@ function checkList()
                                 var publishDate = item.snippet.publishedAt.replace(/.000Z/g, "Z");
                                 var length = item.contentDetails.duration.toString();
                                 var originalTitle = item.snippet.title;
-                                var encodedTitle = format(originalTitle);
+                                var encodedTitle = formatWikiLink(originalTitle);
                                 var url = "https://siivagunner.fandom.com/wiki/" + encodedTitle;
                                 var wikiHyperlink = '=HYPERLINK("' + url + '", "' + originalTitle.replace(/"/g, '""') +'")';
                                 var videoHyperlink = '=HYPERLINK("https://www.youtube.com/watch?v=' + channelVideoIds[i] + '", "' + channelVideoIds[i] + '")';
@@ -450,7 +450,7 @@ function checkList()
 }
 
 // Checks to see if any deleted, privated, or unlisted rips are missing from the spreadsheet.
-function checkWiki()
+function checkRemovedVideos()
 {
   var channelSheet = spreadsheet.getSheetByName("SiIvaGunner");
   var lastRow = channelSheet.getLastRow();
@@ -524,7 +524,7 @@ function checkWiki()
   }
 }
 
-function checkPlaylist()
+function checkPlaylistVideos()
 {
   var channelSheet = spreadsheet.getSheetByName("SiIvaGunner");
   var playlistId = "PLn8P5M1uNQk4_1_eaMchQE5rBpaa064ni";
@@ -581,25 +581,12 @@ function checkPlaylist()
   }
 }
 
-function format(str)
-{
-  str = str.replace(/\[/g, '(');
-  str = str.replace(/\]/g, ')');
-  str = str.replace(/\{/g, '(');
-  str = str.replace(/\}/g, ')');
-  str = str.replace(/#/g, '');
-  str = str.replace(/\​\|\​_/g, 'L');
-  str = str.replace(/\|/g, '∣');
-  str = str.replace(/Nigga/g, 'N----');
-  return encodeURIComponent(str);
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////// THE FOLLOWING CODE IS OUTDATED. UPDATE TO CURRENT STANDARDS BEFORE USING //////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Builds a spreadsheet with basic information for every SiIvaGunner video.
-function buildList()
+function buildSheet()
 {
   var startTime = new Date();
   var mostRecent = channelSheet.getRange("D2").getValue();
@@ -625,7 +612,7 @@ function buildList()
         {
           var playlistItem = playlistResponse.items[j];
           var originalTitle = playlistItem.snippet.title;
-          var encodedTitle = format(originalTitle);
+          var encodedTitle = formatWikiLink(originalTitle);
           var id = playlistItem.snippet.resourceId.videoId;
           var publishDate = playlistItem.snippet.publishedAt;
           var url = wikiUrl + encodedTitle;
@@ -653,7 +640,7 @@ function buildList()
           for (var i = 0; i < allTriggers.length; i++)
             ScriptApp.deleteTrigger(allTriggers[i]);
 
-          ScriptApp.newTrigger("buildList")
+          ScriptApp.newTrigger("buildSheet")
           .timeBased()
           .after(10 * 60 * 500) // 5 minutes
           .create();

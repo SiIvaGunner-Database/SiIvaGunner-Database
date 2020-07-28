@@ -1,4 +1,4 @@
-function fileReport(page, id, desc)
+function reportIssue(page, id, desc)
 {
   var date = new Date();
   var reportsSheet = SpreadsheetApp.openById("1MYZFZyRzmKjyDzC9vOArkoTfXIc5aQmYcErAI4gE1bA").getSheetByName("Reports");
