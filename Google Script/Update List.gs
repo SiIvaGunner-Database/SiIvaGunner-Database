@@ -18,6 +18,8 @@ function updateList()
   else if ((currentDate % 3 == 0 || currentHour == 0) && currentMinute >= 30)
     channel = "ttgd";
 
+  Logger.log("Channel: " + channel);
+
   if (channel == "siiva")
   {
     var channelSheet = spreadsheet.getSheetByName("SiIvaGunner");
@@ -53,11 +55,9 @@ function updateList()
   else if (currentHour >= 21)
     taskId = 1;
 
+  Logger.log("Task id: " + taskId);
   summaryRow += taskId;
-
-  channelSheet.getDataRange().sort({column: 4, ascending: false});
   addNewVideos();
-  channelSheet.getDataRange().sort({column: 4, ascending: false});
 
   var row = summarySheet.getRange(summaryRow, 5).getValue();
 
@@ -71,7 +71,7 @@ function updateList()
   {
     if (row >= channelSheet.getLastRow())
     {
-      if (taskid == 0  && (channel == "siiva" || channel == "ttgd"))
+      if (taskId == 0  && (channel == "siiva" || channel == "ttgd"))
         row = 22;
       else
         row = 2;
@@ -109,6 +109,7 @@ function updateList()
   // Add new rips to list.
   function addNewVideos()
   {
+    channelSheet.getDataRange().sort({column: 4, ascending: false});
     var mostRecent = channelSheet.getRange("D2").getValue();
     var row = channelSheet.getLastRow() + 1;
     var newRipCount = 0;
@@ -179,7 +180,36 @@ function updateList()
       var lastUpdatedRowVal = summarySheet.getRange(lastUpdatedRow, 5).getValue();
       summarySheet.getRange(lastUpdatedRow, 5).setValue(lastUpdatedRowVal + newRipCount);
     }
+
     Logger.log("New rips: " + newRipCount);
+    channelSheet.getDataRange().sort({column: 4, ascending: false});
+
+    // Archive all new videos
+    /*
+    if (newRipCount < 3)
+    {
+      for (var i = 2; i < newRipCount + 2; i++)
+      {
+        Logger.log("Start archiving row " + i);
+        var archiveUrl = "https://web.archive.org/save/https://www.youtube.com/watch?v=" + channelSheet.getRange(i, 3).getValue();
+        var ready = true;
+
+        while (ready)
+        {
+          try
+          {
+            var response = UrlFetchApp.fetch(archiveUrl);
+            ready = false;
+          }
+          catch(e)
+          {
+            Logger.log(e);
+          }
+        }
+        Logger.log("Finished archiving row " + i);
+      }
+    }
+    //*/
   }
 
   function updateWikiStatus(row)
@@ -206,7 +236,7 @@ function updateList()
         channelSheet.getRange(row, 1).setFormula('=HYPERLINK("' + url + '", "' + originalTitle.replace(/"/g, '""') +'")');
         channelSheet.getRange(row, 2).setValue("Yes");
       }
-      else if (e.indexOf("Address unavailable") == -1 && e.indexOf("501") == -1)
+      else if (e.indexOf("Address unavailable") == -1 && e.indexOf("Unexpected error") == -1)
       {
         Logger.log(e + "\n" + originalTitle + "\n" + url);
         errorLog.push(e + "\n[" + originalTitle + "]\n[" + url + "]");
@@ -319,8 +349,8 @@ function updateList()
       {
         change = true;
         var url = "[" + wikiUrl + format(sheetTitle) + "]\n[" + wikiUrl + format(vidTitle) + "]";
-        var urlRow = '=HYPERLINK("' + url + '", "' + vidTitle.replace(/"/g, '""') +'")';
-        channelSheet.getRange(row, 1).setFormula(urlRow);
+        var wikiHyperlink = '=HYPERLINK("' + url + '", "' + vidTitle.replace(/"/g, '""') +'")';
+        channelSheet.getRange(row, 1).setFormula(wikiHyperlink);
         errorLog.push(url + "\nOLD TITLE:\n" + sheetTitle + "\nNEW TITLE:\n" + vidTitle);
       }
 
@@ -336,26 +366,22 @@ function updateList()
   }
 }
 
-function format(str)
+function updateListTrigger()
 {
-  str = str.replace(/\[/g, '(');
-  str = str.replace(/\]/g, ')');
-  str = str.replace(/#/g, '');
-  str = str.replace(/\​\|\​_/g, 'L');
-  str = str.replace(/\|/g, '∣');
-  str = str.replace(/Nigga/g, 'N----');
-  return encodeURIComponent(str);
+  ScriptApp.newTrigger("updateList")
+  .timeBased()
+  .everyMinutes(30)
+  .create();
 }
 
-// Checks to see if any uploaded rips are missing from the spreadsheet.
-function checkForMissingRips()
+// Checks to see if any public uploaded rips are missing from the spreadsheet.
+function checkList()
 {
   var channelSheet = spreadsheet.getSheetByName("SiIvaGunner");
   var channelId = "UC9ecwl3FTG66jIKA9JRDtmg";
-  var range = "C2:C" + channelSheet.getLastRow();
-  var ripIds = channelSheet.getRange(range).getValues();
-  var vidIds = [];
-  var missingRips = [];
+  var channelVideoIds = [];
+  var missingVideoIds = [];
+  var sheetVideoIds = channelSheet.getRange(2, 3, channelSheet.getLastRow() - 1).getValues();
   var results = YouTube.Channels.list('contentDetails', {id: channelId});
 
   for (var i in results.items)
@@ -363,90 +389,149 @@ function checkForMissingRips()
     var item = results.items[i];
     var uploadsPlaylistId = item.contentDetails.relatedPlaylists.uploads;
     var nextPageToken = "";
-    var row = 1;
 
-    //for (var j = 0; j < 200; j++)
     while (nextPageToken != null)
     {
       var playlistResponse = YouTube.PlaylistItems.list('snippet', {playlistId: uploadsPlaylistId, maxResults: 50, pageToken: nextPageToken});
 
       for (var k = 0; k < playlistResponse.items.length; k++)
       {
-        vidIds.push(playlistResponse.items[k].snippet.resourceId.videoId);
+        channelVideoIds.push(playlistResponse.items[k].snippet.resourceId.videoId);
         nextPageToken = playlistResponse.nextPageToken;
       }
     }
   }
 
-  Logger.log("Video IDs: " + vidIds.length);
-  Logger.log("Sheet IDs: " + ripIds.length);
+  Logger.log("Sheet IDs: " + sheetVideoIds.length);
+  Logger.log("Video IDs: " + channelVideoIds.length);
 
-  for (var i in vidIds)
+  var lastRow = channelSheet.getLastRow();
+
+  for (var i in channelVideoIds)
   {
-    var missing = true;
-
-    for (var j in ripIds)
+    for (var k in sheetVideoIds)
     {
-      if (vidIds[i] == ripIds[j][0])
-      {
-        missing = false;
+      if (channelVideoIds[i] == sheetVideoIds[k][0])
         break;
+      else if (k == sheetVideoIds.length - 1)
+      {
+        Logger.log("Missing from sheet: " + channelVideoIds[i]);
+
+        var results = YouTube.Videos.list('snippet,contentDetails',{id: channelVideoIds[i], maxResults: 1, type: 'video'});
+
+        results.items.forEach(function(item)
+                              {
+                                var publishDate = item.snippet.publishedAt.replace(/.000Z/g, "Z");
+                                var length = item.contentDetails.duration.toString();
+                                var originalTitle = item.snippet.title;
+                                var encodedTitle = format(originalTitle);
+                                var url = "https://siivagunner.fandom.com/wiki/" + encodedTitle;
+                                var wikiHyperlink = '=HYPERLINK("' + url + '", "' + originalTitle.replace(/"/g, '""') +'")';
+                                var videoHyperlink = '=HYPERLINK("https://www.youtube.com/watch?v=' + channelVideoIds[i] + '", "' + channelVideoIds[i] + '")';
+                                var length = item.contentDetails.duration.toString();
+                                var description = item.snippet.description.toString().replace(/\r/g, "").replace(/\n/g, "NEWLINE");
+                                Logger.log(publishDate + "\n" + wikiHyperlink + "\n" + videoHyperlink + "\n" + publishDate + "\n" + length + "\n" + description);
+
+                                channelSheet.insertRowAfter(lastRow);
+                                lastRow++;
+
+                                channelSheet.getRange(lastRow, 1).setValue(wikiHyperlink);
+                                channelSheet.getRange(lastRow, 2).setValue("Unknown");
+                                channelSheet.getRange(lastRow, 3).setFormula(videoHyperlink);
+                                channelSheet.getRange(lastRow, 4).setValue(publishDate);
+                                channelSheet.getRange(lastRow, 5).setValue(length);
+                                channelSheet.getRange(lastRow, 6).setValue(description);
+                                channelSheet.getRange(lastRow, 7).setValue("Public");
+                              });
       }
     }
-
-    if (missing == true)
-      missingRips.push(vidIds[i]);
   }
-
-  Logger.log("Missing: " + missingRips);
-
-  for (var i in missingRips)
-  {
-    getVidDetails(missingRips[i])
-  }
+  channelSheet.getDataRange().sort({column: 4, ascending: false});
 }
 
-function getVidDetails(vidId)
+// Checks to see if any deleted, privated, or unlisted rips are missing from the spreadsheet.
+function checkWiki()
 {
-  //vidId = "VB3s9_k_fUI"; // unlisted
-  var channelId = "UC9ecwl3FTG66jIKA9JRDtmg";
-  var results = YouTube.Channels.list('contentDetails', {id: channelId});
+  var channelSheet = spreadsheet.getSheetByName("SiIvaGunner");
+  var lastRow = channelSheet.getLastRow();
+  var sheetVideoTitles = channelSheet.getRange(2, 1, channelSheet.getLastRow() - 1).getValues();
+  var removedVideoTitles = [""];
+  var categories = ["9/11 2016", "GiIvaSunner non-reuploaded", "Removed Green de la Bean rips", "Removed rips", "Unlisted rips", "Unlisted videos"];
 
-  for (var i in results.items)
+  for (var i in categories)
   {
-    var uploadsPlaylistId = results.items[i].contentDetails.relatedPlaylists.uploads;
-    var playlistResponse = YouTube.PlaylistItems.list('snippet,contentDetails', {playlistId: uploadsPlaylistId, videoId: vidId});
-    Logger.log(vidId + "\t" + playlistResponse.items.length);
+    var e = "";
+    var url = "https://siivagunner.fandom.com/api.php?";
+    var params = {
+      action: "query",
+      list: "categorymembers",
+      cmtitle: "Category:" + encodeURIComponent(categories[i]),
+      cmtpye: "title",
+      cmlimit: "500",
+      format: "json"
+    };
 
-    for (var j = 0; j < playlistResponse.items.length; j++)
+    Object.keys(params).forEach(function(key) {url += "&" + key + "=" + params[key];});
+
+    while (e.indexOf("404") == -1)
     {
-      var publishDate = playlistResponse.items[j].snippet.publishedAt.replace(/.000Z/g, "Z");
-      var results = YouTube.Videos.list('snippet,contentDetails', {id: vidId, maxResults: 1, type: 'video'});
+      try
+      {
+        var response = UrlFetchApp.fetch(url);
+        var data = JSON.parse(response.getContentText());
+        var categoryMembers = data.query.categorymembers;
 
-      results.items.forEach(function(item)
-                            {
-                              var originalTitle = item.snippet.title;
-                              var encodedTitle = format(originalTitle);
-                              var url = wikiUrl + encodedTitle;
-                              var urlRow = '=HYPERLINK("' + url + '", "' + originalTitle.replace(/"/g, '""') +'")';
-                              var nameRow = '=HYPERLINK("https://www.youtube.com/watch?v=' + vidId + '", "' + vidId + '")';
-                              var length = item.contentDetails.duration.toString();
-                              var description = item.snippet.description.toString().replace(/\r/g, "").replace(/\n/g, "NEWLINE");
-                              Logger.log("\n" + urlRow + "\n" + nameRow + "\n" + publishDate + "\n" + length + "\n" + description);
-                            });
+        Logger.log("Working on " + categories[i] + " (" + categoryMembers.length + ")");
+
+        for (var k in categoryMembers)
+        {
+          for (var j in removedVideoTitles)
+          {
+            if (categoryMembers[k].title == removedVideoTitles[j])
+              break;
+            else if (j == removedVideoTitles.length - 1)
+            {
+              if (categoryMembers[k].title.indexOf("Category:") == -1)
+                removedVideoTitles.push(categoryMembers[k].title);
+            }
+          }
+        }
+
+        break;
+      }
+      catch(e)
+      {
+        Logger.log(e);
+      }
+    }
+  }
+
+  removedVideoTitles.shift();
+  Logger.log("There are " + removedVideoTitles.length + " removed rips.");
+
+  for (var i in removedVideoTitles)
+  {
+    for (var k in sheetVideoTitles)
+    {
+      if (removedVideoTitles[i] == sheetVideoTitles[k])
+      {
+        Logger.log("Not missing: " + removedVideoTitles[i]);
+        break;
+      }
+      else if (k == sheetVideoTitles.length - 1)
+        Logger.log("Yes missing: " + removedVideoTitles[i]);
     }
   }
 }
 
-function comparePlaylist()
+function checkPlaylist()
 {
   var channelSheet = spreadsheet.getSheetByName("SiIvaGunner");
   var playlistId = "PLn8P5M1uNQk4_1_eaMchQE5rBpaa064ni";
-  var plVideoNames = [];
-  var plVideos = [];
-  var sheetVideos = channelSheet.getRange(2, 3, channelSheet.getLastRow() - 1).getValues();
+  var plistVideoIds = [];
+  var sheetUndocIds = [];
+  var sheetVideoIds = channelSheet.getRange(2, 3, channelSheet.getLastRow() - 1).getValues();
   var sheetVideoVals = channelSheet.getRange(2, 2, channelSheet.getLastRow() - 1).getValues();
-  var undocumentedRips = [];
   var nextPageToken = "";
 
   while (nextPageToken != null)
@@ -455,40 +540,58 @@ function comparePlaylist()
 
     for (var i = 0; i < playlistResponse.items.length; i++)
     {
-      plVideoNames.push(playlistResponse.items[i].snippet.title);
-      plVideos.push(playlistResponse.items[i].snippet.resourceId.videoId);
+      plistVideoIds.push(playlistResponse.items[i].snippet.resourceId.videoId);
       nextPageToken = playlistResponse.nextPageToken;
     }
   }
 
-  for (var i in sheetVideos)
+  for (var i in sheetVideoIds)
   {
     if (sheetVideoVals[i][0] == "Yes")
-      undocumentedRips.push(sheetVideos[i][0]);
+      sheetUndocIds.push(sheetVideoIds[i][0]);
   }
 
-  Logger.log(undocumentedRips.length);
-  Logger.log(plVideos.length);
-  Logger.log(undocumentedRips);
-  Logger.log(plVideos);
+  Logger.log("Sheet length: " + sheetUndocIds.length);
+  Logger.log("Sheet length: " + sheetUndocIds);
+  Logger.log("Playlist IDs: " + plistVideoIds.length);
+  Logger.log("Playlist IDs: " + plistVideoIds);
 
-  // Currently not working
-  for (var i in undocumentedRips)
+  for (var i in plistVideoIds)
   {
-    for (var k in plVideos)
+    for (var k in sheetUndocIds)
     {
-      if (undocumentedRips[i] == plVideos[k])
+      if (plistVideoIds[i] == sheetUndocIds[k])
         break;
+      else if (k == sheetUndocIds.length - 1)
+        Logger.log("Missing from sheet: " + plistVideoIds[i]);
+    }
+  }
+
+  for (var i in sheetUndocIds)
+  {
+    for (var k in plistVideoIds)
+    {
+      if (sheetUndocIds[i] == plistVideoIds[k])
+        break;
+      else if (k == plistVideoIds.length - 1)
+      {
+        Logger.log("Missing from playlist: " + sheetUndocIds[i]);
+      }
     }
   }
 }
 
-function createTrigger()
+function format(str)
 {
-  ScriptApp.newTrigger("updateList")
-  .timeBased()
-  .everyMinutes(30)
-  .create();
+  str = str.replace(/\[/g, '(');
+  str = str.replace(/\]/g, ')');
+  str = str.replace(/\{/g, '(');
+  str = str.replace(/\}/g, ')');
+  str = str.replace(/#/g, '');
+  str = str.replace(/\​\|\​_/g, 'L');
+  str = str.replace(/\|/g, '∣');
+  str = str.replace(/Nigga/g, 'N----');
+  return encodeURIComponent(str);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
