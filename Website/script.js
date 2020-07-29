@@ -1,6 +1,8 @@
 var appUrl = "https://script.google.com/macros/s/AKfycbzm47208rTvNpu2pa-vhqdT53k9_F1l0j47nqlJOw/exec";
 var lastSelection = "single";
+
 document.onkeydown = checkKey;
+
 if (document.location.pathname.match("generator.php"))
 {
   document.onclick = checkSelection;
@@ -73,16 +75,20 @@ function checkSelection()
   }
 }
 
-function search()
+function searchSheet()
 {
-  var input = document.getElementById("inputText").value;
+  var input = document.getElementById("inputText").value.trim();
 
   if (input.length != 11 && input.indexOf(" ") == -1)
     input = input.replace("{\"\":\"", "").replace("\"}", "").replace("&feature=youtu.be", "").replace(/&.*/, "").replace(/h.*=/, "");
 
-  var url = appUrl + "?type=search&input=" + input;
-
-  getUrlResponse(url, "search");
+  if (input.length == 0)
+    document.getElementById("loadStatus").innerHTML = "Please enter a video title, URL, or ID. For example: \"The Inn - Fire Emblem\"";
+  else
+  {
+    var url = appUrl + "?type=search&input=" + input;
+    getUrlResponse(url, "search");
+  }
 }
 
 function copyTemplate()
@@ -98,20 +104,39 @@ function copyTemplate()
 function generateTemplate()
 {
   var format = document.getElementById("format").value;
-  var id = document.getElementById("inputText").value;
-  id = id.replace("{\"\":\"", "").replace("\"}", "").replace("&feature=youtu.be", "").replace(/&.*/, "").replace(/h.*=/, "");
-  var url = appUrl + "?type=template&format=" + format + "&id=" + id;
+  var input = document.getElementById("inputText").value.trim();
 
-  getUrlResponse(url, "template");
+  if (input.length == 0)
+  {
+    document.getElementById("template").rows = 1;
+    document.getElementById("template").innerHTML = "Please enter a video URL or ID. For example: \"NzoneDE0A2o\"";
+    document.getElementById("thumbnail").innerHTML = "";
+  }
+  else
+  {
+    var id = input.replace("{\"\":\"", "").replace("\"}", "").replace("&feature=youtu.be", "").replace(/&.*/, "").replace(/h.*=/, "");
+
+    if (id.length != 11)
+    {
+      document.getElementById("template").rows = 1;
+      document.getElementById("template").innerHTML = "Invalid video URL or ID: \"" + input + "\"";
+      document.getElementById("thumbnail").innerHTML = "";
+    }
+    else
+    {
+      var url = appUrl + "?type=template&format=" + format + "&id=" + id;
+      getUrlResponse(url, "template");
+    }
+  }
 }
 
-function report()
+function reportIssue()
 {
   var page = document.getElementById("page").value;
-  var id = document.getElementById("id").value;
-  var desc = document.getElementById("desc").value;
+  var id = document.getElementById("id").value.trim();
+  var desc = document.getElementById("desc").value.trim();
 
-  if (id == "")
+  if (id.length == 0)
     document.getElementById("loadStatus").innerHTML = "Please enter the title, URL, or ID that caused the problem.";
   else
   {
@@ -145,10 +170,11 @@ function getUrlResponse(url, type)
           document.getElementById("videoEmbed").src = "https://www.youtube.com/embed/" + response[0];
           document.getElementById("videoInfo").innerHTML = response[1];
           document.getElementById("videoDesc").innerHTML = response[2];
-        } else
+        }
+        else
           alert(response);
-
-      } else if (type == "template")
+      }
+      else if (type == "template")
       {
         var id = url.split("id=").pop();
         var lineCount = response.split(/\n/).length + 1;
@@ -161,8 +187,8 @@ function getUrlResponse(url, type)
           var thumbnailLink = "https://img.youtube.com/vi/" + id + "/maxresdefault.jpg";
           document.getElementById("thumbnail").innerHTML = "<a target=\"_blank\" href=\"" + thumbnailLink + "\"><img src=\"" + thumbnailLink + "\" alt=\"Thumbnail\"></a>";
         }
-
-      } else if (type == "report")
+      }
+      else if (type == "report")
         document.getElementById("loadStatus").innerHTML = response;
 
       if (type != "report")

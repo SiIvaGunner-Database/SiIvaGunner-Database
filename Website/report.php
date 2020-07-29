@@ -23,7 +23,7 @@
         <label>Optionally, please describe the problem you encountered.</label>
         <textarea id="desc" rows=10></textarea>
       </div>
-      <button onclick="report()">Submit</button>
+      <button onclick="reportIssue()">Submit</button>
       <p id="loadStatus"></p>
     </main>
     <?php include("footer.html"); ?>

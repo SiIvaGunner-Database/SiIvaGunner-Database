@@ -11,7 +11,7 @@
       </p>
       <div id="searchContainer">
         <input type="text" id="inputText" class="searchBox" placeholder="Search by title, URL, or ID"/>
-        <button id="submitBtn" class="searchBtn" onclick="search()"></button>
+        <button id="submitBtn" class="searchBtn" onclick="searchSheet()"></button>
       </div>
       <span id="loadStatus"></span>
       <br/>

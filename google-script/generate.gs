@@ -1,12 +1,6 @@
 function generateTemplate(videoId, format)
 {
   var channelSheet = spreadsheet.getSheetByName("SiIvaGunner");
-
-  if (videoId == "")
-    return "Please enter a video URL or ID.";
-  else if (videoId.length != 11)
-    return "Invalid video URL or ID: " + videoId;
-
   var playlistId = "";
   var uploadDate = "";
   var length = "";

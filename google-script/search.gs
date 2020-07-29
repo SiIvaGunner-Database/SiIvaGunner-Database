@@ -2,9 +2,7 @@ function searchSheet(input)
 {
   var channelSheet = spreadsheet.getSheetByName("SiIvaGunner");
 
-  if (input == "")
-    return "Please enter a video title, URL, or ID.";
-  else if (input.length == 11)
+  if (input.length == 11)
     var type = "videoId";
   else
     var type = "videoTitle";
