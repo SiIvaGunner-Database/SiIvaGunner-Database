@@ -1,5 +1,7 @@
 function searchSheet(input)
 {
+  return "Searching is still being worked on. Apologies for the inconvenience.";
+
   var channelSheet = spreadsheet.getSheetByName("SiIvaGunner");
 
   if (input.length == 11)

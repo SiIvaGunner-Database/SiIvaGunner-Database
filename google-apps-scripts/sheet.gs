@@ -7,76 +7,64 @@ function checkSheet()
   var currentMinute = startTime.getMinutes();
   var summarySheet = spreadsheet.getSheetByName("Summary");
   var errorLog = [];
-  var channel = "siiva";
+  var changelog = [];
+  var channel = "SiIvaGunner";
   var taskId = 0;
   var ready = true;
 
   if (currentDate == 1 && currentHour >= 20 && currentMinute >= 30)
-    channel = "ff";
+    channel = "Flustered Fernando";
   else if (currentDate % 14 == 0 && currentMinute >= 30)
-    channel = "vavr";
+    channel = "VvvvvaVvvvvvr";
   else if ((currentDate % 3 == 0 || currentHour == 0) && currentMinute >= 30)
-    channel = "ttgd";
+    channel = "TimmyTurnersGrandDad";
 
   Logger.log("Channel: " + channel);
 
-  if (channel == "siiva")
+  switch(channel)
   {
-    var channelSheet = spreadsheet.getSheetByName("SiIvaGunner");
-    var channelId = "UC9ecwl3FTG66jIKA9JRDtmg";
-    var playlistId = "PLn8P5M1uNQk4_1_eaMchQE5rBpaa064ni";
-    var wikiUrl = "https://siivagunner.fandom.com/wiki/";
-    var summaryRow = 2;
+    case "SiIvaGunner":
+      var channelId = "UC9ecwl3FTG66jIKA9JRDtmg";
+      var playlistId = "PLn8P5M1uNQk4_1_eaMchQE5rBpaa064ni";
+      var wikiUrl = "https://siivagunner.fandom.com/wiki/";
+      var summaryRow = 2;
+      break;
+    case "TimmyTurnersGrandDad":
+      var channelId = "UCIXM2qZRG9o4AFmEsKZUIvQ";
+      var wikiUrl = "https://ttgd.fandom.com/wiki/";
+      var summaryRow = 9;
+      break;
+    case "VvvvvaVvvvvvr":
+      var channelId = "UCCPGE1kAoonfPsbieW41ZZA";
+      var wikiUrl = "https://vvvvvavvvvvr.fandom.com/wiki/";
+      var summaryRow = 16;
+      break;
+    case "Flustered Fernando":
+      var channelId = "UC8Q9CaWvV5_x90Z9VZ5cxmg";
+      var wikiUrl = "https://flustered-fernando.fandom.com/wiki/";
+      var summaryRow = 23;
   }
-  else if (channel == "ttgd")
-  {
-    var channelSheet = spreadsheet.getSheetByName("TimmyTurnersGrandDad");
-    var channelId = "UCIXM2qZRG9o4AFmEsKZUIvQ";
-    var wikiUrl = "https://ttgd.fandom.com/wiki/";
-    var summaryRow = 9;
-  }
-  else if (channel == "vavr")
-  {
-    var channelSheet = spreadsheet.getSheetByName("VvvvvaVvvvvvr");
-    var channelId = "UCCPGE1kAoonfPsbieW41ZZA";
-    var wikiUrl = "https://vvvvvavvvvvr.fandom.com/wiki/";
-    var summaryRow = 16;
-  }
-  else if (channel == "ff")
-  {
-    var channelSheet = spreadsheet.getSheetByName("Flustered Fernando");
-    var channelId = "UC8Q9CaWvV5_x90Z9VZ5cxmg";
-    var wikiUrl = "https://flustered-fernando.fandom.com/wiki/";
-    var summaryRow = 23;
-  }
+
+  var channelSheet = spreadsheet.getSheetByName(channel);
 
   if (currentHour == 23)
     taskId = 2;
-  else if (currentHour >= 21)
+  else if (currentHour > 4)
     taskId = 1;
 
   Logger.log("Task id: " + taskId);
   summaryRow += taskId;
   addNewVideos();
+  checkNewArticles();
 
-  var row = summarySheet.getRange(summaryRow, 5).getValue();
-
-  if (channel == "siiva" || channel == "ttgd")
-  {
-    for (var i = 2; i < 21; i++)
-      checkWikiStatus(i);
-  }
+  var row = summarySheet.getRange(summaryRow, lastUpdatedRowCol).getValue();
 
   while (ready)
   {
     if (row >= channelSheet.getLastRow())
-    {
-      if (taskId == 0  && (channel == "siiva" || channel == "ttgd"))
-        row = 22;
-      else
-        row = 2;
-    }
-    else row++;
+      row = 2;
+    else
+      row++;
 
     if (taskId == 0)
       checkWikiStatus(row);
@@ -86,21 +74,36 @@ function checkSheet()
       checkDescTitleStatus(row);
 
     var currentTime = new Date();
-    var currentTimeUtc = Utilities.formatDate(new Date(), "UTC", "MM/dd/yy HH:mm:ss");
-    summarySheet.getRange(summaryRow, 5).setValue(row);
-    summarySheet.getRange(summaryRow, 6).setValue(currentTimeUtc);
+    summarySheet.getRange(summaryRow, lastUpdatedRowCol).setValue(row);
+    summarySheet.getRange(summaryRow, lastUpdatedTimeCol).setValue(currentTime);
 
-    // Check if the script timer has passed a specified time limit.
-    if (currentTime.getTime() - startTime.getTime() > (10 * 60 * 500)) // 5 minutes
+    // Check if the script timer has passed the 80 second time limit.
+    if (currentTime.getTime() - startTime.getTime() > 80000)
     {
       if (errorLog.length > 0)
       {
+        // Send an email notifying of any changes or errors.
         var emailAddress = "a.k.zamboni@gmail.com";
         var subject = "List of Uploads Alert";
         var message = "There are " + errorLog.length + " new alerts.\n\n" + errorLog.join("\n\n").replace(/NEWLINE/g, "\n");
 
         MailApp.sendEmail(emailAddress, subject, message);
         Logger.log("Email successfully sent.\n" + message);
+
+        // Update the changelog spreadsheet with any new changes.
+        Logger.log(changelog);
+        var changelogSpreadsheet = SpreadsheetApp.openById("1EKQq1K8Bd7hDlFMg1Y5G_a2tWk_FH39bgniUUBGlFKM");
+
+        for (var i in changelog)
+        {
+          var changelogSheet = changelogSpreadsheet.getSheetByName(changelog[i][0]);
+          changelogSheet.insertRowBefore(2);
+          changelogSheet.getRange(2, changelogSheet.getLastColumn() - 1).setValue(channel);
+          changelogSheet.getRange(2, changelogSheet.getLastColumn()).setValue(currentTime);
+
+          for (var k = 1; k < changelog[i].length; k++)
+            changelogSheet.getRange(2, parseInt(k)).setValue(changelog[i][k]);
+        }
       }
       ready = false;
     }
@@ -109,147 +112,168 @@ function checkSheet()
   // Add new rips to list.
   function addNewVideos()
   {
-    channelSheet.getDataRange().sort({column: 4, ascending: false});
-    var mostRecent = channelSheet.getRange("D2").getValue();
-    var row = channelSheet.getLastRow() + 1;
+    channelSheet.getDataRange().sort({column: videoUploadDateCol, ascending: false});
+    var recentIds = channelSheet.getRange(2, idCol, 20).getValues();
+    var lastRow = channelSheet.getLastRow();
     var newVideoCount = 0;
     var results = YouTube.Channels.list('contentDetails', {id: channelId});
-
-    Logger.log("Most recent upload date: " + mostRecent);
 
     for (var i in results.items)
     {
       var item = results.items[i];
       var uploadsPlaylistId = item.contentDetails.relatedPlaylists.uploads;
-      var nextPage = true;
       var nextPageToken = "";
 
-      while (nextPage)
+      while (nextPageToken != null)
       {
-        var playlistResponse = YouTube.PlaylistItems.list('snippet,contentDetails', {playlistId: uploadsPlaylistId, maxResults: 50, pageToken: nextPageToken});
+        var playlistResponse = YouTube.PlaylistItems.list('snippet', {playlistId: uploadsPlaylistId, maxResults: 10, pageToken: nextPageToken});
         var pageRipCount = 0;
 
         for (var j = 0; j < playlistResponse.items.length; j++)
         {
-          var playlistItem = playlistResponse.items[j];
-          var publishDate = playlistItem.snippet.publishedAt.replace(/.000Z/g, "Z");
+          var id = playlistResponse.items[j].snippet.resourceId.videoId;
+          var index = recentIds.findIndex(ids => {return ids[0] == id});
 
-          if (publishDate > mostRecent)
+          if (index == -1)
           {
-            var originalTitle = playlistItem.snippet.title;
-            var encodedTitle = formatWikiLink(originalTitle);
-            var url = wikiUrl + encodedTitle;
-            var id = playlistItem.snippet.resourceId.videoId;
-            var description = playlistItem.snippet.description.toString().replace(/\r/g, "").replace(/\n/g, "NEWLINE");
-
-            channelSheet.insertRowAfter(channelSheet.getLastRow());
-            channelSheet.getRange(row, 1).setValue(originalTitle);
-            channelSheet.getRange(row, 2).setValue("Unknown");
-            channelSheet.getRange(row, 3).setFormula('=HYPERLINK("https://www.youtube.com/watch?v=' + id + '", "' + id + '")');
-            channelSheet.getRange(row, 4).setValue(publishDate);
-            channelSheet.getRange(row, 6).setValue(description);
-            channelSheet.getRange(row, 7).setValue("Public");
-
-            var results = YouTube.Videos.list('contentDetails',{id: id, maxResults: 1, type: 'video'});
+            var results = YouTube.Videos.list('snippet,contentDetails,statistics',{id: id, maxResults: 1, type: 'video'});
 
             results.items.forEach(function(item)
                                   {
+                                    var channelId = item.snippet.channelId;
+                                    var title = item.snippet.title;
+                                    var uploadDate = formatDate(item.snippet.publishedAt);
                                     var length = item.contentDetails.duration.toString();
-                                    channelSheet.getRange(row, 5).setValue(length);
-                                  });
+                                    var description = item.snippet.description.toString().replace(/\r/g, "").replace(/\n/g, "NEWLINE");
+                                    var viewCount = item.statistics.viewCount;
+                                    var likeCount = item.statistics.likeCount;
+                                    var dislikeCount = item.statistics.dislikeCount;
+                                    var commentCount = item.statistics.commentCount;
 
-            Logger.log("Row " + row + ": " + originalTitle + " - " + publishDate);
-            row++;
-            newVideoCount++;
-            pageRipCount++;
+                                    channelSheet.insertRowAfter(lastRow);
+                                    lastRow++;
+                                    newVideoCount++;
+                                    pageRipCount++;
+
+                                    channelSheet.getRange(lastRow, idCol).setFormula(formatYouTubeHyperlink(id));
+                                    channelSheet.getRange(lastRow, titleCol).setFormula(formatWikiHyperlink(title, wikiUrl));
+                                    channelSheet.getRange(lastRow, wikiStatusCol).setValue("Undocumented");
+                                    channelSheet.getRange(lastRow, videoStatusCol).setValue("Public");
+                                    channelSheet.getRange(lastRow, videoUploadDateCol).setValue(uploadDate);
+                                    channelSheet.getRange(lastRow, videoLengthCol).setValue(length);
+                                    channelSheet.getRange(lastRow, videoDescriptionCol).setValue(description);
+                                    channelSheet.getRange(lastRow, videoViewsCol).setValue(viewCount);
+                                    channelSheet.getRange(lastRow, videoLikesCol).setValue(likeCount);
+                                    channelSheet.getRange(lastRow, videoDislikesCol).setValue(dislikeCount);
+                                    channelSheet.getRange(lastRow, videoCommentsCol).setValue(commentCount);
+
+                                    Logger.log("Row " + lastRow + ": " + title + " - " + uploadDate);
+
+                                    if (playlistId)
+                                    {
+                                      Logger.log("Add to playlist: " + title);
+                                      YouTube.PlaylistItems.insert({snippet: {playlistId: playlistId, resourceId: {kind: "youtube#video", videoId: id}}}, "snippet");
+                                    }
+                                  });
           }
         }
 
-        if (pageRipCount != 0)
-        {
-          nextPage = true;
+        // Fix this
+        if (pageRipCount == 0)
+          nextPageToken = null;
+        else
           nextPageToken = playlistResponse.nextPageToken;
-        }
-        else nextPage = false;
+
+        nextPageToken = null;
       }
     }
 
     for (var i = 0; i < 3; i++)
     {
       var lastUpdatedRow = summaryRow - taskId + i;
-      var lastUpdatedRowVal = summarySheet.getRange(lastUpdatedRow, 5).getValue();
-      summarySheet.getRange(lastUpdatedRow, 5).setValue(lastUpdatedRowVal + newVideoCount);
+      var lastUpdatedRowVal = summarySheet.getRange(lastUpdatedRow, lastUpdatedRowCol).getValue();
+      summarySheet.getRange(lastUpdatedRow, lastUpdatedRowCol).setValue(lastUpdatedRowVal + newVideoCount);
     }
 
     Logger.log("New rips: " + newVideoCount);
-    channelSheet.getDataRange().sort({column: 4, ascending: false});
+    channelSheet.getDataRange().sort({column: videoUploadDateCol, ascending: false});
+  }
 
-    // Archive all new videos
-    /*
-    if (newVideoCount < 3)
+  function checkNewArticles()
+  {
+    var channelSheet = spreadsheet.getSheetByName("SiIvaGunner");
+    var wikiUrl = "https://siivagunner.fandom.com/wiki/";
+    var playlistId = "PLn8P5M1uNQk4_1_eaMchQE5rBpaa064ni";
+
+    var sheetTitles = channelSheet.getRange(2, titleCol, channelSheet.getLastRow() - 1).getValues();
+    var url = wikiUrl + "Special:NewPages?limit=5";
+    var wikiTitles = [];
+    var errorLog = [];
+
+    var response = UrlFetchApp.fetch(url, {muteHttpExceptions: true}).getContentText();
+
+    while (response.indexOf("mw-newpages-pagename") != -1)
     {
-      for (var i = 2; i < newVideoCount + 2; i++)
-      {
-        Logger.log("Start archiving row " + i);
-        var archiveUrl = "https://web.archive.org/save/https://www.youtube.com/watch?v=" + channelSheet.getRange(i, 3).getValue();
-        var ready = true;
-
-        while (ready)
-        {
-          try
-          {
-            var response = UrlFetchApp.fetch(archiveUrl);
-            ready = false;
-          }
-          catch(e)
-          {
-            Logger.log(e);
-          }
-        }
-        Logger.log("Finished archiving row " + i);
-      }
+      var title = response.split("mw-newpages-pagename\">")[1].split("<")[0];
+      wikiTitles.push(title);
+      response = response.replace("mw-newpages-pagename", "");
     }
-    //*/
+
+    for (var i in wikiTitles)
+    {
+      var index = sheetTitles.findIndex(titles => {return formatWikiLink(titles[0]) == formatWikiLink(wikiTitles[i])});
+
+      if (index != -1)
+      {
+        var row = index + 2;
+        var originalStatus = channelSheet.getRange(row, wikiStatusCol).getValue();
+        var videoId = channelSheet.getRange(row, idCol).getValue();
+
+        Logger.log("Row " + row + ": " + wikiTitles[i] + " (" + originalStatus + ", Documented)")
+
+        if (originalStatus != "Documented")
+        {
+          Logger.log("Remove from playlist: " + wikiTitles[i]);
+
+          var videoResponse = YouTube.PlaylistItems.list('snippet', {playlistId: playlistId, videoId: videoId});
+          var deletionId = videoResponse.items[0].id;
+          YouTube.PlaylistItems.remove(deletionId);
+
+          channelSheet.getRange(row, wikiStatusCol).setValue("Documented");
+        }
+      }
+      else
+        Logger.log("Missing from sheet: " + wikiTitles[i]);
+    }
   }
 
   function checkWikiStatus(row)
   {
-    var originalTitle = channelSheet.getRange(row, 1).getValue();
-    var encodedTitle = formatWikiLink(originalTitle);
-    var url = wikiUrl + encodedTitle;
-    var oldStatus = channelSheet.getRange(row, 2).getValue();
-    var id = channelSheet.getRange(row, 3).getValue();
+    var title = channelSheet.getRange(row, titleCol).getValue();
+    var url = wikiUrl + formatWikiLink(title);
+    var oldStatus = channelSheet.getRange(row, wikiStatusCol).getValue();
+    var id = channelSheet.getRange(row, idCol).getValue();
+    var responseCode = UrlFetchApp.fetch(url, {muteHttpExceptions: true}).getResponseCode();
 
-    try
+    if (responseCode == 200 && oldStatus != "Documented")
+      channelSheet.getRange(row, wikiStatusCol).setValue("Documented");
+    else if (responseCode == 404 && oldStatus != "Undocumented")
+      channelSheet.getRange(row, wikiStatusCol).setValue("Undocumented");
+    else if (responseCode != 200 && responseCode != 404)
+      errorLog.push("Response code " + responseCode + "\n[" + title + "]\n[" + url + "]");
+
+    Logger.log("Row " + row + ": " + title + " (" + responseCode + ")");
+
+    var newStatus = channelSheet.getRange(row, wikiStatusCol).getValue();
+
+    if (oldStatus != newStatus && newStatus == "Undocumented") // The rip needs an article
+      errorLog.push(title + " was changed from documented to undocumented.\n[" + url + "]");
+
+    if (channel == "SiIvaGunner")
     {
-      var response = UrlFetchApp.fetch(url).getResponseCode();
-
-      channelSheet.getRange(row, 1).setFormula('=HYPERLINK("' + url + '", "' + originalTitle.replace(/"/g, '""') + '")');
-      channelSheet.getRange(row, 2).setValue("No");
-    }
-    catch (e)
-    {
-      e = e.toString().replace(/\n\n/g, "\n");
-
-      if (e.indexOf("404") != -1)
+      if (oldStatus == "Undocumented" && newStatus == "Documented") // The rip no longer needs an article
       {
-        channelSheet.getRange(row, 1).setFormula('=HYPERLINK("' + url + '", "' + originalTitle.replace(/"/g, '""') +'")');
-        channelSheet.getRange(row, 2).setValue("Yes");
-      }
-      else if (e.indexOf("Address unavailable") == -1 && e.indexOf("Unexpected error") == -1)
-      {
-        Logger.log(e + "\n" + originalTitle + "\n" + url);
-        errorLog.push(e + "\n[" + originalTitle + "]\n[" + url + "]");
-      }
-    }
-
-    var newStatus = channelSheet.getRange(row, 2).getValue();
-
-    if (channel == "siiva")
-    {
-      if (oldStatus == "Yes" && newStatus == "No") // The rip no longer needs an article
-      {
-        Logger.log("Remove from playlist: " + originalTitle);
+        Logger.log("Remove from playlist: " + title);
         try
         {
           var videoResponse = YouTube.PlaylistItems.list('snippet', {playlistId: playlistId, videoId: id});
@@ -259,83 +283,91 @@ function checkSheet()
         catch (e)
         {
           e = e.toString().replace(/\n\n/g, "\n");
-          Logger.log(e + "\n" + originalTitle + "\n" + url);
-          errorLog.push(e + "\n[" + originalTitle + "]\n[" + url + "]");
+          Logger.log(e + "\n" + title + "\n" + url);
+          errorLog.push(e + "\n[" + title + "]\n[" + url + "]");
         }
       }
-      else if (oldStatus != newStatus && newStatus == "Yes") // The rip needs an article
+      else if (oldStatus != newStatus && newStatus == "Undocumented") // The rip needs an article
       {
-        Logger.log("Add to playlist: " + originalTitle);
+        Logger.log("Add to playlist: " + title);
         YouTube.PlaylistItems.insert({snippet: {playlistId: playlistId, resourceId: {kind: "youtube#video", videoId: id}}}, "snippet");
       }
     }
-    Logger.log("Row " + row + ": " + originalTitle + " (" + oldStatus + ", " + newStatus + ")");
   }
 
   function checkVideoStatus(row)
   {
-    var title = channelSheet.getRange(row, 1).getValue();
-    var vidId = channelSheet.getRange(row, 3).getValue();
-    var currentStatus = channelSheet.getRange(row, 7).getValue();
+    var vidId = channelSheet.getRange(row, idCol).getValue();
+
+    if (vidId == "Unknown")
+      return;
+
+    var title = channelSheet.getRange(row, titleCol).getValue();
+    var currentStatus = channelSheet.getRange(row, videoStatusCol).getValue();
     var url = "https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v=" + vidId + "&format=json";
+    var responseCode = UrlFetchApp.fetch(url, {muteHttpExceptions: true}).getResponseCode();
 
-    try
+    Logger.log("Row " + row + ": " + title + " (" + responseCode + ")");
+
+    switch(responseCode)
     {
-      var response = UrlFetchApp.fetch(url).getResponseCode();
-      channelSheet.getRange(row, 7).setValue("Public");
-    }
-    catch (e)
-    {
-      e = e.toString().replace(/\n\n/g, "\n");
-      if (e.indexOf("404") != -1)
-      {
-        if (currentStatus != "Deleted")
-          errorLog.push(title + " has been deleted.");
-
-        channelSheet.getRange(row, 7).setValue("Deleted");
-      }
-      else if (e.indexOf("401") != -1)
-      {
-        if (currentStatus != "Private")
-          errorLog.push(title + " has been privated.");
-
-        channelSheet.getRange(row, 7).setValue("Private");
-      }
-      else
-      {
-        if (channelSheet.getRange(row, 7).getValue() == "")
-          channelSheet.getRange(row, 7).setValue("Unknown");
-
-        if (e.indexOf("Address unavailable") == -1)
+      case 200:
+        if (responseCode == 200 && currentStatus != "Public" && currentStatus != "Unlisted")
         {
-          Logger.log(e + "\n" + originalTitle + "\n" + url);
-          errorLog.push(e + "\n[" + originalTitle + "]\n[" + url + "]");
+          channelSheet.getRange(row, videoStatusCol).setValue("Public");
+          errorLog.push(title + " has been made public.");
+          changelog.push(["Statuses", formatYouTubeHyperlink(vidId), formatWikiHyperlink(title, wikiUrl), currentStatus, "Public"]);
         }
-      }
+        break;
+      case 401:
+        if (currentStatus != "Private")
+        {
+          channelSheet.getRange(row, videoStatusCol).setValue("Private");
+          errorLog.push(title + " has been privated.");
+          changelog.push(["Statuses", formatYouTubeHyperlink(vidId), formatWikiHyperlink(title, wikiUrl), currentStatus, "Private"]);
+        }
+        break;
+      case 404:
+        if (currentStatus != "Deleted")
+        {
+          channelSheet.getRange(row, videoStatusCol).setValue("Deleted");
+          errorLog.push(title + " has been deleted.");
+          changelog.push(["Statuses", formatYouTubeHyperlink(vidId), formatWikiHyperlink(title, wikiUrl), currentStatus, "Deleted"]);
+        }
+        break;
+      default:
+        errorLog.push("Response code " + responseCode + "\n[" + title + "]\n[" + url + "]");
     }
-    Logger.log("Row " + row + ": " + title + " (" + response + ")");
   }
 
   function checkDescTitleStatus(row)
   {
-    var sheetTitle = channelSheet.getRange(row, 1).getValue();
-    var videoStatus = channelSheet.getRange(row, 7).getValue();
+    var sheetTitle = channelSheet.getRange(row, titleCol).getValue();
+    var videoStatus = channelSheet.getRange(row, videoStatusCol).getValue();
 
     if (videoStatus == "Public" || videoStatus == "Normal")
     {
-      var sheetDesc = channelSheet.getRange(row, 6).getValue();
+      var sheetDesc = channelSheet.getRange(row, videoDescriptionCol).getValue();
       var vidTitle = "";
       var vidDesc = "";
-      var vidId = channelSheet.getRange(row, 3).getValue();
+      var vidId = channelSheet.getRange(row, idCol).getValue();
       var change = false;
 
       try
       {
-        var results = YouTube.Videos.list('snippet', {id: vidId, maxResults: 1, type: 'video'});
+        var results = YouTube.Videos.list('snippet,statistics', {id: vidId, maxResults: 1, type: 'video'});
         results.items.forEach(function(item)
                               {
                                 vidTitle = item.snippet.title;
                                 vidDesc = item.snippet.description.toString().replace(/\r/g, "").replace(/\n/g, "NEWLINE");
+                                var viewCount = item.statistics.viewCount;
+                                var likeCount = item.statistics.likeCount;
+                                var dislikeCount = item.statistics.dislikeCount;
+                                var commentCount = item.statistics.commentCount;
+                                channelSheet.getRange(row, videoViewsCol).setValue(viewCount);
+                                channelSheet.getRange(row, videoLikesCol).setValue(likeCount);
+                                channelSheet.getRange(row, videoDislikesCol).setValue(dislikeCount);
+                                channelSheet.getRange(row, videoCommentsCol).setValue(commentCount);
                               });
       }
       catch(e)
@@ -348,18 +380,18 @@ function checkSheet()
       if (sheetTitle != vidTitle)
       {
         change = true;
-        var url = "[" + wikiUrl + formatWikiLink(sheetTitle) + "]\n[" + wikiUrl + formatWikiLink(vidTitle) + "]";
-        var wikiHyperlink = '=HYPERLINK("' + url + '", "' + vidTitle.replace(/"/g, '""') +'")';
-        channelSheet.getRange(row, 1).setFormula(wikiHyperlink);
+        channelSheet.getRange(row, titleCol).setFormula(formatWikiHyperlink(vidTitle));
         errorLog.push(url + "\nOLD TITLE:\n" + sheetTitle + "\nNEW TITLE:\n" + vidTitle);
+        changelog.push(["Titles", formatYouTubeHyperlink(vidId), formatWikiHyperlink(sheetTitle, wikiUrl), formatWikiHyperlink(vidTitle, wikiUrl)]);
       }
 
       if (sheetDesc != vidDesc)
       {
         change = true;
         var url = "[" + wikiUrl + formatWikiLink(vidTitle) + "]";
-        channelSheet.getRange(row, 6).setValue(vidDesc);
+        channelSheet.getRange(row, videoDescriptionCol).setValue(vidDesc);
         errorLog.push(url + "\nOLD DESCRIPTION:\n" + sheetDesc + "\nNEW DESCRIPTION:\n" + vidDesc);
+        changelog.push(["Descriptions", formatYouTubeHyperlink(vidId), formatWikiHyperlink(vidTitle, wikiUrl), sheetDesc.replace(/NEWLINE/g, "\n"), vidDesc.replace(/NEWLINE/g, "\n")]);
       }
     }
     Logger.log("Row " + row + ": " + sheetTitle + " (" + change + ")");
@@ -370,97 +402,94 @@ function checkSheetTrigger()
 {
   ScriptApp.newTrigger("checkSheet")
   .timeBased()
-  .everyMinutes(30)
+  .everyMinutes(10)
   .create();
 }
 
 // Checks to see if any public uploaded rips are missing from the spreadsheet.
 function checkPublicVideos()
 {
-  var channelSheet = spreadsheet.getSheetByName("SiIvaGunner");
-  var channelId = "UC9ecwl3FTG66jIKA9JRDtmg";
-  var channelVideoIds = [];
-  var missingVideoIds = [];
-  var sheetVideoIds = channelSheet.getRange(2, 3, channelSheet.getLastRow() - 1).getValues();
-  var results = YouTube.Channels.list('contentDetails', {id: channelId});
+  var channels = [["SiIvaGunner", "UC9ecwl3FTG66jIKA9JRDtmg"],
+                  ["TimmyTurnersGrandDad", "UCIXM2qZRG9o4AFmEsKZUIvQ"],
+                  ["VvvvvaVvvvvvr", "UCCPGE1kAoonfPsbieW41ZZA"],
+                  ["Flustered Fernando", "UC8Q9CaWvV5_x90Z9VZ5cxmg"],
+                  ["SiIvaGunner2", "UCYGz7FZImRL8oI68pD7NoKg"],
+                  ["SiLvaGunner", "UCraDChjPs-r9FoNsmJufZZQ"]];
 
-  for (var i in results.items)
+  for (var i in channels)
   {
-    var item = results.items[i];
-    var uploadsPlaylistId = item.contentDetails.relatedPlaylists.uploads;
-    var nextPageToken = "";
+    Logger.log("Working on " + channels[i][0]);
 
-    while (nextPageToken != null)
+    var channelSheet = spreadsheet.getSheetByName(channels[i][0]);
+    var channelId = channels[i][1];
+    var channelVideoIds = [];
+    var missingVideoIds = [];
+    var sheetVideoIds = channelSheet.getRange(2, idCol, channelSheet.getLastRow() - 1).getValues();
+    var results = YouTube.Channels.list('contentDetails', {id: channelId});
+
+    for (var i in results.items)
     {
-      var playlistResponse = YouTube.PlaylistItems.list('snippet', {playlistId: uploadsPlaylistId, maxResults: 50, pageToken: nextPageToken});
+      var item = results.items[i];
+      var uploadsPlaylistId = item.contentDetails.relatedPlaylists.uploads;
+      var nextPageToken = "";
 
-      for (var k = 0; k < playlistResponse.items.length; k++)
+      while (nextPageToken != null)
       {
-        channelVideoIds.push(playlistResponse.items[k].snippet.resourceId.videoId);
+        var playlistResponse = YouTube.PlaylistItems.list('snippet', {playlistId: uploadsPlaylistId, maxResults: 50, pageToken: nextPageToken});
+
+        for (var k = 0; k < playlistResponse.items.length; k++)
+          channelVideoIds.push(playlistResponse.items[k].snippet.resourceId.videoId);
+
         nextPageToken = playlistResponse.nextPageToken;
       }
     }
-  }
 
-  Logger.log("Sheet IDs: " + sheetVideoIds.length);
-  Logger.log("Video IDs: " + channelVideoIds.length);
+    Logger.log("Sheet IDs: " + sheetVideoIds.length);
+    Logger.log("Video IDs: " + channelVideoIds.length);
 
-  var lastRow = channelSheet.getLastRow();
+    var lastRow = channelSheet.getLastRow();
 
-  for (var i in channelVideoIds)
-  {
-    for (var k in sheetVideoIds)
+    for (var k in channelVideoIds)
     {
-      if (channelVideoIds[i] == sheetVideoIds[k][0])
-        break;
-      else if (k == sheetVideoIds.length - 1)
-      {
-        Logger.log("Missing from sheet: " + channelVideoIds[i]);
+      var index = sheetVideoIds.findIndex(ids => {return ids[0] == channelVideoIds[k]});
 
-        var results = YouTube.Videos.list('snippet,contentDetails',{id: channelVideoIds[i], maxResults: 1, type: 'video'});
-
-        results.items.forEach(function(item)
-                              {
-                                var publishDate = item.snippet.publishedAt.replace(/.000Z/g, "Z");
-                                var length = item.contentDetails.duration.toString();
-                                var originalTitle = item.snippet.title;
-                                var encodedTitle = formatWikiLink(originalTitle);
-                                var url = "https://siivagunner.fandom.com/wiki/" + encodedTitle;
-                                var wikiHyperlink = '=HYPERLINK("' + url + '", "' + originalTitle.replace(/"/g, '""') +'")';
-                                var videoHyperlink = '=HYPERLINK("https://www.youtube.com/watch?v=' + channelVideoIds[i] + '", "' + channelVideoIds[i] + '")';
-                                var length = item.contentDetails.duration.toString();
-                                var description = item.snippet.description.toString().replace(/\r/g, "").replace(/\n/g, "NEWLINE");
-                                Logger.log(publishDate + "\n" + wikiHyperlink + "\n" + videoHyperlink + "\n" + publishDate + "\n" + length + "\n" + description);
-
-                                channelSheet.insertRowAfter(lastRow);
-                                lastRow++;
-
-                                channelSheet.getRange(lastRow, 1).setValue(wikiHyperlink);
-                                channelSheet.getRange(lastRow, 2).setValue("Unknown");
-                                channelSheet.getRange(lastRow, 3).setFormula(videoHyperlink);
-                                channelSheet.getRange(lastRow, 4).setValue(publishDate);
-                                channelSheet.getRange(lastRow, 5).setValue(length);
-                                channelSheet.getRange(lastRow, 6).setValue(description);
-                                channelSheet.getRange(lastRow, 7).setValue("Public");
-                              });
-      }
+      if (index == -1)
+        Logger.log("Missing from sheet: " + channelVideoIds[k]);
     }
   }
-  channelSheet.getDataRange().sort({column: 4, ascending: false});
 }
 
 // Checks to see if any deleted, privated, or unlisted rips are missing from the spreadsheet.
 function checkRemovedVideos()
 {
-  var channelSheet = spreadsheet.getSheetByName("SiIvaGunner");
-  var lastRow = channelSheet.getLastRow();
-  var sheetVideoTitles = channelSheet.getRange(2, 1, channelSheet.getLastRow() - 1).getValues();
+  var siivaSheet = spreadsheet.getSheetByName("SiIvaGunner");
+  var siiva2Sheet = spreadsheet.getSheetByName("SiIvaGunner2");
+  var giivaSheet = spreadsheet.getSheetByName("GiIvaSunner Reuploads");
+
+  var siivaVideoTitles = siivaSheet.getRange(2, titleCol, siivaSheet.getLastRow() - 1).getValues();
+  var siiva2VideoTitles = siiva2Sheet.getRange(2, titleCol, siiva2Sheet.getLastRow() - 1).getValues();
+  var giivaVideoTitles = giivaSheet.getRange(2, titleCol, giivaSheet.getLastRow() - 1).getValues();
+
+  Logger.log("There are " + siivaVideoTitles.length + " SiIvaGunner rips.");
+  Logger.log("There are " + siiva2VideoTitles.length + " SiIvaGunner2 rips.");
+  Logger.log("There are " + giivaVideoTitles.length + " GiIvaSunner rips.");
+
+  var sheetVideoTitles = [];
+
+  for (var i in siivaVideoTitles)
+    sheetVideoTitles.push(siivaVideoTitles[i][0]);
+
+  for (var i in siiva2VideoTitles)
+    sheetVideoTitles.push(siiva2VideoTitles[i][0]);
+
+  for (var i in giivaVideoTitles)
+    sheetVideoTitles.push(giivaVideoTitles[i][0]);
+
   var removedVideoTitles = [""];
-  var categories = ["9/11 2016", "GiIvaSunner non-reuploaded", "Removed Green de la Bean rips", "Removed rips", "Unlisted rips", "Unlisted videos"];
+  var categories = ["GiIvaSunner non-reuploaded", "GiIvaSunner reuploads", "9/11 2016", "Removed Green de la Bean rips", "Removed rips", "Unlisted rips", "Unlisted videos"];
 
   for (var i in categories)
   {
-    var e = "";
     var url = "https://siivagunner.fandom.com/api.php?";
     var params = {
       action: "query",
@@ -473,65 +502,55 @@ function checkRemovedVideos()
 
     Object.keys(params).forEach(function(key) {url += "&" + key + "=" + params[key];});
 
-    while (e.indexOf("404") == -1)
+    var response = UrlFetchApp.fetch(url, {muteHttpExceptions: true});
+    var data = JSON.parse(response.getContentText());
+    var categoryMembers = data.query.categorymembers;
+
+    Logger.log("Working on " + categories[i] + " (" + categoryMembers.length + ")");
+
+    for (var k in categoryMembers)
     {
-      try
-      {
-        var response = UrlFetchApp.fetch(url);
-        var data = JSON.parse(response.getContentText());
-        var categoryMembers = data.query.categorymembers;
+      var categoryMember = categoryMembers[k].title.replace(/ \(GiIvaSunner\)/g, "");
 
-        Logger.log("Working on " + categories[i] + " (" + categoryMembers.length + ")");
-
-        for (var k in categoryMembers)
-        {
-          for (var j in removedVideoTitles)
-          {
-            if (categoryMembers[k].title == removedVideoTitles[j])
-              break;
-            else if (j == removedVideoTitles.length - 1)
-            {
-              if (categoryMembers[k].title.indexOf("Category:") == -1)
-                removedVideoTitles.push(categoryMembers[k].title);
-            }
-          }
-        }
-
+      if (categoryMember.indexOf("Category:") != -1)
         break;
-      }
-      catch(e)
-      {
-        Logger.log(e);
-      }
+
+      var index = removedVideoTitles.findIndex(ids => {return ids == categoryMember});
+
+      if (index == -1)
+        removedVideoTitles.push(categoryMember);
     }
   }
 
   removedVideoTitles.shift();
   Logger.log("There are " + removedVideoTitles.length + " removed rips.");
 
+  var missingTitles = [];
+  var row = 1;
+
   for (var i in removedVideoTitles)
   {
-    for (var k in sheetVideoTitles)
-    {
-      if (removedVideoTitles[i] == sheetVideoTitles[k])
-      {
-        Logger.log("Not missing: " + removedVideoTitles[i]);
-        break;
-      }
-      else if (k == sheetVideoTitles.length - 1)
-        Logger.log("Yes missing: " + removedVideoTitles[i]);
-    }
+    var index = sheetVideoTitles.findIndex(ids => {return formatWikiLink(ids) == formatWikiLink(removedVideoTitles[i])});
+
+    if (index == -1)
+      missingTitles.push(removedVideoTitles[i]);
   }
+
+  Logger.log("There are " + missingTitles.length + " missing rips.");
+
+  for (var i in missingTitles)
+    Logger.log(missingTitles[i]);
 }
 
 function checkPlaylistVideos()
 {
   var channelSheet = spreadsheet.getSheetByName("SiIvaGunner");
   var playlistId = "PLn8P5M1uNQk4_1_eaMchQE5rBpaa064ni";
-  var plistVideoIds = [];
-  var sheetUndocIds = [];
-  var sheetVideoIds = channelSheet.getRange(2, 3, channelSheet.getLastRow() - 1).getValues();
-  var sheetVideoVals = channelSheet.getRange(2, 2, channelSheet.getLastRow() - 1).getValues();
+  var playlistVideoIds = [];
+  var sheetUndocumentedIds = [];
+  var sheetVideoIds = channelSheet.getRange(2, idCol, channelSheet.getLastRow() - 1).getValues();
+  var sheetWikiStatuses = channelSheet.getRange(2, wikiStatusCol, channelSheet.getLastRow() - 1).getValues();
+  var sheetVideoStatuses = channelSheet.getRange(2, videoStatusCol, channelSheet.getLastRow() - 1).getValues();
   var nextPageToken = "";
 
   while (nextPageToken != null)
@@ -539,118 +558,138 @@ function checkPlaylistVideos()
     var playlistResponse = YouTube.PlaylistItems.list('snippet', {playlistId: playlistId, maxResults: 50, pageToken: nextPageToken});
 
     for (var i = 0; i < playlistResponse.items.length; i++)
-    {
-      plistVideoIds.push(playlistResponse.items[i].snippet.resourceId.videoId);
-      nextPageToken = playlistResponse.nextPageToken;
-    }
+      playlistVideoIds.push(playlistResponse.items[i].snippet.resourceId.videoId);
+
+    nextPageToken = playlistResponse.nextPageToken;
   }
 
   for (var i in sheetVideoIds)
   {
-    if (sheetVideoVals[i][0] == "Yes")
-      sheetUndocIds.push(sheetVideoIds[i][0]);
+    if (sheetWikiStatuses[i][0] == "Undocumented" && (sheetVideoStatuses[i][0] == "Public" || sheetVideoStatuses[i][0] == "Unlisted"))
+      sheetUndocumentedIds.push(sheetVideoIds[i][0]);
+    else if (sheetWikiStatuses[i][0] == "Undocumented")
+      Logger.log("Deleted video: " + sheetVideoIds[i][0]);
   }
 
-  Logger.log("Sheet length: " + sheetUndocIds.length);
-  Logger.log("Sheet length: " + sheetUndocIds);
-  Logger.log("Playlist IDs: " + plistVideoIds.length);
-  Logger.log("Playlist IDs: " + plistVideoIds);
+  Logger.log("Sheet videos: " + sheetUndocumentedIds.length);
+  Logger.log("Playlist videos: " + playlistVideoIds.length);
 
-  for (var i in plistVideoIds)
+  // Find videos that shouldn't be in the playlist.
+  for (var i in playlistVideoIds)
   {
-    for (var k in sheetUndocIds)
+    var index = sheetUndocumentedIds.findIndex(ids => {return ids == playlistVideoIds[i]});
+
+    if (index == -1)
     {
-      if (plistVideoIds[i] == sheetUndocIds[k])
-        break;
-      else if (k == sheetUndocIds.length - 1)
-        Logger.log("Missing from sheet: " + plistVideoIds[i]);
+      Logger.log("Remove from playlist: " + playlistVideoIds[i]);
+      var videoResponse = YouTube.PlaylistItems.list('snippet', {playlistId: playlistId, videoId: playlistVideoIds[i]});
+      var deletionId = videoResponse.items[0].id;
+      YouTube.PlaylistItems.remove(deletionId);
     }
   }
 
-  for (var i in sheetUndocIds)
+  // Find videos that should be in the playlist.
+  for (var i in sheetUndocumentedIds)
   {
-    for (var k in plistVideoIds)
+    var index = playlistVideoIds.findIndex(ids => {return ids == sheetUndocumentedIds[i]});
+
+    if (index == -1)
     {
-      if (sheetUndocIds[i] == plistVideoIds[k])
-        break;
-      else if (k == plistVideoIds.length - 1)
-      {
-        Logger.log("Missing from playlist: " + sheetUndocIds[i]);
-      }
+      Logger.log("Add to playlist: " + sheetUndocumentedIds[i]);
+      YouTube.PlaylistItems.insert({snippet: {playlistId: playlistId, resourceId: {kind: "youtube#video", videoId: sheetUndocumentedIds[i]}}}, "snippet");
+    }
+  }
+
+  // Find duplicate IDs in the sheet.
+  for (var i in sheetUndocumentedIds)
+  {
+    for (var k in sheetUndocumentedIds)
+    {
+      if (sheetUndocumentedIds[i] == sheetUndocumentedIds[k] && k != i)
+        Logger.log("Duplicate in sheet: " + sheetUndocumentedIds[i]);
+    }
+  }
+
+  // Find duplicate IDs in the playlist.
+  for (var i in playlistVideoIds)
+  {
+    for (var k in playlistVideoIds)
+    {
+      if (playlistVideoIds[i] == playlistVideoIds[k] && k != i)
+        Logger.log("Duplicate in playlist: " + playlistVideoIds[i]);
     }
   }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////// THE FOLLOWING CODE IS OUTDATED. UPDATE TO CURRENT STANDARDS BEFORE USING //////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Builds a spreadsheet with basic information for every SiIvaGunner video.
-function buildSheet()
+// Add new video information to sheet using the IDs provided.
+function addVideosById()
 {
-  var startTime = new Date();
-  var mostRecent = channelSheet.getRange("D2").getValue();
-  var results = YouTube.Channels.list('contentDetails', {id: channelId});
-  var scheduled = false;
+  /*
+  var channelSheet = spreadsheet.getSheetByName("SiIvaGunner");
+  var wikiUrl = "https://siivagunner.fandom.com/wiki/";
+  //*/
+  /*
+  var channelSheet = spreadsheet.getSheetByName("TimmyTurnersGrandDad");
+  var wikiUrl = "https://ttgd.fandom.com/wiki/";
+  //*/
+  //*
+  var channelSheet = spreadsheet.getSheetByName("VvvvvaVvvvvvr");
+  var wikiUrl = "https://vvvvvavvvvvr.fandom.com/wiki/";
+  //*/
+  /*
+  var channelSheet = spreadsheet.getSheetByName("Flustered Fernando");
+  var wikiUrl = "https://flustered-fernando.fandom.com/wiki/";
+  //*/
+  var lastRow = channelSheet.getLastRow();
+  var vidIds = [""];
+  var nextPageToken = "";
 
-  for (var i in results.items)
+  for (var i in vidIds)
   {
-    var item = results.items[i];
-    var uploadsPlaylistId = item.contentDetails.relatedPlaylists.uploads;
-    var nextPageToken = "";
-    var row = 1;
-    var lastRow = channelSheet.getLastRow();
+    var results = YouTube.Videos.list('snippet,contentDetails,statistics',{id: vidIds[i], maxResults: 1, type: 'video'});
 
-    while (nextPageToken != null)
-    {
-      var playlistResponse = YouTube.PlaylistItems.list('snippet', {playlistId: uploadsPlaylistId, maxResults: 50, pageToken: nextPageToken});
+    results.items.forEach(function(item)
+                          {
+                            var channelId = item.snippet.channelId;
+                            var videoHyperlink = formatYouTubeHyperlink(vidIds[i]);
+                            var wikiHyperlink = formatWikiHyperlink(item.snippet.title, wikiUrl);
+                            var uploadDate = formatDate(item.snippet.publishedAt);
+                            var length = item.contentDetails.duration.toString();
+                            var description = item.snippet.description.toString().replace(/\r/g, "").replace(/\n/g, "NEWLINE");
+                            var viewCount = item.statistics.viewCount;
+                            var likeCount = item.statistics.likeCount;
+                            var dislikeCount = item.statistics.dislikeCount;
+                            var commentCount = item.statistics.commentCount;
 
-      for (var j = 0; j < playlistResponse.items.length; j++)
-      {
-        row++;
-        if (row > lastRow)// || row == 2)
-        {
-          var playlistItem = playlistResponse.items[j];
-          var originalTitle = playlistItem.snippet.title;
-          var encodedTitle = formatWikiLink(originalTitle);
-          var id = playlistItem.snippet.resourceId.videoId;
-          var publishDate = playlistItem.snippet.publishedAt;
-          var url = wikiUrl + encodedTitle;
-          var description = playlistItem.snippet.description.toString().replace(/\r/g, "").replace(/\n/g, "NEWLINE");
+                            //*
+                            Logger.log(channelId);
+                            Logger.log(videoHyperlink);
+                            Logger.log(wikiHyperlink);
+                            Logger.log(uploadDate);
+                            Logger.log(length);
+                            Logger.log(description);
+                            Logger.log(viewCount);
+                            Logger.log(likeCount);
+                            Logger.log(dislikeCount);
+                            Logger.log(commentCount);
+                            //*/
 
-          channelSheet.insertRowAfter(channelSheet.getLastRow());
-          channelSheet.getRange(row, 1).setValue(originalTitle);
-          channelSheet.getRange(row, 2).setValue("Unknown");
-          channelSheet.getRange(row, 3).setFormula('=HYPERLINK("https://www.youtube.com/watch?v=' + id + '", "' + id + '")');
-          channelSheet.getRange(row, 4).setValue(publishDate);
-          channelSheet.getRange(row, 6).setValue(description);
-          channelSheet.getRange(row, 7).setValue("Public");
+                            //*
+                            channelSheet.insertRowAfter(lastRow);
+                            lastRow++;
 
-          Logger.log("Row " + row + ": " + originalTitle);
-        }
-        nextPageToken = playlistResponse.nextPageToken;
-
-        // Check if the script timer has passed a specified time limit.
-        var currentTime = new Date();
-
-        if (currentTime.getTime() - startTime.getTime() > (10 * 60 * 2800) && !scheduled) // 28 minutes
-        {
-          var allTriggers = ScriptApp.getProjectTriggers();
-
-          for (var i = 0; i < allTriggers.length; i++)
-            ScriptApp.deleteTrigger(allTriggers[i]);
-
-          ScriptApp.newTrigger("buildSheet")
-          .timeBased()
-          .after(10 * 60 * 500) // 5 minutes
-          .create();
-
-          scheduled = true;
-        }
-        if (scheduled) break;
-      }
-      if (scheduled) break;
-    }
+                            channelSheet.getRange(lastRow, idCol).setFormula(videoHyperlink);
+                            channelSheet.getRange(lastRow, titleCol).setFormula(wikiHyperlink);
+                            channelSheet.getRange(lastRow, wikiStatusCol).setValue("Undocumented");
+                            channelSheet.getRange(lastRow, videoStatusCol).setValue("Public");
+                            channelSheet.getRange(lastRow, videoUploadDateCol).setValue(uploadDate);
+                            channelSheet.getRange(lastRow, videoLengthCol).setValue(length);
+                            channelSheet.getRange(lastRow, videoDescriptionCol).setValue(description);
+                            channelSheet.getRange(lastRow, videoViewsCol).setValue(viewCount);
+                            channelSheet.getRange(lastRow, videoLikesCol).setValue(likeCount);
+                            channelSheet.getRange(lastRow, videoDislikesCol).setValue(dislikeCount);
+                            channelSheet.getRange(lastRow, videoCommentsCol).setValue(commentCount);
+                            //*/
+                          });
   }
-  channelSheet.getDataRange().sort({column: 4, ascending: false});
 }

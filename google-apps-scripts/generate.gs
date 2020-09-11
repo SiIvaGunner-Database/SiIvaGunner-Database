@@ -39,12 +39,14 @@ function generateTemplate(videoId, format)
     }
     catch(e)
     {
+      return "The YouTube API limit has been exceeded. Please try again tomorrow. Apologies for the inconvenience.";
+
       // In case the YouTube API quota has been passed.
-      var values = channelSheet.getRange(2, 3, 20).getValues();
+      var values = channelSheet.getRange(2, 1, 20).getValues();
       var row = values.findIndex(ids => {return ids[0] == videoId});
       if (row == -1)
       {
-        var values = channelSheet.getRange(21, 3, channelSheet.getLastRow() - 20).getValues();
+        var values = channelSheet.getRange(21, 1, channelSheet.getLastRow() - 20).getValues();
         var row = values.findIndex(ids => {return ids[0] == videoId});
 
         if (row == -1)

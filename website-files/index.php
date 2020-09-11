@@ -5,9 +5,8 @@
     <?php include("nav.html"); ?>
     <main>
       <p class="box">
-        Currently, only SiIvaGunner videos have been added to the <a target="_blank" href="https://docs.google.com/spreadsheets/d/1B7b9jEaWiqZI8Z8CzvFN1cBvLVYwjb5xzhWtrgs4anI/edit?usp=sharing">spreadsheet</a> keeping track of rips.<br/>
-        TimmyTurnersGrandDad and VvvvvaVvvvvvr videos will added in the future.<br/>
-        Note that the title searched for must be exact.
+        For a list of every SiIvaGunner, TimmyTurnersGrandDad and VvvvvaVvvvvvr video, see this <a target="_blank" href="https://docs.google.com/spreadsheets/d/1B7b9jEaWiqZI8Z8CzvFN1cBvLVYwjb5xzhWtrgs4anI/edit?usp=sharing">spreadsheet</a>.<br/>
+        Searching is currently being worked on.
       </p>
       <div id="searchContainer">
         <input type="text" id="inputText" class="searchBox" placeholder="Search by title, URL, or ID"/>
