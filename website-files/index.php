@@ -5,8 +5,8 @@
     <?php include("nav.html"); ?>
     <main>
       <p class="box">
-        For a list of every SiIvaGunner, TimmyTurnersGrandDad and VvvvvaVvvvvvr video, see this <a target="_blank" href="https://docs.google.com/spreadsheets/d/1B7b9jEaWiqZI8Z8CzvFN1cBvLVYwjb5xzhWtrgs4anI/edit?usp=sharing">spreadsheet</a>.<br/>
-        Searching is currently being worked on.
+        For a list of every SiIvaGunner, TimmyTurnersGrandDad, and VvvvvaVvvvvvr video, see this <a target="_blank" href="https://docs.google.com/spreadsheets/d/1B7b9jEaWiqZI8Z8CzvFN1cBvLVYwjb5xzhWtrgs4anI/edit?usp=sharing">spreadsheet</a>.<br/>
+        For now, only SiIvaGunner videos can be searched for. Note that the title searched for must be exact.
       </p>
       <div id="searchContainer">
         <input type="text" id="inputText" class="searchBox" placeholder="Search by title, URL, or ID"/>
@@ -19,8 +19,8 @@
       </div>
       <div id="videoInfo" class="box">
         Archive link: <a target="_blank" href="https://web.archive.org/web/*/https://www.youtube.com/watch?v=NzoneDE0A2o">Wayback Machine</a><br/>
-        Upload date: 2018-04-07T08:00:02Z<br/>
-        Video length: PT3M25S<br/>
+        Upload date: 2018-04-07 08:00:02<br/>
+        Video length: 3:25<br/>
         Video status: public<br/>
         Wiki status: <a target="_blank" href="https://siivagunner.fandom.com/wiki/The%20Inn%20-%20Fire%20Emblem">documented</a>
       </div>

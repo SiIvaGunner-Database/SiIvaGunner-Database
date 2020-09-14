@@ -22,44 +22,36 @@ function generateTemplate(videoId, format)
     try
     {
       // Fetch the video details.
-      var results = YouTube.Videos.list('id,snippet,contentDetails',
-                                        {
-                                          id: videoId,
-                                          maxResults: 1,
-                                          type: 'video'
-                                        });
+      var videoResponse = YouTube.Videos.list('id,snippet,contentDetails',
+                                              {
+                                                id: videoId,
+                                                maxResults: 1,
+                                                type: 'video'
+                                              });
 
-      results.items.forEach(function(item)
-                            {
-                              pageName = item.snippet.title.toString();
-                              description = item.snippet.description.toString().replace(/\r/g, "");
-                              uploadDate = item.snippet.publishedAt.toString();
-                              length = item.contentDetails.duration.toString();
-                            });
+      videoResponse.items.forEach(function(item)
+                                  {
+                                    pageName = item.snippet.title.toString();
+                                    description = item.snippet.description.toString().replace(/\r/g, "");
+                                    uploadDate = item.snippet.publishedAt.toString();
+                                    length = item.contentDetails.duration.toString();
+                                  });
     }
     catch(e)
     {
-      return "The YouTube API limit has been exceeded. Please try again tomorrow. Apologies for the inconvenience.";
-
       // In case the YouTube API quota has been passed.
-      var values = channelSheet.getRange(2, 1, 20).getValues();
-      var row = values.findIndex(ids => {return ids[0] == videoId});
-      if (row == -1)
-      {
-        var values = channelSheet.getRange(21, 1, channelSheet.getLastRow() - 20).getValues();
-        var row = values.findIndex(ids => {return ids[0] == videoId});
+      var values = channelSheet.getRange(2, 1, channelSheet.getLastRow() - 1).getValues();
+      var index = values.findIndex(ids => {return ids[0] == videoId});
 
-        if (row == -1)
-          return "Video not found.";
-        else
-          var data = channelSheet.getRange(row + 21, 1, 1, 7).getValues();
-      }
-      else var data = channelSheet.getRange(row + 2, 1, 1, 7).getValues();
+      if (index == -1)
+        return "Video not found.";
+      else
+        var data = channelSheet.getRange(index + 2, 1, 1, 7).getValues();
 
-      pageName = data[0][0];
-      uploadDate = data[0][3];
-      length = data[0][4];
-      description = data[0][5].replace(/NEWLINE/g, "\n");
+      pageName = data[0][1];
+      uploadDate = data[0][4];
+      length = data[0][5];
+      description = data[0][6].replace(/NEWLINE/g, "\n");
     }
 
     // Add labels if needed.
@@ -125,20 +117,7 @@ function generateTemplate(videoId, format)
     if (description.indexOf("Please read the channel description.") == -1 && description.indexOf("\n\n") != -1)
       catchphrase = "\n|catchphrase\t= " + description.split("\n\n").pop();
 
-    // Format the video length, adding zeroes if needed.
-    for (var i = 0; i < length.length; i++)
-    {
-      if (length.charAt(i) == "T" && length.charAt(i+2) == "S")
-        length = length.replace("PT", "0:0");
-      else if (length.charAt(i) == "T" && length.charAt(i+3) == "S")
-        length = length.replace("PT", "0:");
-      else if (length.charAt(i) == "M" && length.charAt(i+2) == "S")
-        length = length.replace("M", ":0");
-      if (length.charAt(i) == "H" && length.charAt(i+2) == "M")
-        length = length.replace("H", ":0");
-    }
-
-    length = length.replace("PT", "").replace("H", ":").replace("M", ":").replace("S", "");
+    length = formatLength(length);
 
     // Format the upload date.
     uploadDate = Utilities.formatDate(new Date(uploadDate), "UTC", "MMMM d, yyyy");
