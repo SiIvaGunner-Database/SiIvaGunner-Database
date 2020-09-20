@@ -1,12 +1,12 @@
 function reportIssue(page, id, desc)
 {
-  var date = new Date();
-  var reportsSheet = SpreadsheetApp.openById("1MYZFZyRzmKjyDzC9vOArkoTfXIc5aQmYcErAI4gE1bA").getSheetByName("Reports");
-  if (reportsSheet.getLastRow() != 1) reportsSheet.insertRowAfter(reportsSheet.getLastRow());
-  var row = reportsSheet.getLastRow() + 1;
-
   try
   {
+    var date = new Date();
+    var reportsSheet = SpreadsheetApp.openById("1MYZFZyRzmKjyDzC9vOArkoTfXIc5aQmYcErAI4gE1bA").getSheetByName("Reports");
+    if (reportsSheet.getLastRow() != 1) reportsSheet.insertRowAfter(reportsSheet.getLastRow());
+    var row = reportsSheet.getLastRow() + 1;
+
     reportsSheet.getRange(row, 1).setValue(date);
     reportsSheet.getRange(row, 2).setValue(page);
     reportsSheet.getRange(row, 3).setValue(id);
@@ -20,5 +20,8 @@ function reportIssue(page, id, desc)
 
     return "Your response has been recorded.";
   }
-  catch (e) { return e; }
+  catch (e)
+  {
+    return e;
+  }
 }

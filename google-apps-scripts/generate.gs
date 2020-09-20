@@ -1,24 +1,24 @@
 function generateTemplate(videoId, format)
 {
-  var channelSheet = spreadsheet.getSheetByName("SiIvaGunner");
-  var playlistId = "";
-  var uploadDate = "";
-  var length = "";
-  var description = "";
-  var pageName = "";
-  var mix = "";
-  var track = "";
-  var simplifiedTrack = "";
-  var composer = "";
-  var composerLabel = "";
-  var platform = "";
-  var platformLabel = "";
-  var ripper = "";
-  var catchphrase = "";
-  var game = "";
-
   try
   {
+    var channelSheet = spreadsheet.getSheetByName("SiIvaGunner");
+    var playlistId = "";
+    var uploadDate = "";
+    var length = "";
+    var description = "";
+    var pageName = "";
+    var mix = "";
+    var track = "";
+    var simplifiedTrack = "";
+    var composer = "";
+    var composerLabel = "";
+    var platform = "";
+    var platformLabel = "";
+    var ripper = "";
+    var catchphrase = "";
+    var game = "";
+
     try
     {
       // Fetch the video details.
@@ -177,11 +177,11 @@ function generateTemplate(videoId, format)
       val = val.replace(/\t\t= |\t= /g, " = ");
     else if (format == "none")
       val = val.replace(/\t\t= |\t= /g, "=");
+
+    return val;
   }
   catch(e)
   {
     return e;
   }
-
-  return val;
 }

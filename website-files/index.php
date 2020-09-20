@@ -6,7 +6,7 @@
     <main>
       <p class="box">
         For a list of every SiIvaGunner, TimmyTurnersGrandDad, and VvvvvaVvvvvvr video, see this <a target="_blank" href="https://docs.google.com/spreadsheets/d/1B7b9jEaWiqZI8Z8CzvFN1cBvLVYwjb5xzhWtrgs4anI/edit?usp=sharing">spreadsheet</a>.<br/>
-        For now, only SiIvaGunner videos can be searched for. Note that the title searched for must be exact.
+        Note that the title or video ID searched for must be exact. This is not yet an actual database.
       </p>
       <div id="searchContainer">
         <input type="text" id="inputText" class="searchBox" placeholder="Search by title, URL, or ID"/>

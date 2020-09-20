@@ -18,8 +18,6 @@ function checkSheet()
   else if ((startDate % 3 == 0 || startHour == 0) && startMinute >= 30)
     channel = "TimmyTurnersGrandDad";
 
-  Logger.log("Channel: " + channel);
-
   switch(channel)
   {
     case "SiIvaGunner":
@@ -46,15 +44,19 @@ function checkSheet()
 
   var channelSheet = spreadsheet.getSheetByName(channel);
 
-  if (startHour > 20)
+  if (startHour > 18)
     taskId = 2;
   else if (startHour > 4)
     taskId = 1;
 
+  Logger.log("Channel: " + channel);
+  Logger.log("Hour: " + startHour);
   Logger.log("Task id: " + taskId);
-  summaryRow += taskId;
+
   addNewVideos();
   checkNewArticles();
+
+  summaryRow += taskId;
 
   var row = summarySheet.getRange(summaryRow, lastUpdatedRowCol).getValue();
 
@@ -281,13 +283,10 @@ function checkSheet()
 
     Logger.log("Row " + row + ": " + title + " (" + responseCode + ")");
 
-    var newStatus = channelSheet.getRange(row, wikiStatusCol).getValue();
-
-    if (oldStatus != newStatus && newStatus == "Undocumented") // The rip needs an article
-      errorLog.push(title + " was changed from documented to undocumented.\n[" + url + "]");
-
     if (channel == "SiIvaGunner")
     {
+      var newStatus = channelSheet.getRange(row, wikiStatusCol).getValue();
+
       if (oldStatus == "Undocumented" && newStatus == "Documented") // The rip no longer needs an article
       {
         Logger.log("Remove from playlist: " + title);
