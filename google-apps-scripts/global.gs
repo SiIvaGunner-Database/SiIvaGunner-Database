@@ -22,7 +22,7 @@ function doGet(e)
   else if (e.parameters.type.toString() == "template")
     return ContentService.createTextOutput(generateTemplate(e.parameters.id.toString(), e.parameters.format.toString()));
   else if (e.parameters.type.toString() == "report")
-    return ContentService.createTextOutput(reportIssue(e.parameters.page.toString(), e.parameters.id.toString(), e.parameters.desc.toString()));
+    return ContentService.createTextOutput(reportIssue(e.parameters.page.toString(), e.parameters.email.toString(), e.parameters.desc.toString()));
 }
 
 function formatDate(date, style)

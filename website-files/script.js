@@ -38,7 +38,7 @@ function load()
 
 function checkKey(e)
 {
-  if (e.code == "Enter" && document.getElementById("inputText").value != "")
+  if (e.code == "Enter" && document.getElementById("inputText") && document.getElementById("inputText").value != "")
     document.getElementById("submitBtn").click();
 }
 
@@ -133,14 +133,17 @@ function generateTemplate()
 function reportIssue()
 {
   var page = document.getElementById("page").value;
-  var id = document.getElementById("id").value.trim();
+  var email = document.getElementById("email").value.trim();
   var desc = document.getElementById("desc").value.trim();
 
-  if (id.length == 0)
-    document.getElementById("loadStatus").innerHTML = "Please enter the title, URL, or ID that caused the problem.";
+  if (desc.length == 0)
+  {
+    var message = "Please describe the problem. Even just a video title, ID, or URL is enough.";
+    document.getElementById("loadStatus").innerHTML = message;
+  }
   else
   {
-    var url = appUrl + "?type=report&page=" + page  + "&id=" + id + "&desc=" + desc;
+    var url = appUrl + "?type=report&page=" + page + "&email=" + email + "&desc=" + desc;
     getUrlResponse(url, "report");
   }
 }

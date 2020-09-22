@@ -5,23 +5,24 @@
     <?php include("nav.html"); ?>
     <main>
       <div>
-        <label>What page did you encounter a problem on?</label>
+        <label>Where did you encounter a problem?</label>
         <br/>
         <select id="page">
-          <option value="database">Database Search</option>
+          <option value="spreadsheet">Database Spreadsheet</option>
+          <option value="search">Database Search</option>
           <option value="generator">Template Generator</option>
         </select>
       </div>
       <br/>
       <div>
-        <label>What did you enter when the problem occurred?</label>
+        <label>If you want a response, please enter an email address.</label>
         <br/>
-        <input type="text" id="id" placeholder="Enter title, URL, or ID" required/>
+        <input type="email" id="email" placeholder="Enter email address"/>
       </div>
       <br/>
       <div>
-        <label>Optionally, please describe the problem you encountered.</label>
-        <textarea id="desc" rows=10></textarea>
+        <label>Please describe the problem you encountered.</label>
+        <textarea id="desc" rows=10  placeholder="Enter any relevant information"></textarea>
       </div>
       <button onclick="reportIssue()">Submit</button>
       <p id="loadStatus"></p>
