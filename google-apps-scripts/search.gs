@@ -70,10 +70,8 @@ function searchSheet(input)
     status += "<br/>Video length: " + length;
     status += "<br/>Video status: " + videoStatus;
 
-    if (wikiStatus == "Documented")
-      status += "<br/>Wiki status: <a target=\"_blank\" href=\"" + wikiUrl + "\">Documented</a>";
-    else if (wikiStatus == "Undocumented")
-      status += "<br/>Wiki status: <a target=\"_blank\" href=\"" + wikiUrl + "\">Undocumented</a>";
+    if (wikiStatus == "Documented" || wikiStatus == "Undocumented")
+      status += "<br/>Wiki status: <a target=\"_blank\" href=\"" + wikiUrl + "\">" + wikiStatus + "</a>";
     else
       status += "<br/>Wiki status: " + wikiUrl;
 

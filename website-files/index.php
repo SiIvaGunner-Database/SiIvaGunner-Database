@@ -21,8 +21,8 @@
         Archive link: <a target="_blank" href="https://web.archive.org/web/*/https://www.youtube.com/watch?v=NzoneDE0A2o">Wayback Machine</a><br/>
         Upload date: 2018-04-07 08:00:02<br/>
         Video length: 3:25<br/>
-        Video status: public<br/>
-        Wiki status: <a target="_blank" href="https://siivagunner.fandom.com/wiki/The%20Inn%20-%20Fire%20Emblem">documented</a>
+        Video status: Public<br/>
+        Wiki status: <a target="_blank" href="https://siivagunner.fandom.com/wiki/The%20Inn%20-%20Fire%20Emblem">Documented</a>
       </div>
       <div id="videoDesc">
         Music: The Inn<br/>
