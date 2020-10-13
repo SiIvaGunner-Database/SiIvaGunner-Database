@@ -12,11 +12,11 @@ function checkSheet()
   var channel = "SiIvaGunner";
   var taskId = 0;
 
-  if (startDate == 1 && startHour >= 20 && startMinute >= 30)
+  if (startDate % 14 == 0 && startMinute >= 50)
     channel = "Flustered Fernando";
-  else if (startDate % 14 == 0 && startMinute >= 30)
+  else if (startDate % 4 == 0 && startMinute >= 50)
     channel = "VvvvvaVvvvvvr";
-  else if ((startDate % 3 == 0 || startHour == 0) && startMinute >= 30)
+  else if (startMinute <= 10)
     channel = "TimmyTurnersGrandDad";
 
   switch(channel)
@@ -688,7 +688,16 @@ function addVideosById(videoIds, channel)
 
   for (var i in videoIds)
   {
-    var videoResponse = YouTube.Videos.list('snippet,contentDetails,statistics',{id: videoIds[i], maxResults: 1, type: 'video'});
+    do
+    {
+      try
+      {
+        var videoResponse = YouTube.Videos.list('snippet,contentDetails,statistics',{id: videoIds[i], maxResults: 1, type: 'video'});
+        var e = "";
+      }
+      catch (e) {}
+    }
+    while (e != "")
 
     videoResponse.items.forEach(function(item)
                                 {
