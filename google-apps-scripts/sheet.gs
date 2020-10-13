@@ -1,4 +1,5 @@
 // Update rip values and add missing rips.
+// This is the main function that manages most of the updating and managing of the spreadsheet.
 function checkSheet()
 {
   var startTime = new Date();
@@ -440,10 +441,12 @@ function checkPublicVideos()
 
   for (var i in channels)
   {
-    Logger.log("Working on " + channels[i][0]);
-
-    var channelSheet = spreadsheet.getSheetByName(channels[i][0]);
+    var channelTitle = channels[i][0];
     var channelId = channels[i][1];
+
+    Logger.log("Working on " + channelTitle);
+
+    var channelSheet = spreadsheet.getSheetByName(channelTitle);
     var channelVideoIds = [];
     var missingVideoIds = [];
     var sheetVideoIds = channelSheet.getRange(2, idCol, channelSheet.getLastRow() - 1).getValues();
@@ -476,8 +479,14 @@ function checkPublicVideos()
       var index = sheetVideoIds.findIndex(ids => {return ids[0] == channelVideoIds[k]});
 
       if (index == -1)
-        Logger.log("Missing from sheet: " + channelVideoIds[k]);
+        missingVideoIds.push(channelVideoIds[k]);
     }
+
+    for (var k in missingVideoIds)
+      Logger.log("Missing from sheet: " + missingVideoIds[k]);
+
+    // Optionally, add all missing videos to the corresponding sheet.
+    // addVideosById(missingVideoIds, channelTitle);
   }
 }
 
@@ -576,6 +585,7 @@ function checkRemovedVideos()
     Logger.log(missingTitles[i]);
 }
 
+// Checks to see what rips in the undocumented rips playlist should or shouldn't be there.
 function checkPlaylistVideos()
 {
   var channelSheet = spreadsheet.getSheetByName("SiIvaGunner");
@@ -656,14 +666,12 @@ function checkPlaylistVideos()
 }
 
 // Add new video information to sheet using the IDs provided.
-function addVideosById()
+function addVideosById(videoIds, channel)
 {
-  var channel = "SiIvaGunner";
+  var logging = false; // Log the operations when true
+  var building = true; // Add to sheet when true
   var channelSheet = spreadsheet.getSheetByName(channel);
   var lastRow = channelSheet.getLastRow();
-  var videoIds = [""];
-  var logging = false;
-  var building = false;
 
   if (channel == "TimmyTurnersGrandDad")
     var wikiUrl = "https://ttgd.fandom.com/wiki/";
