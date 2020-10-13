@@ -221,7 +221,11 @@ function checkSheet()
 
     while (responseText.indexOf("mw-newpages-pagename") != -1)
     {
-      var title = responseText.split("mw-newpages-pagename\">")[1].split("<")[0];
+      if (responseText.indexOf("mw-newpages-pagename\" title=\"") != -1)
+        var title = responseText.split("mw-newpages-pagename\" title=\"")[1].split("\">")[1].split("</a>")[0];
+      else
+        var title = responseText.split("mw-newpages-pagename\">")[1].split("<")[0];
+
       wikiTitles.push(title);
       responseText = responseText.replace("mw-newpages-pagename", "");
     }
