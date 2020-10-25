@@ -8,6 +8,8 @@ Work in progress.
 
 * [SiIvaGunner Database Spreadsheet](https://docs.google.com/spreadsheets/d/1B7b9jEaWiqZI8Z8CzvFN1cBvLVYwjb5xzhWtrgs4anI/edit?usp=sharing)
 
+* [SiIvaGunner Database Changelog Spreadsheet](https://docs.google.com/spreadsheets/d/1EKQq1K8Bd7hDlFMg1Y5G_a2tWk_FH39bgniUUBGlFKM/edit?usp=sharing)
+
 * [SiIvaGunner Bootleg Database Spreadsheet](https://docs.google.com/spreadsheets/d/1Q_L84zZ2rzS57ZcDcCdmxMsguqjpnbLGr5_QVX5LVKA/edit?usp=sharing)
 
 * [SiIvaGunner Wiki](https://siivagunner.fandom.com/wiki/SiIvaGunner_Wikia)
