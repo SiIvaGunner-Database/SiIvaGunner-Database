@@ -6,11 +6,10 @@ function checkSheet()
   var startDate = startTime.getDate();
   var startHour = startTime.getHours();
   var startMinute = startTime.getMinutes();
-  var summarySheet = spreadsheet.getSheetByName("Summary");
+  var indexSheet = spreadsheet.getSheetByName("Index");
   var errorLog = [];
   var changelog = [];
   var channel = "SiIvaGunner";
-  var taskId = 0;
 
   if (startDate % 14 == 0 && startMinute >= 50)
     channel = "Flustered Fernando";
@@ -25,41 +24,33 @@ function checkSheet()
       var channelId = "UC9ecwl3FTG66jIKA9JRDtmg";
       var playlistId = "PLn8P5M1uNQk4_1_eaMchQE5rBpaa064ni";
       var wikiUrl = "https://siivagunner.fandom.com/wiki/";
-      var summaryRow = 2;
       break;
     case "TimmyTurnersGrandDad":
       var channelId = "UCIXM2qZRG9o4AFmEsKZUIvQ";
       var wikiUrl = "https://ttgd.fandom.com/wiki/";
-      var summaryRow = 9;
       break;
     case "VvvvvaVvvvvvr":
       var channelId = "UCCPGE1kAoonfPsbieW41ZZA";
       var wikiUrl = "https://vvvvvavvvvvr.fandom.com/wiki/";
-      var summaryRow = 16;
       break;
     case "Flustered Fernando":
       var channelId = "UC8Q9CaWvV5_x90Z9VZ5cxmg";
       var wikiUrl = "https://flustered-fernando.fandom.com/wiki/";
-      var summaryRow = 23;
   }
+
+  var channelNames = indexSheet.getRange(1, 2, indexSheet.getLastRow() - 1).getValues();
+  var index = channelNames.findIndex(channelName => {return channelName == channel});
+  var indexRow = index + 3;
 
   var channelSheet = spreadsheet.getSheetByName(channel);
 
-  if (startHour > 18)
-    taskId = 2;
-  else if (startHour > 4)
-    taskId = 1;
-
   Logger.log("Channel: " + channel);
   Logger.log("Hour: " + startHour);
-  Logger.log("Task id: " + taskId);
-
-  summaryRow += taskId;
 
   addNewVideos();
   checkNewArticles();
 
-  var row = summarySheet.getRange(summaryRow, lastUpdatedRowCol).getValue();
+  var row = parseInt(indexSheet.getRange(indexRow, 2).getValue().replace(/.*row/g, ""));
 
   do
   {
@@ -68,25 +59,23 @@ function checkSheet()
     else
       row++;
 
-    if (taskId == 0)
-      checkWikiStatus(row);
-    else if (taskId == 1)
-      checkVideoStatus(row);
-    else if (taskId == 2)
-      checkDescTitleStatus(row);
+    checkWikiStatus(row);
+    checkVideoStatus(row);
+    checkDescTitleStatus(row);
 
     var currentTime = new Date();
-    summarySheet.getRange(summaryRow, lastUpdatedRowCol).setValue(row);
-    summarySheet.getRange(summaryRow, lastUpdatedTimeCol).setValue(currentTime);
+    var formattedTime = formatDate(currentTime).replace("   ", " ");
+
+    indexSheet.getRange(indexRow, 2).setValue("Last updated " + formattedTime + " UTC on row " + row + ".");
   }
-  while (currentTime.getTime() - startTime.getTime() < 80000) // Run until the time passes 80 seconds.
+  while (currentTime.getTime() - startTime.getTime() < 55000) // Run until the time passes 60 seconds.
 
   if (errorLog.length > 0)
   {
     // Send an email notifying of any changes or errors.
     var emailAddress = "a.k.zamboni@gmail.com";
-    var subject = "List of Uploads Alert";
-    var message = "There are " + errorLog.length + " new alerts.\n\n" + errorLog.join("\n\n").replace(/NEWLINE/g, "\n");
+    var subject = "SiIvaGunner Changelog Update";
+    var message = "There are " + errorLog.length + " new changes.\n\n" + errorLog.join("\n\n").replace(/NEWLINE/g, "\n");
 
     MailApp.sendEmail(emailAddress, subject, message);
     Logger.log("Email successfully sent.\n" + message);
@@ -188,15 +177,9 @@ function checkSheet()
       }
     }
 
-    for (var i = 0; i < 3; i++)
-    {
-      var lastUpdatedRow = summaryRow - taskId + i;
-      var lastUpdatedRowVal = summarySheet.getRange(lastUpdatedRow, lastUpdatedRowCol).getValue();
-      summarySheet.getRange(lastUpdatedRow, lastUpdatedRowCol).setValue(lastUpdatedRowVal + newVideoCount);
-    }
-
     Logger.log("New rips: " + newVideoCount);
     channelSheet.getDataRange().sort({column: videoUploadDateCol, ascending: false});
+    //row += newVideoCount;
   }
 
   function checkNewArticles()
@@ -232,7 +215,7 @@ function checkSheet()
 
     for (var i in wikiTitles)
     {
-      var index = sheetTitles.findIndex(titles => {return formatWikiLink(titles[0]) == formatWikiLink(wikiTitles[i])});
+      var index = sheetTitles.findIndex(titles => {return titles[0] == wikiTitles[i]});
 
       if (index != -1)
       {
@@ -285,7 +268,7 @@ function checkSheet()
     else if (responseCode != 200 && responseCode != 404)
       errorLog.push("Response code " + responseCode + "\n[" + title + "]\n[" + url + "]");
 
-    Logger.log("Row " + row + ": " + title + " (" + responseCode + ")");
+    Logger.log("Row " + row + ": " + title + " (wiki status " + responseCode + ")");
 
     if (channel == "SiIvaGunner")
     {
@@ -330,7 +313,7 @@ function checkSheet()
     }
     while (responseCode == null)
 
-    Logger.log("Row " + row + ": " + title + " (" + responseCode + ")");
+    Logger.log("Row " + row + ": " + title + " (youtube status " + responseCode + ")");
 
     switch(responseCode)
     {
@@ -338,15 +321,15 @@ function checkSheet()
         if (currentStatus != "Public" && currentStatus != "Unlisted")
         {
           channelSheet.getRange(row, videoStatusCol).setValue("Public");
-          errorLog.push(title + " has been made public.");
+          errorLog.push(title + " has been made public. [" + responseCode + "]");
           changelog.push(["Statuses", formatYouTubeHyperlink(videoId), formatWikiHyperlink(title, wikiUrl), currentStatus, "Public"]);
         }
         break;
-      case 401:
+      case 403:
         if (currentStatus != "Private")
         {
           channelSheet.getRange(row, videoStatusCol).setValue("Private");
-          errorLog.push(title + " has been privated.");
+          errorLog.push(title + " has been privated. [" + responseCode + "]");
           changelog.push(["Statuses", formatYouTubeHyperlink(videoId), formatWikiHyperlink(title, wikiUrl), currentStatus, "Private"]);
         }
         break;
@@ -354,7 +337,7 @@ function checkSheet()
         if (currentStatus != "Deleted")
         {
           channelSheet.getRange(row, videoStatusCol).setValue("Deleted");
-          errorLog.push(title + " has been deleted.");
+          errorLog.push(title + " has been deleted. [" + responseCode + "]");
           changelog.push(["Statuses", formatYouTubeHyperlink(videoId), formatWikiHyperlink(title, wikiUrl), currentStatus, "Deleted"]);
         }
         break;
@@ -421,7 +404,7 @@ function checkSheet()
         changelog.push(["Descriptions", formatYouTubeHyperlink(videoId), formatWikiHyperlink(videoTitle, wikiUrl), sheetDescription.replace(/NEWLINE/g, "\n"), videoDescription.replace(/NEWLINE/g, "\n")]);
       }
     }
-    Logger.log("Row " + row + ": " + sheetTitle + " (" + change + ")");
+    Logger.log("Row " + row + ": " + sheetTitle + " (desc/title change " + change + ")");
   }
 }
 
@@ -490,7 +473,7 @@ function checkPublicVideos()
       Logger.log("Missing from sheet: " + missingVideoIds[k]);
 
     // Optionally, add all missing videos to the corresponding sheet.
-    // addVideosById(missingVideoIds, channelTitle);
+    addVideosById(missingVideoIds, channelTitle);
   }
 }
 
@@ -742,6 +725,8 @@ function addVideosById(videoIds, channel)
                                     channelSheet.getRange(lastRow, videoLikesCol).setValue(likeCount);
                                     channelSheet.getRange(lastRow, videoDislikesCol).setValue(dislikeCount);
                                     channelSheet.getRange(lastRow, videoCommentsCol).setValue(commentCount);
+
+                                    Logger.log("Added " + item.snippet.title + " to " + channel);
                                   }
                                 });
   }
