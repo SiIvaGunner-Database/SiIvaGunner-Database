@@ -10,6 +10,7 @@ function checkSheet()
   var errorLog = [];
   var changelog = [];
   var channel = "SiIvaGunner";
+  var updateCount = 0;
 
   if (startDate % 14 == 0 && startMinute >= 50)
     channel = "Flustered Fernando";
@@ -63,12 +64,13 @@ function checkSheet()
     checkVideoStatus(row);
     checkDescTitleStatus(row);
 
+    updateCount++;
     var currentTime = new Date();
     var formattedTime = formatDate(currentTime).replace("   ", " ");
 
     indexSheet.getRange(indexRow, 2).setValue("Last updated " + formattedTime + " UTC on row " + row + ".");
   }
-  while (currentTime.getTime() - startTime.getTime() < 55000) // Run until the time passes 60 seconds.
+  while (updateCount < 24 && currentTime.getTime() - startTime.getTime() < 240000) // Run until the time passes 240 seconds.
 
   if (errorLog.length > 0)
   {
@@ -298,51 +300,64 @@ function checkSheet()
 
     var title = channelSheet.getRange(row, titleCol).getValue();
     var currentStatus = channelSheet.getRange(row, videoStatusCol).getValue();
-    var url = "https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v=" + videoId + "&format=json";
+    var newStatus = "Unchanged";
+    var url = "https://www.youtube.com/watch?v=" + videoId;
 
     do
     {
       try
       {
-        var responseCode = UrlFetchApp.fetch(url, {muteHttpExceptions: true}).getResponseCode();
+        var responseFetch = UrlFetchApp.fetch(url, {muteHttpExceptions: true});
+        Utilities.sleep(5000);
+        var responseText = responseFetch.getContentText();
       }
       catch (e)
       {
-        var responseCode = null;
+        var responseText = null;
       }
+      var currentTime = new Date();
     }
-    while (responseCode == null)
+    while ((responseText.indexOf('"status"') == -1 || responseText == null) && (currentTime.getTime() - startTime.getTime() < 240000))
 
-    Logger.log("Row " + row + ": " + title + " (youtube status " + responseCode + ")");
-
-    switch(responseCode)
+    if (responseText.indexOf('"isUnlisted":true') != -1)
     {
-      case 200:
-        if (currentStatus != "Public" && currentStatus != "Unlisted")
-        {
-          channelSheet.getRange(row, videoStatusCol).setValue("Public");
-          errorLog.push(title + " has been made public. [" + responseCode + "]");
-          changelog.push(["Statuses", formatYouTubeHyperlink(videoId), formatWikiHyperlink(title, wikiUrl), currentStatus, "Public"]);
-        }
-        break;
-      case 403:
-        if (currentStatus != "Private")
-        {
-          channelSheet.getRange(row, videoStatusCol).setValue("Private");
-          errorLog.push(title + " has been privated. [" + responseCode + "]");
-          changelog.push(["Statuses", formatYouTubeHyperlink(videoId), formatWikiHyperlink(title, wikiUrl), currentStatus, "Private"]);
-        }
-        break;
-      case 404:
-        if (currentStatus != "Deleted")
-        {
-          channelSheet.getRange(row, videoStatusCol).setValue("Deleted");
-          errorLog.push(title + " has been deleted. [" + responseCode + "]");
-          changelog.push(["Statuses", formatYouTubeHyperlink(videoId), formatWikiHyperlink(title, wikiUrl), currentStatus, "Deleted"]);
-        }
-        break;
-      default:
-        errorLog.push("Response code " + responseCode + "\n[" + title + "]\n[" + url + "]");
+      if (currentStatus != "Unlisted")
+        newStatus = "Unlisted";
+    }
+    else if (responseText.indexOf('"status":"OK"') != -1)
+    {
+      //errorLog.push(title + " video status public. [" + videoId + "]\n" + responseText);
+      if (currentStatus != "Public")
+        newStatus = "Public";
+    }
+    else if (responseText.indexOf('"This video is private."') != -1)
+    {
+      if (currentStatus != "Private")
+        newStatus = "Private";
+    }
+    else if (responseText.indexOf('"status":"ERROR"') != -1)
+    {
+      if (currentStatus != "Deleted")
+        newStatus = "Deleted";
+    }
+    else if (responseText.indexOf('"status":"UNPLAYABLE"') != -1)
+    {
+      if (currentStatus != "Unavailable")
+        newStatus = "Unavailable";
+    }
+    else
+    {
+      Logger.log(title + " video status not found.");
+      //errorLog.push(title + " video status not found. [" + videoId + "]\n" + responseText);
+    }
+
+    Logger.log("Row " + row + ": " + title + " (" + newStatus + ")");
+
+    if (newStatus != "Unchanged")
+    {
+      channelSheet.getRange(row, videoStatusCol).setValue(newStatus);
+      errorLog.push(title + " was changed from " + currentStatus + " to " + newStatus + ".");
+      changelog.push(["Statuses", formatYouTubeHyperlink(videoId), formatWikiHyperlink(title, wikiUrl), currentStatus, newStatus]);
     }
   }
 
@@ -352,7 +367,7 @@ function checkSheet()
     var videoStatus = channelSheet.getRange(row, videoStatusCol).getValue();
     var change = false;
 
-    if (videoStatus == "Public" || videoStatus == "Normal")
+    if (videoStatus == "Public" || videoStatus == "Unlisted")
     {
       var sheetDescription = channelSheet.getRange(row, videoDescriptionCol).getValue();
       var videoId = channelSheet.getRange(row, idCol).getValue();
@@ -412,7 +427,7 @@ function checkSheetTrigger()
 {
   ScriptApp.newTrigger("checkSheet")
   .timeBased()
-  .everyMinutes(10)
+  .everyMinutes(5)
   .create();
 }
 
@@ -424,7 +439,7 @@ function checkPublicVideos()
                   ["VvvvvaVvvvvvr", "UCCPGE1kAoonfPsbieW41ZZA"],
                   ["Flustered Fernando", "UC8Q9CaWvV5_x90Z9VZ5cxmg"],
                   ["SiIvaGunner2", "UCYGz7FZImRL8oI68pD7NoKg"],
-                  ["SiLvaGunner", "UCraDChjPs-r9FoNsmJufZZQ"]];
+                  ["GilvaSunner", "UCraDChjPs-r9FoNsmJufZZQ"]];
 
   for (var i in channels)
   {

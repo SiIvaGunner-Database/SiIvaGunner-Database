@@ -1,4 +1,4 @@
-var appUrl = "https://script.google.com/macros/s/AKfycbzm47208rTvNpu2pa-vhqdT53k9_F1l0j47nqlJOw/exec";
+var appUrl = "https://script.google.com/macros/s/AKfycbwgn6o-MQ8ocE_AobilHlMWoURgYAXLQ8ZwkTIO1rbck_qffAMkVQxgpA/exec";
 var lastSelection = "single";
 
 document.onkeydown = checkKey;
