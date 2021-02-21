@@ -70,7 +70,7 @@ function checkSheet()
 
     indexSheet.getRange(indexRow, 2).setValue("Last updated " + formattedTime + " UTC on row " + row + ".");
   }
-  while (updateCount < 24 && currentTime.getTime() - startTime.getTime() < 240000) // Run until the time passes 240 seconds.
+  while (updateCount < 42 && currentTime.getTime() - startTime.getTime() < 240000)
 
   if (errorLog.length > 0)
   {
@@ -195,10 +195,17 @@ function checkSheet()
     {
       try
       {
-        var responseText = UrlFetchApp.fetch(url, {muteHttpExceptions: true}).getContentText();
+        var responseText = UrlFetchApp.fetch(url).getContentText();
       }
       catch (e)
       {
+        Logger.log(e);
+
+        if (e.toString().indexOf("429") != -1)
+          Utilities.sleep(30000);
+        else
+          Utilities.sleep(1000);
+
         var responseText = null;
       }
     }
@@ -217,6 +224,7 @@ function checkSheet()
 
     for (var i in wikiTitles)
     {
+      wikiTitles[i] = wikiTitles[i].replace(/&#039;/g, "'").replace(/&amp;/g, "&");
       var index = sheetTitles.findIndex(titles => {return titles[0] == wikiTitles[i]});
 
       if (index != -1)
@@ -254,10 +262,17 @@ function checkSheet()
     {
       try
       {
-        var responseCode = UrlFetchApp.fetch(url, {muteHttpExceptions: true}).getResponseCode();
+        var responseCode = UrlFetchApp.fetch(url).getResponseCode();
       }
       catch (e)
       {
+        Logger.log(e);
+
+        if (e.toString().indexOf("429") != -1)
+          Utilities.sleep(30000);
+        else
+          Utilities.sleep(1000);
+
         var responseCode = null;
       }
     }
@@ -307,17 +322,21 @@ function checkSheet()
     {
       try
       {
-        var responseFetch = UrlFetchApp.fetch(url, {muteHttpExceptions: true});
-        Utilities.sleep(5000);
-        var responseText = responseFetch.getContentText();
+        var responseText = UrlFetchApp.fetch(url).getContentText();
       }
       catch (e)
       {
+        Logger.log(e);
+
+        if (e.toString().indexOf("429") != -1)
+          Utilities.sleep(30000);
+        else
+          Utilities.sleep(1000);
+
         var responseText = null;
       }
-      var currentTime = new Date();
     }
-    while ((responseText.indexOf('"status"') == -1 || responseText == null) && (currentTime.getTime() - startTime.getTime() < 240000))
+    while (responseText == null)
 
     if (responseText.indexOf('"isUnlisted":true') != -1)
     {
@@ -367,7 +386,7 @@ function checkSheet()
     var videoStatus = channelSheet.getRange(row, videoStatusCol).getValue();
     var change = false;
 
-    if (videoStatus == "Public" || videoStatus == "Unlisted")
+    if (videoStatus == "Public" || videoStatus == "Unlisted" || videoStatus == "Unavailable")
     {
       var sheetDescription = channelSheet.getRange(row, videoDescriptionCol).getValue();
       var videoId = channelSheet.getRange(row, idCol).getValue();
@@ -539,10 +558,17 @@ function checkRemovedVideos()
     {
       try
       {
-        var responseText = UrlFetchApp.fetch(url, {muteHttpExceptions: true}).getContentText();
+        var responseText = UrlFetchApp.fetch(url).getContentText();
       }
       catch (e)
       {
+        Logger.log(e);
+
+        if (e.toString().indexOf("429") != -1)
+          Utilities.sleep(30000);
+        else
+          Utilities.sleep(1000);
+
         var responseText = null;
       }
     }
