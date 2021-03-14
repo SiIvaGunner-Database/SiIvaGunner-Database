@@ -1,0 +1,19 @@
+{% extends 'baseLayout.html' %}
+{% block content%}
+  <div class="ripAdd">
+    <h2>Add a rip to the database</h2>
+    <span class="smallText">Only the title is required, but please provide as much information as possible.</span>
+    <br />
+    <span class="smallText">The information submitted will not be visible in the database until after it is manually verified.</span>
+    <br />
+    <span class="smallText">Please note that recently uploaded rips will eventually be added automatically, so there is no need to submit them.</span>
+    <br />
+    <a class="smallText" href="{% url 'channels:add' %}">Add a channel instead</a>
+    <hr />
+    <form class="siteForm" action="{% url 'rips:add' %}" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form }}
+      <input type="submit" value="Add" />
+    </form>
+  </div>
+{% endblock %}

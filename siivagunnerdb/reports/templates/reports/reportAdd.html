@@ -1,0 +1,13 @@
+{% extends 'baseLayout.html' %}
+{% block content%}
+  <div class="reportAdd">
+    <h2>Report a bug or suggestion</h2>
+    <span class="smallText">If you wish to receive a response, make sure to include a way to be contacted.</span>
+    <hr />
+    <form class="siteForm" action="{% url 'reports:add' %}" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form }}
+      <input type="submit" value="Submit" />
+    </form>
+  </div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'baseLayout.html' %}
+{% block content%}
+  <div class="account">
+    <h2>{{ user.get_username }}</h2>
+    <span class="smallText">The site is still in its early stages and accounts can not do much. In the future, you can expect a way to save rip and channel pages.</span>
+    <hr />
+    <div class="gridDiv">
+      <!--
+      <div>
+        <h4>Saved Pages</h4>
+      </div>
+      -->
+      <form class="siteForm" action="{% url 'accounts:myAccount' %}" method="post">
+        <h4>Change Username</h4>
+        {% csrf_token %}
+        {{ usernameForm }}
+        <input type="submit" name="saveUsername" value="Save username" />
+      </form>
+      <form class="siteForm" action="{% url 'accounts:myAccount' %}" method="post">
+        <h4>Change Password</h4>
+        {% csrf_token %}
+        {{ passwordForm }}
+        <input type="submit"  name="savePassword" value="Save password" />
+      </form>
+    </div>
+  </div>
+{% endblock %}

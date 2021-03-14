@@ -1,0 +1,40 @@
+{% extends 'baseLayout.html' %}
+{% block content%}
+  <h2>Generate a template for wiki articles</h2>
+  <input type="text" id="inputText" placeholder="Enter URL or ID"/>
+  <button id="submitBtn" onclick="generateTemplate()">Submit</button>
+  <button onclick="copyTemplate()">Copy</button>
+  <select id="format">
+    <option value="single">One-sided spacing</option>
+    <option value="double">Double-sided spacing</option>
+    <option value="tab">Tabbed spacing</option>
+    <option value="none">No spacing</option>
+  </select>
+  <textarea class="wikiText" readonly id="template" rows="21">
+{{Rip
+|image= Fire Emblem.jpg
+
+|link= NzoneDE0A2o
+|playlist= Fire Emblem
+|playlist id= PLL0CQjrcN8D1CYB8alWM5bax6yGk83dZ8
+|upload= April 7, 2018
+|length= 3:25
+|author=
+
+|album=
+|track=
+
+|music= The Inn
+|composer= Yuka Tsujiyoko
+|platform= Game Boy Advance
+|catchphrase= Go-Go Gadget Channel Description!
+}}
+"'''The Inn - Fire Emblem'''" is a high quality rip of "The Inn" from ''Fire Emblem''.
+== Jokes ==
+  </textarea>
+  <div id="thumbnail">
+    <a target="_blank" href="https://img.youtube.com/vi/NzoneDE0A2o/maxresdefault.jpg">
+      <img src="https://img.youtube.com/vi/NzoneDE0A2o/maxresdefault.jpg" alt="Thumbnail">
+    </a>
+  </div>
+{% endblock %}

@@ -1,0 +1,222 @@
+
+/*
+Inspector Gadget
+Skin: #ECBCA7
+Tie:  #104381
+Coat: #BBBBBB
+
+Normal Links
+Link: #0645AD
+Hover:#0B0080
+
+General Style
+Main: #F8F8F8
+Input:#F0F0F0
+<hr/>:#DDDDDD
+Nav:  #BBBBBB
+Hover:#999999
+Text: #444444
+*/
+
+html {
+  padding: 0 calc((100% - 1024px)/2);
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  width: 1024px;
+  display: flex;
+  flex-flow: column;
+}
+
+header, header a, header button, nav, footer {
+  color: #BBBBBB;
+  font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+header {
+  display: grid;
+  grid-template-columns: 4fr 1fr;
+}
+
+header button, header li a {
+  padding: 0;
+  background: none;
+  border: none;
+  font-size: 1em;
+}
+
+header button:hover, header a:hover {
+  color: #999999;
+}
+
+header ul li {
+  float: right;
+  margin: 1em 16px 0 0;
+}
+
+nav ul, footer {
+  background-color: #BBBBBB;
+  text-align: center;
+  overflow: hidden;
+}
+
+nav li {
+  float: left;
+}
+
+nav li a, footer a {
+  color: #FFFFFF;
+  padding: 0 16px;
+  text-align: center;
+  text-decoration: none;
+}
+
+nav li a:hover, footer a:hover {
+  background-color: #999999;
+}
+
+main {
+  padding: 16px;
+  flex-grow: 1;
+  color: #444444;
+  background-color: #F8F8F8;
+}
+
+main, textarea:not(.wikiText) {
+  font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+}
+
+main a, main a:visited {
+  color: #0645AD;
+}
+
+main a:hover {
+  color: #0B0080;
+}
+
+main button, main input, main select, main textarea, .errorlist li, .messages li {
+  margin-bottom: 4px;
+  padding: 4px;
+  border: 2px solid #999999;
+  border-radius: 3px;
+  background: none;
+  font-size: 1em;
+}
+
+main button:hover, main input:hover, main textarea:hover {
+  background-color: #F0F0F0;
+}
+
+h2 {
+  margin: 4px 0 20px 0;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+a {
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+form br {
+  display: none;
+}
+
+textarea {
+  width: calc(100% - 12px);
+}
+
+hr {
+  border: 0;
+  height: 1px;
+  background-color: #BBBBBB;
+  background-image: linear-gradient(to right, #DDDDDD, #BBBBBB, #DDDDDD);
+}
+
+table {
+  margin: 4px 0;
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+th, td {
+  border: 2px solid #BBBBBB;
+  padding: 4px;
+  max-width: 200px;
+  overflow: hidden;
+  text-align: left;
+}
+
+tr:nth-child(even) {
+  background-color: #F0F0F0;
+}
+
+#headerTitle {
+  margin-left: 16px;
+  font-size: 2.4em;
+}
+
+#template {
+  border: none;
+  background-color: inherit;
+}
+
+#thumbnail img {
+  height: 180px;
+  width: 320px;
+}
+
+.wikiText {
+  tab-size: 4;
+}
+
+.smallText, .helptext, .helptext ul {
+  font-size: 0.9em;
+}
+
+.siteForm input, .siteForm textarea, .siteForm select, .helptext, .helptext ul {
+  display: block;
+  margin-bottom: 18px;
+}
+
+/* For computer viewing */
+@media only screen and (min-width: 1024px) {
+  .gridDiv {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* For tablet viewing */
+@media only screen and (max-width: 1024px) {
+  html {
+    padding: 0;
+  }
+
+  body {
+    width: auto;
+  }
+
+  iframe {
+    height: 240px;
+    width: 426px;
+  }
+}
+
+/* For mobile viewing */
+@media only all and (max-width: 768px) {
+}

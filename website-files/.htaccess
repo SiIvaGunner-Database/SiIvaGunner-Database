@@ -1,6 +1,0 @@
-ErrorDocument 404 /404.php
-
-RewriteEngine On
-RewriteBase /
-RewriteCond %{HTTPS} off
-RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]

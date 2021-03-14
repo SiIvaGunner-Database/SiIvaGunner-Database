@@ -1,0 +1,60 @@
+{% extends 'baseLayout.html' %}
+{% block content%}
+  <h2>Search the video database</h2>
+  <form action="{% url 'rips:list' %}" method="post">
+    {% csrf_token %}
+    <input type="text" name="searchTerms" placeholder="Search for title or ID"/>
+    <input type="submit" value="Search"/>
+    <select name="sort" selectedIndex=2>
+      <option value="uploadDate">By upload date</option>
+      <option value="title">By title</option>
+      <option value="length">By length</option>
+      <option value="viewCount">By views</option>
+    </select>
+    <select name="sortType">
+      <option value="-">Descending</option>
+      <option value="">Ascending</option>
+    </select>
+    <select name="filter">
+      <option value="Unfiltered">No filter</option>
+      <option value="Documented">Documented</option>
+      <option value="Undocumented">Undocumented</option>
+      <option value="Public">Public</option>
+      <option value="Unlisted">Unlisted</option>
+      <option value="Private">Private</option>
+      <option value="Deleted">Deleted</option>
+      <option value="Unavailable">Unavailable</option>
+    </select>
+    <select name="maxResults">
+      <option value="100">100 results</option>
+      <option value="1000">1,000 results</option>
+      <option value="10000">10,000 results</option>
+      <option value="100000">Show all</option>
+    </select>
+  </form>
+  <a class="smallText" href="{% url 'channels:list' %}">Search for channels instead</a>
+  <table class="rips">
+    <tr class="rip">
+      <th>Video Title</th>
+      <th>Video ID</th>
+      <th>Wiki Status</th>
+      <th>Video Status</th>
+      <th>Upload Date</th>
+      <th>Channel</th>
+      <th>Length</th>
+      <th>Views</th>
+    </tr>
+    {% for rip in rips %}
+      <tr class="rip">
+        <td><a href="{% url 'rips:details' rip.slug %}">{{rip.title}}</a></td>
+        <td><a href="https://www.youtube.com/watch?v={{ rip.videoId }}" target="_blank">{{ rip.videoId }}</a></td>
+        <td>{{ rip.wikiStatus }}</td>
+        <td>{{ rip.videoStatus }}</td>
+        <td>{{ rip.uploadDate }}</td>
+        <td><a href="{% url 'channels:details' rip.channel.slug %}">{{ rip.channel }}</a></td>
+        <td>{{ rip.length }}</td>
+        <td>{{ rip.viewCount }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endblock %}

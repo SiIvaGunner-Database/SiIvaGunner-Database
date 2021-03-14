@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>SiIvaGunner Database</title>
+    <!--
+    <link rel="shortcut icon" type="image/ico" href="{% static 'images/favicons/favicon-48x48.ico' %}"/>
+    <link rel="stylesheet" href="{% static 'style.css' %}"/>
+    <script src="{% static 'script.js' %}"></script>
+    <!---->
+    <!---->
+    <link rel="shortcut icon" type="image/ico" href="https://storage.cloud.google.com/siivagunner-database-media/siivagunnerdb/images/favicons/favicon-48x48.ico"/>
+    <link rel="stylesheet" href="https://storage.cloud.google.com/siivagunner-database-media/siivagunnerdb/style.css"/>
+    <script src="https://storage.cloud.google.com/siivagunner-database-media/siivagunnerdb/script.js"></script>
+    <!---->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-149462139-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-149462139-2');
+    </script>
+  </head>
+  <body>
+    <header class="wrapper">
+      <div>
+        <a id="headerTitle" href="{% url 'home' %}">SiIvaGunner Database</a>
+      </div>
+      <ul>
+        {% if user.is_authenticated %}
+          <li>
+            <form class="logoutLink" action="{% url 'accounts:logout' %}" method="post">
+              {% csrf_token %}
+              <button type="submit">Logout</button>
+            </form>
+            <li><a href="{% url 'accounts:myAccount' %}">Account</a></li>
+          </li>
+        {% else %}
+          <li><a href="{% url 'accounts:signup' %}">Signup</a></li>
+          <li><a href="{% url 'accounts:login' %}">Login</a></li>
+        {% endif %}
+      </ul>
+    </header>
+    <nav>
+      <ul>
+        <li><a href="{% url 'home' %}">Search database</a></li>
+        <li><a href="{% url 'rips:add' %}">Add to database</a></li>
+        <li><a href="{% url 'generate' %}">Generate rip template</a></li>
+        <li><a href="{% url 'reports:add' %}">Report a bug</a></li>
+      </ul>
+    </nav>
+    <main>
+      <div class="wrapper">
+        {% if messages %}
+          <ul class="messages">
+            {% for message in messages %}
+              <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+        {% block content %}
+        {% endblock %}
+      </div>
+    </main>
+    <footer>
+      <a target="_blank" href="https://github.com/AAAAAAidan/">&copy;Aidan Zamboni</a>
+    </footer>
+  </body>
+</html>

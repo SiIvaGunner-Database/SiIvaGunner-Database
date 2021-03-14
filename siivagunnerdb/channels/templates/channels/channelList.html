@@ -1,0 +1,43 @@
+{% extends 'baseLayout.html' %}
+{% block content%}
+  <h2>Search the channel database</h2>
+  <form action="{% url 'channels:list' %}" method="post">
+    {% csrf_token %}
+    <input type="text" name="searchTerms" placeholder="Search for title or ID"/>
+    <input type="submit" value="Search"/>
+    <select name="sort">
+      <option value="joinDate">By join date</option>
+      <option value="name">By name</option>
+      <!--
+      <option value="subscriberCount">By subscribers</option>
+      -->
+    </select>
+    <select name="sortType">
+      <option value="-">Descending</option>
+      <option value="">Ascending</option>
+    </select>
+  </form>
+  <a class="smallText" href="{% url 'rips:list' %}">Search for videos instead</a>
+  <table class="channels">
+    <tr class="channel">
+      <th>Channel Name</th>
+      <th>Channel ID</th>
+      <th>Status</th>
+      <th>Join Date</th>
+      <!--
+      <th>Subscribers</th>
+      -->
+    </tr>
+    {% for channel in channels %}
+      <tr class="channel">
+        <td><a href="{% url 'channels:details' channel.slug %}">{{channel.name}}</a></td>
+        <td><a href="https://www.youtube.com/channel/{{ channel.channelId }}" target="_blank">{{ channel.channelId }}</a></td>
+        <td>{{ channel.channelStatus }}</td>
+        <td>{{ channel.joinDate }}</td>
+        <!--
+        <td>{{ channel.subscriberCount }}</td>
+        -->
+      </tr>
+    {% endfor %}
+  </table>
+{% endblock %}

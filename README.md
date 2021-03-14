@@ -1,6 +1,8 @@
 # SiIvaGunner Database
 
-Manages spreadsheets containing information from nearly every SiIvaGunner video in addition to those from other SiIvaGunner inspired channels.
+siivagunnerdatabase.net is an HTML5 website built with Django that runs on Google Cloud Run and Cloud SQL. Note that it currently only has data from the three main channels and does not yet update automatically.
+
+The Google Apps Script file is used to manage spreadsheets containing data from nearly every SiIvaGunner video in addition to those from other SiIvaGunner inspired channels.
 
 ### External Links
 
