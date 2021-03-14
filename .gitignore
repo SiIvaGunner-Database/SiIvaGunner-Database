@@ -1,6 +1,3 @@
-# Ignore secret file
-siivagunnerdb/.env
-
 # Ignore database file
 siivagunnerdb/db.sqlite3
 
