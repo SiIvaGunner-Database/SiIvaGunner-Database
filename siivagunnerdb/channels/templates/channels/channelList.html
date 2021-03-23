@@ -3,18 +3,22 @@
   <h2>Search the channel database</h2>
   <form action="{% url 'channels:list' %}" method="post">
     {% csrf_token %}
-    <input type="text" name="searchTerms" placeholder="Search for title or ID"/>
+    {% if request.GET.search %}
+      <input type="text" name="searchTerms" placeholder="Search for title or ID" value="{{ request.GET.search }}"/>
+    {% else %}
+      <input type="text" name="searchTerms" placeholder="Search for title or ID"/>
+    {% endif %}
     <input type="submit" value="Search"/>
     <select name="sort">
       <option value="joinDate">By join date</option>
-      <option value="name">By name</option>
+      <option value="name" {% if request.GET.sort == 'name' %} selected {% endif %}>By name</option>
       <!--
       <option value="subscriberCount">By subscribers</option>
       -->
     </select>
     <select name="sortType">
-      <option value="-">Descending</option>
-      <option value="">Ascending</option>
+      <option value="descending">Descending</option>
+      <option value="ascending" {% if request.GET.order == 'ascending' %} selected {% endif %}>Ascending</option>
     </select>
   </form>
   <a class="smallText" href="{% url 'rips:list' %}">Search for videos instead</a>

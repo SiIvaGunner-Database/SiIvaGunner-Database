@@ -3,34 +3,40 @@
   <h2>Search the video database</h2>
   <form action="{% url 'rips:list' %}" method="post">
     {% csrf_token %}
-    <input type="text" name="searchTerms" placeholder="Search for title or ID"/>
+    {% if request.GET.search %}
+      <input type="text" name="searchTerms" placeholder="Search for title or ID" value="{{ request.GET.search }}"/>
+    {% else %}
+      <input type="text" name="searchTerms" placeholder="Search for title or ID"/>
+    {% endif %}
     <input type="submit" value="Search"/>
     <select name="sort" selectedIndex=2>
-      <option value="uploadDate">By upload date</option>
-      <option value="title">By title</option>
-      <option value="length">By length</option>
-      <option value="viewCount">By views</option>
+      <option value="date">By upload date</option>
+      <option value="title" {% if request.GET.sort == 'title' %} selected {% endif %}>By title</option>
+      <!--<option value="length" {% if request.GET.sort == 'length' %} selected {% endif %}>By length</option>-->
+      <option value="views" {% if request.GET.sort == 'views' %} selected {% endif %}>By views</option>
     </select>
     <select name="sortType">
-      <option value="-">Descending</option>
-      <option value="">Ascending</option>
+      <option value="descending">Descending</option>
+      <option value="ascending" {% if request.GET.order == 'ascending' %} selected {% endif %}>Ascending</option>
     </select>
     <select name="filter">
-      <option value="Unfiltered">No filter</option>
-      <option value="Documented">Documented</option>
-      <option value="Undocumented">Undocumented</option>
-      <option value="Public">Public</option>
-      <option value="Unlisted">Unlisted</option>
-      <option value="Private">Private</option>
-      <option value="Deleted">Deleted</option>
-      <option value="Unavailable">Unavailable</option>
+      <option value="unfiltered">No filter</option>
+      <option value="documented" {% if request.GET.filter == 'documented' %} selected {% endif %}>Documented</option>
+      <option value="undocumented" {% if request.GET.filter == 'undocumented' %} selected {% endif %}>Undocumented</option>
+      <option value="public" {% if request.GET.filter == 'public' %} selected {% endif %}>Public</option>
+      <option value="unlisted" {% if request.GET.filter == 'unlisted' %} selected {% endif %}>Unlisted</option>
+      <option value="private" {% if request.GET.filter == 'private' %} selected {% endif %}>Private</option>
+      <option value="deleted" {% if request.GET.filter == 'deleted' %} selected {% endif %}>Deleted</option>
+      <option value="unavailable" {% if request.GET.filter == 'unavailable' %} selected {% endif %}>Unavailable</option>
     </select>
+    <!--
     <select name="maxResults">
       <option value="100">100 results</option>
       <option value="1000">1,000 results</option>
       <option value="10000">10,000 results</option>
       <option value="100000">Show all</option>
     </select>
+    -->
   </form>
   <a class="smallText" href="{% url 'channels:list' %}">Search for channels instead</a>
   <table class="rips">
@@ -57,4 +63,9 @@
       </tr>
     {% endfor %}
   </table>
+  <div style="margin-top:16px; text-align:center;">
+    <a href="{{ urls.0 }}"><</a>
+    {% if request.GET.page %} {{ request.GET.page }} {% else %} 1 {% endif %}
+    <a href="{{ urls.1 }}">></a>
+  </div>
 {% endblock %}
