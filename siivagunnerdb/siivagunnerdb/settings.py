@@ -32,8 +32,8 @@ SECRET_KEY = env("SECRET_KEY")
 ALLOWED_HOSTS = ["*"]
 
 # Default false. True allows default landing pages to be visible
-DEBUG = env("DEBUG")
-#DEBUG = True
+#DEBUG = env("DEBUG")
+DEBUG = False
 
 # Set this value from django-environ
 DATABASES = {"default": env.db()}
