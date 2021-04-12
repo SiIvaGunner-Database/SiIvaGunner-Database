@@ -23,8 +23,6 @@ driverName = 'postgres+pg8000'
 queryString =  dict({"unix_sock": "/cloudsql/{}/.s.PGSQL.5432".format(connectionName)})
 
 def update(request):
-  print(functionPassword)
-  
   jsonRequest = request.get_json()
   result = 'Unknown'
 
@@ -74,7 +72,7 @@ def update(request):
             conn.execute(
               '''
                 Update Rips_rip
-                Set (title, "wikiStatus", "videoStatus", description, "viewCount", "likeCount", "dislikeCount", "commentCount") = 
+                Set (title, "wikiStatus", "videoStatus", description, "viewCount", "likeCount", "dislikeCount", "commentCount") =
                     (%s, %s, %s, %s, %s, %s, %s, %s)
                 Where "videoId" = %s;
               ''',
@@ -99,7 +97,6 @@ def update(request):
 
   except Exception as e:
     result = 'Error: {}'.format(str(e))
-  
+
   print(result)
   return result
-  

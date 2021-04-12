@@ -1,5 +1,7 @@
 var spreadsheet = SpreadsheetApp.openById("1B7b9jEaWiqZI8Z8CzvFN1cBvLVYwjb5xzhWtrgs4anI");
 
+var emailAddress = "a.k.zamboni@gmail.com";
+
 var idCol = 1;
 var titleCol = 2;
 var wikiStatusCol = 3;
@@ -83,7 +85,8 @@ function checkSheet()
       else
         row++;
 
-      //checkWikiStatus(row);
+      checkWikiStatus(row);
+      Utilities.sleep(1000);
       checkVideoStatus(row);
       checkDescTitleStatus(row);
 
@@ -103,7 +106,6 @@ function checkSheet()
   if (errorLog.length > 0)
   {
     // Send an email notifying of any changes or errors.
-    var emailAddress = "a.k.zamboni@gmail.com";
     var subject = "SiIvaGunner Changelog Update";
     var message = "There are " + errorLog.length + " new changes.\n\n" + errorLog.join("\n\n").replace(/NEWLINE/g, "\n");
 
@@ -196,7 +198,7 @@ function checkSheet()
               };
 
               Logger.log("Insert " + videoId + " to database");
-              var updateResponse = updateDatabase(data);
+              var updateResponse = postToDatabase(data);
               Logger.log(updateResponse);
 
               if (updateResponse.indexOf("Error") != -1)
@@ -517,17 +519,18 @@ function checkSheet()
 // Checks to see if any public uploaded rips are missing from the spreadsheet
 function checkPublicVideos()
 {
-  var channels = [["SiIvaGunner", "UC9ecwl3FTG66jIKA9JRDtmg"],
-                  ["TimmyTurnersGrandDad", "UCIXM2qZRG9o4AFmEsKZUIvQ"],
-                  ["VvvvvaVvvvvvr", "UCCPGE1kAoonfPsbieW41ZZA"],
-                  ["Flustered Fernando", "UC8Q9CaWvV5_x90Z9VZ5cxmg"],
-                  ["SiIvaGunner2", "UCYGz7FZImRL8oI68pD7NoKg"],
-                  ["GilvaSunner", "UCraDChjPs-r9FoNsmJufZZQ"]];
+  var channels = [["SiIvaGunner", "UC9ecwl3FTG66jIKA9JRDtmg", 1],
+                  ["TimmyTurnersGrandDad", "UCIXM2qZRG9o4AFmEsKZUIvQ", 3],
+                  ["VvvvvaVvvvvvr", "UCCPGE1kAoonfPsbieW41ZZA", 2],
+                  ["Flustered Fernando", "UC8Q9CaWvV5_x90Z9VZ5cxmg", null],
+                  ["SiIvaGunner2", "UCYGz7FZImRL8oI68pD7NoKg", null],
+                  ["GilvaSunner", "UCraDChjPs-r9FoNsmJufZZQ", null]];
 
   for (var i in channels)
   {
     var channelTitle = channels[i][0];
     var channelId = channels[i][1];
+    var channelDatabaseId = channels[i][2];
 
     Logger.log("Working on " + channelTitle);
 
@@ -557,8 +560,6 @@ function checkPublicVideos()
     Logger.log("Sheet IDs: " + sheetVideoIds.length);
     Logger.log("Video IDs: " + channelVideoIds.length);
 
-    var lastRow = channelSheet.getLastRow();
-
     for (var k in channelVideoIds)
     {
       var index = sheetVideoIds.findIndex(ids => {return ids[0] == channelVideoIds[k]});
@@ -568,10 +569,24 @@ function checkPublicVideos()
     }
 
     for (var k in missingVideoIds)
-      Logger.log("Missing from sheet: " + missingVideoIds[k]);
+      Logger.log("Missing from spreadsheet: " + missingVideoIds[k]);
 
-    // Optionally, add all missing videos to the corresponding sheet.
-    addVideosById(missingVideoIds, channelTitle);
+    // Add missing videos to the corresponding sheet and database table
+    addRipsToSheet(missingVideoIds, channelTitle);
+
+    if (channelDatabaseId != null)
+    {
+      var subject = "SiIvaGunner Spreadsheet Missing IDs";
+      var message = "Missing from spreadsheet: " + missingVideoIds.join(", ");
+
+      if (missingVideoIds.length > 0)
+      {
+        MailApp.sendEmail(emailAddress, subject, message);
+        Logger.log("Email successfully sent.");
+
+        addRipsToDatabase(missingVideoIds, channelTitle, channelDatabaseId);
+      }
+    }
   }
 }
 
@@ -764,7 +779,7 @@ function checkPlaylistVideos()
 
 
 // For manually adding rips to the spreadsheet
-function addVideosById(videoIds, channel)
+function addRipsToSheet(videoIds, channel)
 {
   var logging = false; // Log the operations when true
   var building = true; // Add to sheet when true
@@ -844,7 +859,7 @@ function addVideosById(videoIds, channel)
 
 
 // Sends a post request to a cloud hosted function
-function updateDatabase(data)
+function postToDatabase(data)
 {
   var options = {
         'method' : 'post',
@@ -862,7 +877,7 @@ function updateDatabase(data)
 
 
 // Updates the titles, descriptions, views, etc. of rips from a channel in the database
-function updateChannelRipsInDatabase()
+function updateDatabase()
 {
   var startTime = new Date();
   var startHour = startTime.getHours();
@@ -904,14 +919,6 @@ function updateChannelRipsInDatabase()
 
   for (var i in videoIds)
   {
-    if (!viewCounts[i][0])
-      viewCounts[i][0] = 0;
-    if (!likeCounts[i][0])
-      likeCounts[i][0] = 0;
-    if (!dislikeCounts[i][0])
-      dislikeCounts[i][0] = 0;
-    if (!commentCounts[i][0])
-      commentCounts[i][0] = 0;
     if (!videoIds[i][0])
       break;
 
@@ -938,7 +945,7 @@ function updateChannelRipsInDatabase()
   };
 
   Logger.log("Selected " + videoIds.length + " rips from " + channel);
-  var updateResponse = updateDatabase(data);
+  var updateResponse = postToDatabase(data);
   Logger.log(updateResponse);
 }
 
@@ -947,11 +954,19 @@ function updateChannelRipsInDatabase()
 // Checks a channel in the database for missing rips
 function checkDatabase()
 {
+  var startTime = new Date();
+  var startHour = startTime.getHours();
   var channel = "SiIvaGunner";
-  var channelId = "1";
+  var channelDatabaseId = 1;
+
+  if (startHour < 12)
+  {
+    channel = "TimmyTurnersGrandDad";
+    channelDatabaseId = 3;
+  }
+
   var channelSheet = spreadsheet.getSheetByName(channel);
-  var rowCount = channelSheet.getLastRow() - 1;
-  var videoIds = channelSheet.getRange(2, idCol, rowCount).getValues();
+  var videoIds = channelSheet.getRange("A2:A").getValues();
 
   for (var i in videoIds)
     videoIds[i] = videoIds[i][0];
@@ -959,66 +974,84 @@ function checkDatabase()
   var data = {
     "operation": "check",
     "password": functionPassword,
-    "channelId": channelId,
+    "channelId": channelDatabaseId,
     "videoIds": videoIds,
   };
 
   Logger.log(channel + " has " + videoIds.length + " rips");
-  var updateResponse = updateDatabase(data);
+  var updateResponse = postToDatabase(data);
   Logger.log(updateResponse);
+
+  updateResponse = updateResponse.replace("Missing IDs: ", "").split(", ");
+
+  if (updateResponse != "")
+  {
+    var subject = "SiIvaGunner Database Missing IDs";
+    var message = "Missing from database: " + updateResponse;
+
+    MailApp.sendEmail(emailAddress, subject, message);
+    Logger.log("Email successfully sent.");
+
+    addRipsToDatabase(updateResponse, channel, channelDatabaseId);
+  }
 }
 
 
 
 // For manually adding rips to the database
-function addRipsToDatabase()
+function addRipsToDatabase(idsToAdd, channel, channelDatabaseId)
 {
-  var channel = "SiIvaGunner";
   var channelSheet = spreadsheet.getSheetByName(channel);
   var ids = channelSheet.getRange("A2:A").getValues();
-  var row = 2;
 
-  for (var i in ids)
+  for (var i in idsToAdd)
   {
-    var videoId = ids[i][0];
+    var videoId = idsToAdd[i];
 
-    var title = channelSheet.getRange(row, titleCol).getValue();
-    var wikiStatus = channelSheet.getRange(row, wikiStatusCol).getValue();
-    var videoStatus = channelSheet.getRange(row, videoStatusCol).getValue();
-    var uploadDate = channelSheet.getRange(row, videoUploadDateCol).getValue();
-    var length = channelSheet.getRange(row, videoLengthCol).getValue();
-    var description = channelSheet.getRange(row, videoDescriptionCol).getValue().replace(/NEWLINE/g, "\n");
-    var viewCount = channelSheet.getRange(row, videoViewsCol).getValue();
-    var likeCount = channelSheet.getRange(row, videoLikesCol).getValue();
-    var dislikeCount = channelSheet.getRange(row, videoDislikesCol).getValue();
-    var commentCount = channelSheet.getRange(row, videoCommentsCol).getValue();
+    var index = ids.findIndex(ids => {return ids[0] == videoId});
 
-    var data = {
-      "operation": "insert",
-      "password": functionPassword,
-      "rip":
-      {
-        "videoId": videoId,
-        "title": title,
-        "slug": videoId,
-        "wikiStatus": wikiStatus,
-        "videoStatus": videoStatus,
-        "uploadDate": uploadDate,
-        "description": description.replace(/NEWLINE/g, "\n"),
-        "length": length,
-        "viewCount": viewCount.toString(),
-        "likeCount": likeCount.toString(),
-        "dislikeCount": dislikeCount.toString(),
-        "commentCount": commentCount.toString(),
-        "channelId": channelDatabaseId.toString()
-      }
-    };
+    if (index != -1)
+    {
+      var row = index + 2;
 
-    Logger.log("Insert " + videoId + " to database");
-    var updateResponse = updateDatabase(data);
-    Logger.log(updateResponse);
+      var title = channelSheet.getRange(row, titleCol).getValue();
+      var wikiStatus = channelSheet.getRange(row, wikiStatusCol).getValue();
+      var videoStatus = channelSheet.getRange(row, videoStatusCol).getValue();
+      var uploadDate = channelSheet.getRange(row, videoUploadDateCol).getValue();
+      var length = channelSheet.getRange(row, videoLengthCol).getValue();
+      var description = channelSheet.getRange(row, videoDescriptionCol).getValue().replace(/NEWLINE/g, "\n");
+      var viewCount = channelSheet.getRange(row, videoViewsCol).getValue();
+      var likeCount = channelSheet.getRange(row, videoLikesCol).getValue();
+      var dislikeCount = channelSheet.getRange(row, videoDislikesCol).getValue();
+      var commentCount = channelSheet.getRange(row, videoCommentsCol).getValue();
 
-    row++;
+      var data = {
+        "operation": "insert",
+        "password": functionPassword,
+        "rip":
+        {
+          "videoId": videoId,
+          "title": title,
+          "slug": videoId,
+          "wikiStatus": wikiStatus,
+          "videoStatus": videoStatus,
+          "uploadDate": uploadDate,
+          "description": description.replace(/NEWLINE/g, "\n"),
+          "length": length,
+          "viewCount": viewCount.toString(),
+          "likeCount": likeCount.toString(),
+          "dislikeCount": dislikeCount.toString(),
+          "commentCount": commentCount.toString(),
+          "channelId": channelDatabaseId.toString()
+        }
+      };
+
+      Logger.log("Insert " + videoId + " to database");
+      var updateResponse = postToDatabase(data);
+      Logger.log(updateResponse);
+    }
+    else
+      Logger.log(videoId + " not found");
   }
 }
 
