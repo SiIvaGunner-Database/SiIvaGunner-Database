@@ -1,5 +1,2 @@
 # Ignore database file
 cloudrun/siivagunnerdb/db.sqlite3
-
-# Ignore authentication file
-cloudrun/siivagunnerdb/siivagunner-database-dda5d17a8cba.json
