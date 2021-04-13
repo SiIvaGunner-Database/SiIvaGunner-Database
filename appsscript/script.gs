@@ -174,6 +174,9 @@ function checkSheet()
             var dislikeCount = item.statistics.dislikeCount;
             var commentCount = item.statistics.commentCount;
 
+            if (commentCount.length == 0)
+              commentCount = 0;
+
             if (channelDatabaseId)
             {
               var data = {
@@ -421,7 +424,6 @@ function checkSheet()
     }
     else if (responseText.indexOf('"status":"OK"') != -1)
     {
-      //errorLog.push(title + " video status public. [" + videoId + "]\n" + responseText);
       if (currentStatus != "Public")
         newStatus = "Public";
     }
@@ -479,6 +481,9 @@ function checkSheet()
         var likeCount = item.statistics.likeCount;
         var dislikeCount = item.statistics.dislikeCount;
         var commentCount = item.statistics.commentCount;
+
+        if (commentCount.length == 0)
+          commentCount = 0;
 
         channelSheet.getRange(row, videoViewsCol).setValue(viewCount);
         channelSheet.getRange(row, videoLikesCol).setValue(likeCount);
@@ -574,18 +579,15 @@ function checkPublicVideos()
     // Add missing videos to the corresponding sheet and database table
     addRipsToSheet(missingVideoIds, channelTitle);
 
-    if (channelDatabaseId != null)
+    if (channelDatabaseId != null && missingVideoIds.length > 0)
     {
       var subject = "SiIvaGunner Spreadsheet Missing IDs";
       var message = "Missing from spreadsheet: " + missingVideoIds.join(", ");
 
-      if (missingVideoIds.length > 0)
-      {
-        MailApp.sendEmail(emailAddress, subject, message);
-        Logger.log("Email successfully sent.");
+      MailApp.sendEmail(emailAddress, subject, message);
+      Logger.log("Email successfully sent.");
 
-        addRipsToDatabase(missingVideoIds, channelTitle, channelDatabaseId);
-      }
+      addRipsToDatabase(missingVideoIds, channelTitle, channelDatabaseId);
     }
   }
 }
@@ -820,6 +822,9 @@ function addRipsToSheet(videoIds, channel)
     var dislikeCount = item.statistics.dislikeCount;
     var commentCount = item.statistics.commentCount;
 
+    if (commentCount.length == 0)
+      commentCount = 0;
+
     if (logging)
     {
       Logger.log(channelId);
@@ -947,6 +952,14 @@ function updateDatabase()
   Logger.log("Selected " + videoIds.length + " rips from " + channel);
   var updateResponse = postToDatabase(data);
   Logger.log(updateResponse);
+
+  if (updateResponse.indexOf("Error") != -1)
+  {
+    var subject = "SiIvaGunner Database Update Error";
+
+    MailApp.sendEmail(emailAddress, subject, updateResponse);
+    Logger.log("Email successfully sent.");
+  }
 }
 
 
@@ -984,15 +997,18 @@ function checkDatabase()
 
   updateResponse = updateResponse.replace("Missing IDs: ", "").split(", ");
 
-  if (updateResponse != "")
+  if (updateResponse != "" || updateResponse.indexOf("Error") != -1)
   {
-    var subject = "SiIvaGunner Database Missing IDs";
-    var message = "Missing from database: " + updateResponse;
+    if (updateResponse != "")
+      var subject = "SiIvaGunner Database Missing IDs";
+    else
+      var subject = "SiIvaGunner Database Check Error";
 
-    MailApp.sendEmail(emailAddress, subject, message);
+    MailApp.sendEmail(emailAddress, subject, updateResponse);
     Logger.log("Email successfully sent.");
 
-    addRipsToDatabase(updateResponse, channel, channelDatabaseId);
+    if (updateResponse != "")
+      addRipsToDatabase(updateResponse, channel, channelDatabaseId);
   }
 }
 
