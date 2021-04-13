@@ -1,6 +1,5 @@
 import io
 import os
-
 import environ
 import google.auth
 from google.cloud import secretmanager as sm
@@ -12,7 +11,6 @@ try:
     from .local import *
 except ImportError:
     pass
-
 
 # Pull django-environ settings file, stored in Secret Manager
 SETTINGS_NAME = "application_settings"
@@ -32,7 +30,6 @@ SECRET_KEY = env("SECRET_KEY")
 ALLOWED_HOSTS = ["*"]
 
 # Default false. True allows default landing pages to be visible
-#DEBUG = env("DEBUG")
 DEBUG = False
 
 # Set this value from django-environ

@@ -6,9 +6,13 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, Pass
 from django.contrib.auth.models import User
 from . import forms
 
+
+
+# The signup page
 def signupView(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
+
         if form.is_valid():
             form.save()
             username = form.cleaned_data['username']
@@ -18,14 +22,20 @@ def signupView(request):
             return redirect('rips:list')
     else:
         form = UserCreationForm()
+
     return render(request, 'accounts/signup.html', { 'form':form })
 
+
+
+# The login page
 def loginView(request):
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
+        
         if form.is_valid():
             user = form.get_user()
             login(request, user)
+
             if 'next' in request.POST:
                 return redirect(request.POST.get('next'))
             else:
@@ -34,16 +44,23 @@ def loginView(request):
         form = AuthenticationForm()
     return render(request, 'accounts/login.html', { 'form':form })
 
+
+
+# The logout redirect
 def logoutView(request):
     if request.method == 'POST':
         logout(request)
         return redirect('rips:list')
 
+
+
+# The account page
 @login_required()
 def myAccountView(request):
     if request.method == 'POST':
         if 'saveUsername' in request.POST:
             form = forms.ChangeUsername(request.POST)
+
             if form.is_valid():
                 newusername = form.cleaned_data['username']
                 username = request.user.username
@@ -54,8 +71,10 @@ def myAccountView(request):
                 return redirect('accounts:myAccount')
             else:
                 messages.error(request, 'An error occurred. The username you entered is either taken or contains invalid characters.')
+
         elif 'savePassword' in request.POST:
             form = PasswordChangeForm(request.user, request.POST)
+
             if form.is_valid():
                 user = form.save()
                 update_session_auth_hash(request, user)  # Important!
@@ -63,6 +82,7 @@ def myAccountView(request):
                 return redirect('accounts:myAccount')
             else:
                 messages.error(request, 'An error occurred. Please make sure the password fits the criteria.')
+
     usernameForm = forms.ChangeUsername()
     passwordForm = PasswordChangeForm(request.user)
     return render(request, 'accounts/myAccount.html', { 'usernameForm':usernameForm, 'passwordForm': passwordForm })

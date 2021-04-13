@@ -1,16 +1,23 @@
-var lastSelection = "single";
+var lastSelection = "single"; // Default spacing format for rip templates
 
 document.onkeydown = checkKey;
 
+if (document.location.pathname.match("generate"))
+  document.onclick = checkSelection;
+
+
+
+// Check for enter key presses
 function checkKey(e)
 {
   if (e.code == "Enter" && document.getElementById("inputText") && document.getElementById("inputText").value != "")
     document.getElementById("submitBtn").click();
 }
 
-if (document.location.pathname.match("generate"))
-  document.onclick = checkSelection;
 
+
+
+// Format spacing in the rip template
 function checkSelection()
 {
   var selection = document.getElementById("format").value;
@@ -44,6 +51,9 @@ function checkSelection()
   }
 }
 
+
+
+// Copy rip template text to clipboard
 function copyTemplate()
 {
   var copyText = document.getElementById("template");
@@ -54,6 +64,9 @@ function copyTemplate()
   document.execCommand("copy");
 }
 
+
+
+// Generate a rip template for use with wiki articles
 function generateTemplate()
 {
   var format = document.getElementById("format").value;
@@ -119,8 +132,7 @@ function generateTemplate()
           var catchphrase = "";
           var game = "";
 
-
-          // Add labels if needed.
+          // Add labels if needed
           if (description.indexOf("Composers: ") != -1)
           {
             description = description.replace("Composers: ", "Composer: ");
@@ -153,7 +165,7 @@ function generateTemplate()
             platformLabel = "\n|platform label\t= Platforms";
           }
 
-          // Use regular expressions to get the necessary information from the description.
+          // Use regular expressions to get the necessary information from the description
           var playlistIdPattern = new RegExp("Playlist: (.*)\n");
           var composerPattern = new RegExp("Composer: (.*)\n");
           var platformPattern = new RegExp("Platform: (.*)\n");
@@ -200,12 +212,12 @@ function generateTemplate()
 
           length = length.replace("PT", "").replace("H", ":").replace("M", ":").replace("S", "");
 
-          // Format the upload date.
+          // Format the upload date
           var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-          uploadDate = new Date(uploadDate);//"MMMM d, yyyy"
+          uploadDate = new Date(uploadDate); // "MMMM d, yyyy"
           uploadDate = months[uploadDate.getUTCMonth() - 1] + " " + uploadDate.getUTCDate() + ", " + uploadDate.getUTCFullYear();
 
-          // Seperate the rip title into four parts: full title, song title, game title, and mix.
+          // Seperate the rip title into four parts: full title, song title, game title, and mix
           pageName = pageName.split(" - ");
 
           for (i = 0; i < pageName.length - 1; i++)
@@ -229,7 +241,7 @@ function generateTemplate()
             mix = track.replace(simplifiedTrack + " ", "").replace(/\(/g, "of the ").replace(/\)/g, " ").replace(/Mix/g, "mix").replace(/Version/g, "version");
           }
 
-          // Build the template.
+          // Build the template
           var template = "{{Rip" +
                          "\n|image\t\t= " + game + ".jpg" +
                          "\n" +
@@ -274,6 +286,9 @@ function generateTemplate()
   }
 }
 
+
+
+// Send a URL get request
 function requestUrl(url)
 {
   if (window.XMLHttpRequest)
