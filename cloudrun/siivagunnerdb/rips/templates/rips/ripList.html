@@ -29,14 +29,11 @@
       <option value="deleted" {% if request.GET.filter == 'deleted' %} selected {% endif %}>Deleted</option>
       <option value="unavailable" {% if request.GET.filter == 'unavailable' %} selected {% endif %}>Unavailable</option>
     </select>
-    <!--
-    <select name="maxResults">
-      <option value="100">100 results</option>
-      <option value="1000">1,000 results</option>
-      <option value="10000">10,000 results</option>
-      <option value="100000">Show all</option>
-    </select>
-    -->
+    {% if request.GET.channel %}
+      <input type="hidden" name="channel" value="{{ request.GET.channel }}"/>
+    {% else %}
+      <input type="hidden" name="channel"/>
+    {% endif %}
   </form>
   <a class="smallText" href="{% url 'channels:list' %}">Search for channels instead</a>
   <table class="rips">
@@ -63,9 +60,20 @@
       </tr>
     {% endfor %}
   </table>
-  <div style="margin-top:16px; text-align:center;">
-    <a href="{{ urls.0 }}"><</a>
-    {% if request.GET.page %} {{ request.GET.page }} {% else %} 1 {% endif %}
-    <a href="{{ urls.1 }}">></a>
+  <div class="pageDiv">
+    <div style="text-align:left;">
+      {% for page in pageNumbers %}
+        {% if page == "skip" %}
+          . . .
+        {% elif page == "current" %}
+          <span class="buttonStyleLinkActive">{{ currentPage }}</span>
+        {% else %}
+          <a class="buttonStyleLink" href="{{ url }}{{ page }}">{{ page }}</a>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div style="text-align:right;">
+      Found {{ resultCount }} results
+    </div>
   </div>
 {% endblock %}

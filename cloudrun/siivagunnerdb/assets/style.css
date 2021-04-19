@@ -40,7 +40,7 @@ header, header a, header button, nav, footer {
 
 header {
   display: grid;
-  grid-template-columns: 4fr 1fr;
+  grid-template-columns: 3fr 1fr;
 }
 
 header button, header li a {
@@ -99,7 +99,7 @@ main a:hover {
   color: #0B0080;
 }
 
-main button, main input, main select, main textarea, .errorlist li, .messages li {
+main button, main input, main select, main textarea, .errorlist li, .messages li, .buttonStyleLink, .buttonStyleLinkActive {
   margin-bottom: 4px;
   padding: 4px;
   border: 2px solid #999999;
@@ -108,7 +108,7 @@ main button, main input, main select, main textarea, .errorlist li, .messages li
   font-size: 1em;
 }
 
-main button:hover, main input:hover, main textarea:hover {
+main button:hover, main input:hover, main textarea:hover, tr:nth-child(even), .buttonStyleLink:hover {
   background-color: #F0F0F0;
 }
 
@@ -153,16 +153,16 @@ table {
   font-size: 0.9em;
 }
 
+table, p {
+  white-space: pre-wrap;
+}
+
 th, td {
   border: 2px solid #BBBBBB;
   padding: 4px;
   max-width: 200px;
   overflow: hidden;
   text-align: left;
-}
-
-tr:nth-child(even) {
-  background-color: #F0F0F0;
 }
 
 #headerTitle {
@@ -193,6 +193,16 @@ tr:nth-child(even) {
   margin-bottom: 18px;
 }
 
+.buttonStyleLinkActive {
+  background-color: #DDDDDD;
+}
+
+.pageDiv {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  margin-top:16px;
+}
+
 /* For computer viewing */
 @media only screen and (min-width: 1024px) {
   .gridDiv {
@@ -201,7 +211,7 @@ tr:nth-child(even) {
   }
 }
 
-/* For tablet viewing */
+/* For tablet and mobile viewing */
 @media only screen and (max-width: 1024px) {
   html {
     padding: 0;
@@ -218,5 +228,8 @@ tr:nth-child(even) {
 }
 
 /* For mobile viewing */
-@media only all and (max-width: 768px) {
+@media only screen and (max-width: 768px) {
+  body {
+    font-size: 1.2em;
+  }
 }

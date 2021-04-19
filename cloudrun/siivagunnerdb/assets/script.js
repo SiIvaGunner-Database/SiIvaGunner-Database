@@ -215,7 +215,7 @@ function generateTemplate()
           // Format the upload date
           var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
           uploadDate = new Date(uploadDate); // "MMMM d, yyyy"
-          uploadDate = months[uploadDate.getUTCMonth() - 1] + " " + uploadDate.getUTCDate() + ", " + uploadDate.getUTCFullYear();
+          uploadDate = months[uploadDate.getUTCMonth()] + " " + uploadDate.getUTCDate() + ", " + uploadDate.getUTCFullYear();
 
           // Seperate the rip title into four parts: full title, song title, game title, and mix
           pageName = pageName.split(" - ");

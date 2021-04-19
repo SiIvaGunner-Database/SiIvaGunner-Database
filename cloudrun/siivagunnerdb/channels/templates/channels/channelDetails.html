@@ -6,12 +6,13 @@
     <br />
     <a class="smallText" href="https://web.archive.org/web/*/https://www.youtube.com/channel/{{ channel.channelId }}" target="_blank">View on the Wayback Machine</a>
     <hr />
-    <p>Joined {{ channel.joinDate }}</p>
+    <p style="font-style: italic">Joined on {{ channel.joinDate }}.</p>
+    <p style="font-style: italic">Has uploaded at least {{ ripCount }} videos.</p>
     <p>{{ channel.description }}</p>
     <!--
     <p>At the time of the last check, this channel had {{ channel.subscriberCount }} subscribers.</p>
     -->
-    <h4>Recent Uploads</h4>
+    <h4>Recent Uploads (<a href="{% url 'rips:list' %}?channel={{ channel.channelId }}">View All</a>)</h4>
     <table class="rips">
       <tr class="rip">
         <th>Video Title</th>

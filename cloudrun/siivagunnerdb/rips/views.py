@@ -7,6 +7,7 @@ from django.urls import reverse
 from urllib.parse import urlencode
 from .models import Rip
 from . import forms
+import math
 import re
 
 
@@ -20,7 +21,7 @@ def ripList(request):
         # Check for search parameters
 
         if request.POST['searchTerms']:
-            queryString =  urlencode({'search': request.POST['searchTerms']})  # param=val
+            queryString =  urlencode({'search': request.POST['searchTerms'].strip()})  # param=val
             parameters.append(queryString)
 
         if request.POST['sort'] != 'date':
@@ -33,6 +34,10 @@ def ripList(request):
 
         if request.POST['filter'] != 'unfiltered':
             queryString =  urlencode({'filter': request.POST['filter']})  # param=val
+            parameters.append(queryString)
+
+        if request.POST['channel']:
+            queryString =  urlencode({'channel': request.POST['channel']})  # param=val
             parameters.append(queryString)
 
         # Format the parameters in the URL
@@ -51,45 +56,81 @@ def ripList(request):
         # Load the search parameters if they exist
         # Otherwise, load the defaults
 
+        urlParameters = []
+
         if request.GET.get('search'):
             search = request.GET.get('search')
+            urlParameters.append('search=' + search)
         else:
             search = None
 
         if request.GET.get('sort'):
             sort = request.GET.get('sort')
+            urlParameters.append('sort=' + sort)
+            sortOptions = ["date", "title", "views"]
+
+            if sort not in sortOptions:
+                sort = "uploadDate"
+
             if sort == "views":
                 sort = "viewCount"
         else:
             sort = "uploadDate"
 
         if request.GET.get('order') and request.GET.get('order') == "ascending":
-            order = ""
+            order = "ascending"
+            urlParameters.append('order=' + order)
         else:
-            order = "-"
+            order = "descending"
 
         if request.GET.get('filter'):
             filter = request.GET.get('filter')
+            urlParameters.append('filter=' + filter)
+            filterOptions = ["unfiltered", "documented", "undocumented", "public", "unlisted", "private", "deleted", "unavailable"]
+
+            if filter not in filterOptions:
+                filter = None
         else:
             filter = None
 
-        try:
-            page = int(request.GET.get('page'))
-            if page < 1:
-                page = 1
-        except:
-            page = 1
+        if request.GET.get('channel'):
+            channelId = request.GET.get('channel')
+            urlParameters.append('channel=' + channelId)
+        else:
+            channelId = None
 
-        # If search terms were entered, the search merges multiple queries
+        try:
+            currentPage = int(request.GET.get('page'))
+
+            if currentPage < 1:
+                currentPage = 1
+        except:
+            currentPage = 1
+
+        # Query the search using any given filters or sorting
+
         if search:
             ripsByTitle = Rip.objects.filter(visible=True, title__icontains=search)
             ripsByChannel = Rip.objects.filter(visible=True, channel__name__icontains=search)
             ripsById = Rip.objects.filter(visible=True, videoId__icontains=search)
-            rips = (ripsByTitle | ripsById | ripsByChannel).order_by(order + sort)
+            rips = (ripsByTitle | ripsById | ripsByChannel)
         else:
-            rips = Rip.objects.filter(visible=True).order_by(order + sort)
+            rips = Rip.objects.filter(visible=True)
 
-        # If a filter was given
+        if channelId:
+            rips = rips & Rip.objects.filter(visible=True, channel__channelId=channelId)
+
+        if order == "descending":
+            if sort != "title":
+                rips = rips.order_by('-' + sort)
+            else:
+                rips = rips.order_by(Lower(sort).desc())
+        else:
+            if sort != "title":
+                rips = rips.order_by(sort)
+            else:
+                rips = rips.order_by(Lower(sort))
+
         if filter:
             filter = filter.capitalize()
 
@@ -98,26 +139,67 @@ def ripList(request):
             else:
                 rips = rips.filter(videoStatus=filter)
 
-        # Determine the next and previous page links
+        # Build the url
 
-        ripCount = rips.count()
-        rips = rips[page * 100 - 100:page * 100]
         url = request.get_full_path()
-        url = re.sub('page=.*&', '', url, flags=re.DOTALL)
-        url = re.sub('&page=.*', '', url, flags=re.DOTALL)
+        url = re.sub('\?.*', '?', url, flags=re.DOTALL)
 
         try:
             url.index('?')
             pageStr = '&page='
+            for parameter in urlParameters:
+                url += parameter + '&'
         except:
-            pageStr = '?page='
+            url += '?'
 
-        prevUrl = url + pageStr + str(page - 1)
-        nextUrl = url + pageStr + str(page + 1)
-        urls = [prevUrl, nextUrl]
+        url += 'page='
+
+        # Determine the search page numbers
+
+        resultCount = rips.count()
+        pageCounter = resultCount
+        pageNumber = 0
+        pageNumbers = []
+        lastPage = math.ceil(resultCount / 100)
+
+        if currentPage > lastPage:
+            currentPage = lastPage
+
+        while pageCounter >= 0:
+            pageCounter -= 100
+            pageNumber += 1
+
+            if  (
+                    pageNumber <= 3 or pageNumber >= lastPage - 2
+                    or (pageNumber >= currentPage - 2 and pageNumber <= currentPage + 2)
+                ):
+                if pageNumber == currentPage:
+                    pageNumbers.append('current')
+                else:
+                    pageNumbers.append(pageNumber)
+            elif(
+                    pageNumber == currentPage - 3 or pageNumber == currentPage + 3
+                    or (pageNumber == 4 and currentPage == 1)
+                    or (pageNumber == lastPage - 3 and currentPage == lastPage)
+                ):
+                pageNumbers.append('skip')
+
+        # Use only the rips for the current page
+        rips = rips[currentPage * 100 - 100:currentPage * 100]
+
+        # Format the upload dates
+        for rip in rips:
+            rip.uploadDate = rip.uploadDate.strftime("%Y-%m-%d   %H:%M:%S")
 
         # Return the page with the searched rips
-        return render(request, 'rips/ripList.html', { 'rips':rips, 'urls':urls, } )
+        return render(request, 'rips/ripList.html', {
+                'rips':rips,
+                'url':url,
+                'resultCount':resultCount,
+                'currentPage':currentPage,
+                'pageNumbers':pageNumbers,
+            }
+        )
 
 
 
