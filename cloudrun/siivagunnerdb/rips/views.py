@@ -217,11 +217,7 @@ def ripAdd(request):
 
         if form.is_valid():
             instance = form.save(commit=False)
-
-            if instance.videoId == '' or Rip.objects.filter(slug=instance.videoId).count() > 0:
-                instance.slug = 'CHANGE-ME-' + instance.videoId
-            else:
-                instance.slug = instance.videoId
+            instance.slug = 'SLUG-' + instance.videoId
 
             if request.user.is_authenticated:
                 instance.author = request.user

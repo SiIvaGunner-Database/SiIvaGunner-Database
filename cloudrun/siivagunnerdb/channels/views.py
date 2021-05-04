@@ -114,11 +114,7 @@ def channelAdd(request):
         form = forms.AddChannel(request.POST, request.FILES)
         if form.is_valid():
             instance = form.save(commit=False)
-
-            if instance.channelId == '' or Channel.objects.filter(slug=instance.channelId).count() > 0:
-                instance.slug = 'CHANGE-ME-' + instance.channelId
-            else:
-                instance.slug = instance.channelId
+            instance.slug = 'SLUG-' + instance.channelId
 
             if request.user.is_authenticated:
                 instance.author = request.user
