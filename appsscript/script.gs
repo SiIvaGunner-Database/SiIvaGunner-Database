@@ -96,7 +96,7 @@ function checkSheet()
 
       indexSheet.getRange(indexRow, 2).setValue("Last updated " + formattedTime + " UTC on row " + row + ".");
     }
-    while (updateCount < 40 && currentTime.getTime() - startTime.getTime() < 240000)
+    while (updateCount < 35 && currentTime.getTime() - startTime.getTime() < 180000)
   }
   catch(e)
   {
@@ -174,7 +174,7 @@ function checkSheet()
             var dislikeCount = item.statistics.dislikeCount;
             var commentCount = item.statistics.commentCount;
 
-            if (commentCount.length == 0)
+            if (!commentCount)
               commentCount = 0;
 
             if (channelDatabaseId)
@@ -406,7 +406,7 @@ function checkSheet()
         var responseText = null;
         var currentTime = new Date();
 
-        if (currentTime.getTime() - startTime.getTime() > 240000)
+        if (currentTime.getTime() - startTime.getTime() > 180000)
          break;
       }
     }
@@ -482,7 +482,7 @@ function checkSheet()
         var dislikeCount = item.statistics.dislikeCount;
         var commentCount = item.statistics.commentCount;
 
-        if (commentCount.length == 0)
+        if (!commentCount)
           commentCount = 0;
 
         channelSheet.getRange(row, videoViewsCol).setValue(viewCount);
@@ -822,7 +822,7 @@ function addRipsToSheet(videoIds, channel)
     var dislikeCount = item.statistics.dislikeCount;
     var commentCount = item.statistics.commentCount;
 
-    if (commentCount.length == 0)
+    if (!commentCount)
       commentCount = 0;
 
     if (logging)
