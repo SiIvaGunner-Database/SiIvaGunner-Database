@@ -115,6 +115,7 @@ def channelAdd(request):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.slug = 'SLUG-' + instance.channelId
+            instance.channelId = 'ID-' + instance.channelId
 
             if request.user.is_authenticated:
                 instance.author = request.user

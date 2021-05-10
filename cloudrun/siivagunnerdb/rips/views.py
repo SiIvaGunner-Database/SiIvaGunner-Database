@@ -218,6 +218,7 @@ def ripAdd(request):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.slug = 'SLUG-' + instance.videoId
+            instance.videoId = 'ID-' + instance.videoId
 
             if request.user.is_authenticated:
                 instance.author = request.user
