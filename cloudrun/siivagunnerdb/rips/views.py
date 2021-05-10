@@ -7,6 +7,7 @@ from django.urls import reverse
 from urllib.parse import urlencode
 from .models import Rip
 from . import forms
+import datetime
 import math
 import re
 
@@ -162,6 +163,9 @@ def ripList(request):
         pageNumbers = []
         lastPage = math.ceil(resultCount / 100)
 
+        if lastPage < 1:
+            lastPage = 1
+
         if currentPage > lastPage:
             currentPage = lastPage
 
@@ -185,11 +189,13 @@ def ripList(request):
                 pageNumbers.append('skip')
 
         # Use only the rips for the current page
-        rips = rips[currentPage * 100 - 100:currentPage * 100]
+        if resultCount > 0:
+            rips = rips[currentPage * 100 - 100:currentPage * 100]
 
         # Format the upload dates
         for rip in rips:
-            rip.uploadDate = rip.uploadDate.strftime("%Y-%m-%d   %H:%M:%S")
+            if type(rip.uploadDate) is datetime.datetime:
+                rip.uploadDate = rip.uploadDate.strftime("%Y-%m-%d   %H:%M:%S")
 
         # Return the page with the searched rips
         return render(request, 'rips/ripList.html', {
