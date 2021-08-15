@@ -116,12 +116,13 @@ function generateTemplate()
           }
 
           var pageName = videoJSON.snippet.title.toString();
-          var description = videoJSON.snippet.description.toString().replace(/\r/g, "");
+          var description = videoJSON.snippet.description.toString().replace(/\r/g, "").replace(/  /g, "&nbsp;&nbsp;");
           var uploadDate = videoJSON.snippet.publishedAt.toString();
           var length = videoJSON.contentDetails.duration.toString();
           var channelId = videoJSON.snippet.channelId.toString();
 
           var vavrId = "UCCPGE1kAoonfPsbieW41ZZA";
+          var vavrDescription = description.replace(/\n/g, "<br/>\n");
 
           var playlistId = "";
           var mix = "";
@@ -249,16 +250,6 @@ function generateTemplate()
             mix = track.replace(simplifiedTrack + " ", "").replace(/\(/g, "of the ").replace(/\)/g, " ").replace(/Mix/g, "mix").replace(/Version/g, "version");
           }
 
-          if (channelId == vavrId)
-          {
-            pageName = "{{PAGENAME}}";
-            catchphrase = catchphrase.replace(/catchphrase/g, "description");
-            catchphrase = catchphrase.replace(/\n/g, "<br/>");
-            catchphrase = catchphrase.replace("<br/>", "\n");
-          }
-
-          catchphrase = catchphrase.replace(/  /g, "&nbsp;&nbsp;");
-
           // Build the template
           var template = "{{Rip" +
                          "\n|image\t\t= " + game + ".jpg" +
@@ -275,37 +266,36 @@ function generateTemplate()
                          "\n|length\t\t= " + length +
                          "\n|author\t\t= " + ripper;
 
-          if (channelId == vavrId)
-          {
-            template +=  "\n|all_authors_if_multiple= ";
-          }
-
-          template +=    "\n";
-
           if (channelId != vavrId)
           {
-            template +=  "\n|album\t\t= ";
-          }
-
-          template +=   "\n|track\t\t= " +
+            template +=  "\n" +
+                         "\n|album\t\t= " +
+                         "\n|track\t\t= " +
                          "\n" +
                          "\n|music\t\t= " + track +
                          /* "\n|composer\t= " + */ composer +
                          /* "\n|composer label\t= " + */ composerLabel +
                          /* "\n|platform\t= " + */ platform +
-                         /* "\n|platform label\t= " + */ platformLabel;
-
-          if (channelId == vavrId)
-          {
-            template +=  "\n|previous\t\t= " +
-                         "\n|next\t\t= ";
-          }
-
-          template +=    /* "\n|catchphrase\t= " + */ catchphrase +
+                         /* "\n|platform label\t= " + */ platformLabel +
+                         /* "\n|catchphrase\t= " + */ catchphrase +
                          "\n}}" +
                          "\n\"'''" + pageName + "'''\" is a high quality rip " + mix +
                          "of \"" + simplifiedTrack + "\" from ''" + game + "''." +
+                          "\n== Jokes ==";
+          }
+          else
+          {
+            template +=  "\n|all_authors_if_multiple= " +
+                         "\n" +
+                         "\n|track\t\t= " +
+                         "\n|previous\t\t= " +
+                         "\n|next\t\t= " +
+                         "\n|description\t= " + vavrDescription +
+                         "\n}}" +
+                         "\n\"'''{{PAGENAME}}'''\" is a super duper epic medium-high quality vip " + mix +
+                         "of \"" + simplifiedTrack + "\" from ''" + game + "''." +
                          "\n== Jokes ==";
+          }
 
           if (format == "single")
             template = template.replace(/\t\t= |\t= /g, "= ");
