@@ -119,6 +119,9 @@ function generateTemplate()
           var description = videoJSON.snippet.description.toString().replace(/\r/g, "");
           var uploadDate = videoJSON.snippet.publishedAt.toString();
           var length = videoJSON.contentDetails.duration.toString();
+          var channelId = videoJSON.snippet.channelId.toString();
+
+          var vavrId = "UCCPGE1kAoonfPsbieW41ZZA";
 
           var playlistId = "";
           var mix = "";
@@ -163,6 +166,11 @@ function generateTemplate()
           {
             description = description.replace("Platforms: ", "Platform: ");
             platformLabel = "\n|platform label\t= Platforms";
+          }
+          else if (description.indexOf("Available on: ") != -1)
+          {
+            description = description.replace("Available on: ", "Platform: ");
+            platformLabel = "\n|platform label\t= Available on";
           }
 
           // Use regular expressions to get the necessary information from the description
@@ -241,26 +249,59 @@ function generateTemplate()
             mix = track.replace(simplifiedTrack + " ", "").replace(/\(/g, "of the ").replace(/\)/g, " ").replace(/Mix/g, "mix").replace(/Version/g, "version");
           }
 
+          if (channelId == vavrId)
+          {
+            pageName = "{{PAGENAME}}";
+            catchphrase = catchphrase.replace(/catchphrase/g, "description");
+            catchphrase = catchphrase.replace(/\n/g, "<br/>");
+            catchphrase = catchphrase.replace("<br/>", "\n");
+          }
+
+          catchphrase = catchphrase.replace(/  /g, "&nbsp;&nbsp;");
+
           // Build the template
           var template = "{{Rip" +
                          "\n|image\t\t= " + game + ".jpg" +
                          "\n" +
-                         "\n|link\t\t= " + id +
-                         "\n|playlist\t= " + game +
-                         "\n|playlist id\t= " + playlistId.replace(/h.*=/, "") +
-                         "\n|upload\t\t= " + uploadDate +
+                         "\n|link\t\t= " + id;
+
+          if (channelId != vavrId)
+          {
+            template +=  "\n|playlist\t= " + game +
+                         "\n|playlist id\t= " + playlistId.replace(/h.*=/, "");
+          }
+
+          template +=    "\n|upload\t\t= " + uploadDate +
                          "\n|length\t\t= " + length +
-                         "\n|author\t\t= " + ripper +
-                         "\n" +
-                         "\n|album\t\t= " +
-                         "\n|track\t\t= " +
+                         "\n|author\t\t= " + ripper;
+
+          if (channelId == vavrId)
+          {
+            template +=  "\n|all_authors_if_multiple= ";
+          }
+
+          template +=    "\n";
+
+          if (channelId != vavrId)
+          {
+            template +=  "\n|album\t\t= ";
+          }
+
+          template +=   "\n|track\t\t= " +
                          "\n" +
                          "\n|music\t\t= " + track +
                          /* "\n|composer\t= " + */ composer +
                          /* "\n|composer label\t= " + */ composerLabel +
                          /* "\n|platform\t= " + */ platform +
-                         /* "\n|platform label\t= " + */ platformLabel +
-                         /* "\n|catchphrase\t= " + */ catchphrase +
+                         /* "\n|platform label\t= " + */ platformLabel;
+
+          if (channelId == vavrId)
+          {
+            template +=  "\n|previous\t\t= " +
+                         "\n|next\t\t= ";
+          }
+
+          template +=    /* "\n|catchphrase\t= " + */ catchphrase +
                          "\n}}" +
                          "\n\"'''" + pageName + "'''\" is a high quality rip " + mix +
                          "of \"" + simplifiedTrack + "\" from ''" + game + "''." +
