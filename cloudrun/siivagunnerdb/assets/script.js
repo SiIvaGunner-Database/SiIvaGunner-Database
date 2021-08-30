@@ -80,7 +80,7 @@ function generateTemplate()
   }
   else
   {
-    var id = input.replace("{\"\":\"", "").replace("\"}", "").replace("&feature=youtu.be", "").replace(/&.*/, "").replace(/h.*=/, "");
+    var id = input.replace(/&.*/g, "").replace(/.*[=\/]/g, "");
 
     if (id.length != 11)
     {
