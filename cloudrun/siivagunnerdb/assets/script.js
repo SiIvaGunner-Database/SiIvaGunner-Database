@@ -8,8 +8,7 @@ if (document.location.pathname.match("generate"))
 
 
 // Check for enter key presses
-function checkKey(e)
-{
+function checkKey(e) {
   if (e.code == "Enter" && document.getElementById("inputText") && document.getElementById("inputText").value != "")
     document.getElementById("submitBtn").click();
 }
@@ -18,12 +17,10 @@ function checkKey(e)
 
 
 // Format spacing in the rip template
-function checkSelection()
-{
+function checkSelection() {
   var selection = document.getElementById("format").value;
 
-  if (selection != lastSelection)
-  {
+  if (selection != lastSelection) {
     var template = document.getElementById("template").value;
     template = template.toString().replace("== Jokes ==", "JOKEHEADER");
     lastSelection = selection;
@@ -34,8 +31,7 @@ function checkSelection()
       template = template.replace(/\t\t\t= |\t\t= |\t= | = |=/g, "= ");
     else if (selection == "double")
       template = template.replace(/\t\t\t= |\t\t= |\t= |= |=/g, " = ");
-    else if (selection == "tab")
-    {
+    else if (selection == "tab") {
       template = template.replace(/ = |= |=/g, "\t\t\t= ");
       template = template.replace("playlist\t\t", "playlist\t");
       template = template.replace("playlist id\t\t\t", "playlist id\t");
@@ -54,8 +50,7 @@ function checkSelection()
 
 
 // Copy rip template text to clipboard
-function copyTemplate()
-{
+function copyTemplate() {
   var copyText = document.getElementById("template");
 
   copyText.select();
@@ -67,29 +62,24 @@ function copyTemplate()
 
 
 // Generate a rip template for use with wiki articles
-function generateTemplate()
-{
+function generateTemplate() {
   var format = document.getElementById("format").value;
   var input = document.getElementById("inputText").value.trim();
 
-  if (input.length == 0)
-  {
+  if (input.length == 0) {
     document.getElementById("template").rows = 1;
     document.getElementById("template").innerHTML = "Please enter a video URL or ID. For example: \"NzoneDE0A2o\"";
     document.getElementById("thumbnail").innerHTML = "";
   }
-  else
-  {
+  else {
     var id = input.replace(/&.*/g, "").replace(/.*[=\/]/g, "");
 
-    if (id.length != 11)
-    {
+    if (id.length != 11) {
       document.getElementById("template").rows = 1;
       document.getElementById("template").innerHTML = "Invalid video URL or ID: \"" + input + "\"";
       document.getElementById("thumbnail").innerHTML = "";
     }
-    else
-    {
+    else {
       var url = "https://youtube.googleapis.com/youtube/v3/videos?";
       var params = {
         part: "id,snippet,contentDetails",
@@ -101,14 +91,11 @@ function generateTemplate()
 
       var urlRequest = requestUrl(url);
 
-      urlRequest.onreadystatechange = function()
-      {
-        if (urlRequest.readyState == 4 && urlRequest.status == 200)
-        {
+      urlRequest.onreadystatechange = function() {
+        if (urlRequest.readyState == 4 && urlRequest.status == 200) {
           var videoJSON = JSON.parse(urlRequest.responseText).items[0];
 
-          if (!videoJSON)
-          {
+          if (!videoJSON) {
             document.getElementById("template").rows = 1;
             document.getElementById("template").innerHTML = 'No video found with the ID "' + id + '"';
             document.getElementById("thumbnail").innerHTML = "";
@@ -137,39 +124,32 @@ function generateTemplate()
           var game = "";
 
           // Add labels if needed
-          if (description.indexOf("Composers: ") != -1)
-          {
+          if (description.indexOf("Composers: ") != -1) {
             description = description.replace("Composers: ", "Composer: ");
             composerLabel = "\n|composer label\t= Composers";
           }
-          else if (description.indexOf("Composer(s): ") != -1)
-          {
+          else if (description.indexOf("Composer(s): ") != -1) {
             description = description.replace("Composer(s): ", "Composer: ");
             composerLabel = "\n|composer label\t= Composer(s)";
           }
-          else if (description.indexOf("Arrangement: ") != -1)
-          {
+          else if (description.indexOf("Arrangement: ") != -1) {
             description = description.replace("Arrangement: ", "Composer: ");
             composerLabel = "\n|composer label\t= Arrangement";
           }
-          else if (description.indexOf("Arrangers: ") != -1)
-          {
+          else if (description.indexOf("Arrangers: ") != -1) {
             description = description.replace("Arrangers: ", "Composer: ");
             composerLabel = "\n|composer label\t= Arrangers";
           }
-          else if (description.indexOf("Composed by: ") != -1)
-          {
+          else if (description.indexOf("Composed by: ") != -1) {
             description = description.replace("Composed by: ", "Composer: ");
             composerLabel = "\n|composer label\t= Composed by";
           }
 
-          if (description.indexOf("Platforms: ") != -1)
-          {
+          if (description.indexOf("Platforms: ") != -1) {
             description = description.replace("Platforms: ", "Platform: ");
             platformLabel = "\n|platform label\t= Platforms";
           }
-          else if (description.indexOf("Available on: ") != -1)
-          {
+          else if (description.indexOf("Available on: ") != -1) {
             description = description.replace("Available on: ", "Platform: ");
             platformLabel = "\n|platform label\t= Available on";
           }
@@ -181,8 +161,7 @@ function generateTemplate()
 
           if (description.indexOf("\n\n") != -1)
             var ripperPattern = new RegExp("Ripper: (.*)\n");
-          else
-          {
+          else {
             var ripperPattern = new RegExp("Ripper: (.*)");
             catchphrase = "\n|catchphrase\t= ";
           }
@@ -204,8 +183,7 @@ function generateTemplate()
           if (description.indexOf("Please read the channel description.") == -1 && description.indexOf("\n\n") != -1)
             catchphrase = "\n|catchphrase\t= " + description.split("\n\n").pop();
 
-          for (var i = 0; i < length.length; i++)
-          {
+          for (var i = 0; i < length.length; i++) {
             if (length.charAt(i) == "T" && length.charAt(i + 2) == "S")
               length = length.replace("PT", "0:0");
             else if (length.charAt(i) == "T" && length.charAt(i + 3) == "S")
@@ -229,8 +207,7 @@ function generateTemplate()
           // Seperate the rip title into four parts: full title, song title, game title, and mix
           pageName = pageName.split(" - ");
 
-          for (i = 0; i < pageName.length - 1; i++)
-          {
+          for (i = 0; i < pageName.length - 1; i++) {
             track += pageName[i] + " - ";
             game = pageName[i+1];
           }
@@ -239,8 +216,7 @@ function generateTemplate()
           track = track.substring(0, track.length - 3);
           simplifiedTrack = track;
 
-          if (track.indexOf("(") != -1 && (track.indexOf("Mix)") != -1 || track.indexOf("Version)") != -1))
-          {
+          if (track.indexOf("(") != -1 && (track.indexOf("Mix)") != -1 || track.indexOf("Version)") != -1)) {
             var simplifiedTrackPattern = new RegExp(/(.*) \(/);
             track = track.replace(/,/g, "COMMA");
             simplifiedTrack = simplifiedTrackPattern.exec(track).toString().split(",").pop().replace(/COMMA/g, ",");
@@ -256,8 +232,7 @@ function generateTemplate()
                          "\n" +
                          "\n|link\t\t= " + id;
 
-          if (channelId != vavrId)
-          {
+          if (channelId != vavrId) {
             template +=  "\n|playlist\t= " + game +
                          "\n|playlist id\t= " + playlistId.replace(/h.*=/, "");
           }
@@ -266,8 +241,7 @@ function generateTemplate()
                          "\n|length\t\t= " + length +
                          "\n|author\t\t= " + ripper;
 
-          if (channelId != vavrId)
-          {
+          if (channelId != vavrId) {
             template +=  "\n" +
                          "\n|album\t\t= " +
                          "\n|track\t\t= " +
@@ -283,8 +257,7 @@ function generateTemplate()
                          "of \"" + simplifiedTrack + "\" from ''" + game + "''." +
                           "\n== Jokes ==";
           }
-          else
-          {
+          else {
             template +=  "\n|all_authors_if_multiple= " +
                          "\n" +
                          "\n|track\t\t= " +
@@ -320,8 +293,7 @@ function generateTemplate()
 
 
 // Send a URL get request
-function requestUrl(url)
-{
+function requestUrl(url) {
   if (window.XMLHttpRequest)
     var request = new XMLHttpRequest(); // For modern browsers
   else
