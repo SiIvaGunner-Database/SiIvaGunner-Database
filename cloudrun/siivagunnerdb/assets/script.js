@@ -108,6 +108,7 @@ function generateTemplate() {
           var length = videoJSON.contentDetails.duration.toString();
           var channelId = videoJSON.snippet.channelId.toString();
 
+          var mysiktId = "UCnv4xkWtbqAKMj8TItM6kOA";
           var vavrId = "UCCPGE1kAoonfPsbieW41ZZA";
           var vavrDescription = description.replace(/\n/g, "<br/>\n");
 
@@ -205,25 +206,38 @@ function generateTemplate() {
           uploadDate = months[uploadDate.getUTCMonth()] + " " + uploadDate.getUTCDate() + ", " + uploadDate.getUTCFullYear();
 
           // Seperate the rip title into four parts: full title, song title, game title, and mix
-          pageName = pageName.split(" - ");
+          if (channelId == mysiktId) {
+            var titleSections = pageName.split(/ \| /g);
+            track = titleSections[0];
+            game = titleSections[1];
+            simplifiedTrack = track;
 
-          for (i = 0; i < pageName.length - 1; i++) {
-            track += pageName[i] + " - ";
-            game = pageName[i+1];
+            if (track.indexOf("~") != -1 && (track.indexOf("Mix") != -1 || track.indexOf("Version") != -1)) {
+              var trackSections = track.split(/ ~ /g);
+              simplifiedTrack = trackSections[0];
+              mix = "of the " + trackSections[1].replace(/Mix/g, "mix").replace(/Version/g, "version") + " ";
+            }
           }
+          else {
+            pageName = pageName.split(" - ");
 
-          pageName = pageName.join(" - ");
-          track = track.substring(0, track.length - 3);
-          simplifiedTrack = track;
+            for (i = 0; i < pageName.length - 1; i++) {
+              track += pageName[i] + " - ";
+              game = pageName[i+1];
+            }
 
-          if (track.indexOf("(") != -1 && (track.indexOf("Mix)") != -1 || track.indexOf("Version)") != -1)) {
-            var simplifiedTrackPattern = new RegExp(/(.*) \(/);
-            track = track.replace(/,/g, "COMMA");
-            simplifiedTrack = simplifiedTrackPattern.exec(track).toString().split(",").pop().replace(/COMMA/g, ",");
-            simplifiedTrack = simplifiedTrack.replace(/COMMA/g, ",");
-            track = track.replace(/COMMA/g, ",");
+            pageName = pageName.join(" - ");
+            track = track.substring(0, track.length - 3);
+            simplifiedTrack = track;
 
-            mix = track.replace(simplifiedTrack + " ", "").replace(/\(/g, "of the ").replace(/\)/g, " ").replace(/Mix/g, "mix").replace(/Version/g, "version");
+            if (track.indexOf("(") != -1 && (track.indexOf("Mix)") != -1 || track.indexOf("Version)") != -1)) {
+              var simplifiedTrackPattern = new RegExp(/(.*) \(/);
+              track = track.replace(/,/g, "COMMA");
+              simplifiedTrack = simplifiedTrackPattern.exec(track).toString().split(",").pop().replace(/COMMA/g, ",");
+              simplifiedTrack = simplifiedTrack.replace(/COMMA/g, ",");
+              track = track.replace(/COMMA/g, ",");
+              mix = track.replace(simplifiedTrack + " ", "").replace(/\(/g, "of the ").replace(/\)/g, " ").replace(/Mix/g, "mix").replace(/Version/g, "version");
+            }
           }
 
           // Build the template
