@@ -108,6 +108,8 @@ function generateTemplate() {
           var length = videoJSON.contentDetails.duration.toString();
           var channelId = videoJSON.snippet.channelId.toString();
 
+          var siivaId = "UC9ecwl3FTG66jIKA9JRDtmg";
+          var ttgdId = "UCIXM2qZRG9o4AFmEsKZUIvQ";
           var mysiktId = "UCnv4xkWtbqAKMj8TItM6kOA";
           var vavrId = "UCCPGE1kAoonfPsbieW41ZZA";
           var vavrDescription = description.replace(/\n/g, "<br/>\n");
@@ -116,6 +118,7 @@ function generateTemplate() {
           var mix = "";
           var track = "";
           var simplifiedTrack = "";
+          var developer = "";
           var composer = "";
           var composerLabel = "";
           var platform = "";
@@ -125,42 +128,47 @@ function generateTemplate() {
           var game = "";
 
           // Add labels if needed
-          if (description.indexOf("Composers: ") != -1) {
+          if (description.includes("Composers: ")) {
             description = description.replace("Composers: ", "Composer: ");
             composerLabel = "\n|composer label\t= Composers";
           }
-          else if (description.indexOf("Composer(s): ") != -1) {
+          else if (description.includes("Composer(s): ")) {
             description = description.replace("Composer(s): ", "Composer: ");
             composerLabel = "\n|composer label\t= Composer(s)";
           }
-          else if (description.indexOf("Arrangement: ") != -1) {
+          else if (description.includes("Arrangement: ")) {
             description = description.replace("Arrangement: ", "Composer: ");
             composerLabel = "\n|composer label\t= Arrangement";
           }
-          else if (description.indexOf("Arrangers: ") != -1) {
+          else if (description.includes("Arrangers: ")) {
             description = description.replace("Arrangers: ", "Composer: ");
             composerLabel = "\n|composer label\t= Arrangers";
           }
-          else if (description.indexOf("Composed by: ") != -1) {
+          else if (description.includes("Composed by: ")) {
             description = description.replace("Composed by: ", "Composer: ");
             composerLabel = "\n|composer label\t= Composed by";
           }
 
-          if (description.indexOf("Platforms: ") != -1) {
+          if (description.includes("Platforms: ")) {
             description = description.replace("Platforms: ", "Platform: ");
             platformLabel = "\n|platform label\t= Platforms";
           }
-          else if (description.indexOf("Available on: ") != -1) {
+          else if (description.includes("Available on: ")) {
             description = description.replace("Available on: ", "Platform: ");
             platformLabel = "\n|platform label\t= Available on";
+          }
+
+          if (description.includes("Ripped by: ")) {
+            description = description.replace("Ripped by: ", "Ripper: ");
           }
 
           // Use regular expressions to get the necessary information from the description
           var playlistIdPattern = new RegExp("Playlist: (.*)\n");
           var composerPattern = new RegExp("Composer: (.*)\n");
+          var developerPattern = new RegExp("Developed by: (.*)\n");
           var platformPattern = new RegExp("Platform: (.*)\n");
 
-          if (description.indexOf("\n\n") != -1)
+          if (description.includes("\n\n"))
             var ripperPattern = new RegExp("Ripper: (.*)\n");
           else {
             var ripperPattern = new RegExp("Ripper: (.*)");
@@ -169,20 +177,23 @@ function generateTemplate() {
 
           description = description.replace(/,/g, "COMMA");
 
-          if (description.indexOf("Playlist: ") != -1)
+          if (description.includes("Playlist: "))
             playlistId = playlistIdPattern.exec(description).toString().split(",").pop();
 
-          if (description.indexOf("Ripper: ") != -1)
+          if (description.includes("Ripper: "))
             ripper = ripperPattern.exec(description).toString().split(",").pop().replace(/COMMA/g, ",");
 
-          if (description.indexOf("Composer: ") != -1)
+          if (description.includes("Developed by: "))
+            developer = developerPattern.exec(description).toString().split(",").pop().replace(/COMMA/g, ",");
+
+          if (description.includes("Composer: "))
             composer = "\n|composer\t= " + composerPattern.exec(description).toString().split(",").pop().replace(/COMMA/g, ",");
 
-          if (description.indexOf("Platform: ") != -1)
+          if (description.includes("Platform: "))
             platform = "\n|platform\t= " + platformPattern.exec(description).toString().split(",").pop().replace(/COMMA/g, ",");
 
-          if (description.indexOf("Please read the channel description.") == -1 && description.indexOf("\n\n") != -1)
-            catchphrase = "\n|catchphrase\t= " + description.split("\n\n").pop();
+          if (!description.includes("Please read the channel description.") && description.match(/(\n\n|═\n)/))
+            catchphrase = "\n|catchphrase\t= " + description.split(/(\n\n|═\n)/).pop().replace(/COMMA/g, ",");
 
           for (var i = 0; i < length.length; i++) {
             if (length.charAt(i) == "T" && length.charAt(i + 2) == "S")
@@ -195,7 +206,7 @@ function generateTemplate() {
               length = length.replace("H", ":0");
           }
 
-          if (length.indexOf("S") == -1)
+          if (!length.includes("S"))
             length += "00";
 
           length = length.replace("PT", "").replace("H", ":").replace("M", ":").replace("S", "");
@@ -206,82 +217,107 @@ function generateTemplate() {
           uploadDate = months[uploadDate.getUTCMonth()] + " " + uploadDate.getUTCDate() + ", " + uploadDate.getUTCFullYear();
 
           // Seperate the rip title into four parts: full title, song title, game title, and mix
-          if (channelId == mysiktId) {
-            var titleSections = pageName.split(/ \| /g);
-            track = titleSections[0];
-            game = titleSections[1];
-            simplifiedTrack = track;
+          var gameSeperatorChar = "-";
+          var versionSeperatorChar = "(";
 
-            if (track.indexOf("~") != -1 && (track.indexOf("Mix") != -1 || track.indexOf("Version") != -1)) {
-              var trackSections = track.split(/ ~ /g);
-              simplifiedTrack = trackSections[0];
-              mix = "of the " + trackSections[1].replace(/Mix/g, "mix").replace(/Version/g, "version") + " ";
+          if (channelId == mysiktId) {
+            if (pageName.includes("~")) {
+              versionSeperatorChar = "~";
+            }
+
+            if (pageName.includes("|")) {
+              gameSeperatorChar = "|";
             }
           }
+
+          var titleSections = pageName.split(gameSeperatorChar);
+
+          if (titleSections.length > 1) {
+            game = titleSections.pop().trim();
+            track = titleSections.join(gameSeperatorChar).trim();
+          }
           else {
-            pageName = pageName.split(" - ");
+            game = pageName;
+            track = pageName;
+          }
 
-            for (i = 0; i < pageName.length - 1; i++) {
-              track += pageName[i] + " - ";
-              game = pageName[i+1];
+          if (channelId == mysiktId) {
+            if (description.match(game + ": (.*)\n")) {
+              playlistIdPattern = new RegExp(game + ": (.*)\n");
+              playlistId = playlistIdPattern.exec(description).toString().split(",").pop();
             }
 
-            pageName = pageName.join(" - ");
-            track = track.substring(0, track.length - 3);
-            simplifiedTrack = track;
+            game = game.replace(/ Music$/, "");
+          }
 
-            if (track.indexOf("(") != -1 && (track.indexOf("Mix)") != -1 || track.indexOf("Version)") != -1)) {
-              var simplifiedTrackPattern = new RegExp(/(.*) \(/);
-              track = track.replace(/,/g, "COMMA");
-              simplifiedTrack = simplifiedTrackPattern.exec(track).toString().split(",").pop().replace(/COMMA/g, ",");
-              simplifiedTrack = simplifiedTrack.replace(/COMMA/g, ",");
-              track = track.replace(/COMMA/g, ",");
-              mix = track.replace(simplifiedTrack + " ", "").replace(/\(/g, "of the ").replace(/\)/g, " ").replace(/Mix/g, "mix").replace(/Version/g, "version");
-            }
+          simplifiedTrack = track;
+
+          if (track.includes(versionSeperatorChar) && (track.includes("Mix") || track.includes("Version"))) {
+            var trackSections = track.split(versionSeperatorChar);
+            mix = "of the " + trackSections.pop().replace(/\)/g, "").replace(/Mix/g, "mix").replace(/Version/g, "version").trim() + " ";
+            simplifiedTrack = trackSections.join(versionSeperatorChar).trim();
           }
 
           // Build the template
-          var template = "{{Rip" +
-                         "\n|image\t\t= " + game + ".jpg" +
-                         "\n" +
-                         "\n|link\t\t= " + id;
+          var template = "";
 
-          if (channelId != vavrId) {
-            template +=  "\n|playlist\t= " + game +
-                         "\n|playlist id\t= " + playlistId.replace(/h.*=/, "");
+          if (pageName.includes("|")) {
+            template += "{{DISPLAYTITLE:" + pageName.replace(/\|/g, "{{!}}") + "}}\n"
           }
 
-          template +=    "\n|upload\t\t= " + uploadDate +
-                         "\n|length\t\t= " + length +
-                         "\n|author\t\t= " + ripper;
+          template += "{{Rip" +
+                      "\n|image\t\t= " + game + ".jpg" +
+                      "\n" +
+                      "\n|link\t\t= " + id;
 
           if (channelId != vavrId) {
-            template +=  "\n" +
-                         "\n|album\t\t= " +
-                         "\n|track\t\t= " +
-                         "\n" +
-                         "\n|music\t\t= " + track +
-                         /* "\n|composer\t= " + */ composer +
-                         /* "\n|composer label\t= " + */ composerLabel +
-                         /* "\n|platform\t= " + */ platform +
-                         /* "\n|platform label\t= " + */ platformLabel +
-                         /* "\n|catchphrase\t= " + */ catchphrase +
-                         "\n}}" +
-                         "\n\"'''" + pageName + "'''\" is a high quality rip " + mix +
-                         "of \"" + simplifiedTrack + "\" from ''" + game + "''." +
-                          "\n== Jokes ==";
+            template += "\n|playlist\t= " + game +
+                        "\n|playlist id\t= " + playlistId.replace(/h.*=/, "");
+          }
+
+          template += "\n|upload\t\t= " + uploadDate +
+                      "\n|length\t\t= " + length +
+                      "\n|author\t\t= " + ripper;
+
+          if (channelId != vavrId) {
+            template += "\n";
+
+            if (channelId == siivaId || channelId == ttgdId) {
+              template += "\n|album\t\t= " +
+                          "\n|track\t\t= " +
+                          "\n";
+            }
+
+            if (channelId != mysiktId) {
+              template += "\n|music\t\t= " + track;
+            }
+
+            template += /* "\n|composer\t= " + */ composer +
+                        /* "\n|composer label\t= " + */ composerLabel;
+
+            if (channelId == mysiktId) {
+              template += "\n|developer\t\t= " + developer;
+            }
+
+            template += /* "\n|platform\t= " + */ platform +
+                        /* "\n|platform label\t= " + */ platformLabel +
+                        /* "\n|catchphrase\t= " + */ catchphrase +
+                        "\n}}" +
+                        "\n\"'''" + pageName + "'''\" is a high quality rip " + mix +
+                        "of \"" + simplifiedTrack + "\" from ''" + game + "''." +
+                        "\n== Jokes ==";
           }
           else {
-            template +=  "\n|all_authors_if_multiple= " +
-                         "\n" +
-                         "\n|track\t\t= " +
-                         "\n|previous\t\t= " +
-                         "\n|next\t\t= " +
-                         "\n|description\t= " + vavrDescription +
-                         "\n}}" +
-                         "\n\"'''{{PAGENAME}}'''\" is a super duper epic medium-high quality vip " + mix +
-                         "of \"" + simplifiedTrack + "\" from ''" + game + "''." +
-                         "\n== Jokes ==";
+            template += "\n|all_authors_if_multiple= " +
+                        "\n" +
+                        "\n|track\t\t= " +
+                        "\n|previous\t\t= " +
+                        "\n|next\t\t= " +
+                        "\n|description\t= " + vavrDescription +
+                        "\n}}" +
+                        "\n\"'''{{PAGENAME}}'''\" is a super duper epic medium-high quality vip " + mix +
+                        "of \"" + simplifiedTrack + "\" from ''" + game + "''." +
+                        "\n== Jokes ==";
           }
 
           if (format == "single")
