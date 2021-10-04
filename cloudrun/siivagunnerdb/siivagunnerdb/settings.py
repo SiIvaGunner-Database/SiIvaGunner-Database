@@ -1,8 +1,11 @@
 try:
-    from .localsettings import *
+    print("Loading base settings")
+    from .basesettings import *
+    print("Loading local")
     from .local import *
-    from .productionsettings import *
-    print("Using production settings")
-except ImportError:
-    print("Using local settings")
+    print("Loading production settings")
+    from .prodsettings import *
+    print("Done!")
+except ImportError as error:
+    print(error)
     pass
