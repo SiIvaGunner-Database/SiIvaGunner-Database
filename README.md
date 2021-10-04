@@ -4,7 +4,7 @@
 
 ### Local Development
 
-Requires an active [Django development environment](https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/development_environment). Start by navigating into ```cloudrun/siivagunnerdb/```. Then use the following command to run locally. Currently, the project requires credentials to run locally, but I plan on fixing this in the future.
+Requires an active [Django development environment](https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/development_environment). Navigate into ```cloudrun/siivagunnerdb/```, then use the following command:
 
     python manage.py runserver
 
