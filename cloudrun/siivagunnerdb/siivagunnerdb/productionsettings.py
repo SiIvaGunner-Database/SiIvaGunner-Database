@@ -18,22 +18,15 @@ env.read_env(io.StringIO(payload))
 # Setting this value from django-environ
 SECRET_KEY = env("SECRET_KEY")
 
-# Allow all hosts to access Django site
-ALLOWED_HOSTS = ["*"]
-
-# Default false. True allows default landing pages to be visible
-DEBUG = False
-
 # Set this value from django-environ
 DATABASES = {"default": env.db()}
 
 INSTALLED_APPS += ["storages"] # for django-storages
 if "siivagunnerdb" not in INSTALLED_APPS:
-     INSTALLED_APPS += ["siivagunnerdb"] # for custom data migration
+    INSTALLED_APPS += ["siivagunnerdb"] # for custom data migration
 
 # Define static storage via django-storages[google]
 GS_BUCKET_NAME = env("GS_BUCKET_NAME")
-STATICFILES_DIRS = []
 DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
 STATICFILES_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
 GS_DEFAULT_ACL = "publicRead"
