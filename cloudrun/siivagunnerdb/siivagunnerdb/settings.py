@@ -1,11 +1,7 @@
+from .basesettings import *
+
 try:
-    print("Loading base settings")
-    from .basesettings import *
-    print("Loading local")
-    from .local import *
-    print("Loading production settings")
     from .prodsettings import *
-    print("Done!")
-except ImportError as error:
-    print(error)
-    pass
+    print("Loaded production settings!")
+except Exception as e:
+    print("Failed to load production settings: " + str(e))
