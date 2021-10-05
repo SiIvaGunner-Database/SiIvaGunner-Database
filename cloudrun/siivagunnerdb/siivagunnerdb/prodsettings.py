@@ -3,6 +3,7 @@ import os
 import environ
 import google.auth
 from google.cloud import secretmanager as sm
+from .basesettings import *
 
 # Pull django-environ settings file, stored in Secret Manager
 SETTINGS_NAME = "application_settings"
