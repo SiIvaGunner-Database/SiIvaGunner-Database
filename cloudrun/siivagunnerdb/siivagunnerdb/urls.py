@@ -15,7 +15,6 @@ urlpatterns = [
     path('reports/', include('reports.urls')),
     path('rips/', include('rips.urls')),
     path('generate/', views.generate, name="generate"),
-    path('report/', views.report, name="report"),
     path('', ripViews.ripList, name="home"),
 ]
 

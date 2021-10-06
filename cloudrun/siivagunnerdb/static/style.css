@@ -1,4 +1,3 @@
-
 /*
 Inspector Gadget
 Skin: #ECBCA7
@@ -82,12 +81,14 @@ nav li a:hover, footer a:hover {
 
 main {
   padding: 16px;
+  display: flex;
+  flex-flow: column;
   flex-grow: 1;
   color: #444444;
   background-color: #F8F8F8;
 }
 
-main, textarea:not(.wikiText) {
+main, textarea:not(#template) {
   font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 }
 
@@ -168,16 +169,6 @@ th, td {
 #headerTitle {
   margin-left: 16px;
   font-size: 2.4em;
-}
-
-#template {
-  border: none;
-  background-color: inherit;
-}
-
-#thumbnail img {
-  height: 180px;
-  width: 320px;
 }
 
 .wikiText {

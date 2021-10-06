@@ -8,9 +8,6 @@ from .basesettings import *
 # Pull django-environ settings file, stored in Secret Manager
 SETTINGS_NAME = "application_settings"
 
-# Allow all hosts to access Django site
-ALLOWED_HOSTS = ["*"]
-
 _, project = google.auth.default()
 client = sm.SecretManagerServiceClient()
 name = f"projects/{project}/secrets/{SETTINGS_NAME}/versions/latest"

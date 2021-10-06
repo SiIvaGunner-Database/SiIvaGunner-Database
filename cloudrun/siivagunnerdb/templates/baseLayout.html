@@ -2,12 +2,11 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <meta name="description" content="A searchable database of information retrieved from SiIvaGunner videos." />
     <title>SiIvaGunner Database</title>
-    <link rel="shortcut icon" type="image/ico" href="https://storage.googleapis.com/siivagunner-database-media/siivagunnerdb/images/favicons/favicon-48x48.ico"/>
-    <link rel="stylesheet" href="https://storage.googleapis.com/siivagunner-database-media/siivagunnerdb/style.css"/>
-    <script src="https://storage.googleapis.com/siivagunner-database-media/siivagunnerdb/script.js"></script>
+    <link rel="shortcut icon" type="image/ico" href="{% static 'favicon.ico' %}" />
+    <link rel="stylesheet" href="{% static 'style.css' %}" />
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-149462139-2"></script>
     <script>
@@ -45,17 +44,15 @@
       </ul>
     </nav>
     <main>
-      <div class="wrapper">
-        {% if messages %}
-          <ul class="messages">
-            {% for message in messages %}
-              <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-        {% block content %}
-        {% endblock %}
-      </div>
+      {% if messages %}
+        <ul class="messages">
+          {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      {% block content %}
+      {% endblock %}
     </main>
     <footer>
       <a target="_blank" href="https://github.com/SiIvaGunner-Database">SiIvaGunner Database</a>
