@@ -1,3 +1,7 @@
+import datetime
+import math
+import re
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models.functions import Lower
@@ -14,14 +18,10 @@ from . import forms
 from .models import Rip
 from .serializers import RipSerializer
 
-import datetime
-import math
-import re
-
-
-
-# The rip search page
 def ripList(request):
+    """
+    The rip search page.
+    """
     # If the search is being submitted
     if request.method == 'POST':
         parameters = []
@@ -214,17 +214,17 @@ def ripList(request):
             }
         )
 
-
-
-# The rip details page
 def ripDetails(request, ripSlug):
+    """
+    The rip details page.
+    """
     rip = Rip.objects.get(slug=ripSlug)
     return render(request, 'rips/ripDetails.html', { 'rip':rip })
 
-
-
-# The rip submission page
 def ripAdd(request):
+    """
+    The rip submission page.
+    """
     if request.method == 'POST':
         form = forms.AddRip(request.POST, request.FILES)
 
@@ -243,9 +243,6 @@ def ripAdd(request):
 
     return render(request, 'rips/ripAdd.html', { 'form':form })
 
-
-
-# The rip API viewset
 class RipViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows rips to be viewed or edited.

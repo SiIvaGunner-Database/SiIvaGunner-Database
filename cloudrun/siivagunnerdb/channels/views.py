@@ -14,10 +14,10 @@ from .models import Channel
 from .serializers import ChannelSerializer
 from rips.models import Rip
 
-
-
-# The channel search page
 def channelList(request):
+    """
+    The channel search page.
+    """
     # If the search is being submitted
     if request.method == 'POST':
         parameters = []
@@ -98,10 +98,10 @@ def channelList(request):
         # Return the page with the searched channels
         return render(request, 'channels/channelList.html', {'channels':channels })
 
-
-
-# The channel details page
 def channelDetails(request, channelSlug):
+    """
+    The channel details page.
+    """
     channel = Channel.objects.get(slug=channelSlug)
     rips = Rip.objects.filter(visible=True, channel__slug=channelSlug)
     ripCount = rips.count()
@@ -112,12 +112,13 @@ def channelDetails(request, channelSlug):
 
     return render(request, 'channels/channelDetails.html', {'channel':channel, 'rips':rips, 'ripCount':ripCount})
 
-
-
-# The channel submission page
 def channelAdd(request):
+    """
+    The channel submission page.
+    """
     if request.method == 'POST':
         form = forms.AddChannel(request.POST, request.FILES)
+
         if form.is_valid():
             instance = form.save(commit=False)
             instance.slug = 'SLUG-' + instance.channelId
@@ -133,9 +134,6 @@ def channelAdd(request):
 
     return render(request, 'channels/channelAdd.html', { 'form':form })
 
-
-
-# The channel API viewset
 class ChannelViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows channels to be viewed or edited.

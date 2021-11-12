@@ -11,10 +11,10 @@ from . import forms
 from .models import Report
 from .serializers import ReportSerializer
 
-
-
-# The report submission page
 def reportAdd(request):
+    """
+    The report submission page.
+    """
     if request.method == 'POST':
         form = forms.AddReport(request.POST, request.FILES)
 
@@ -31,9 +31,6 @@ def reportAdd(request):
 
     return render(request, 'reports/reportAdd.html', { 'form':form })
 
-
-
-# The report API viewset
 class ReportViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows reports to be viewed or edited.

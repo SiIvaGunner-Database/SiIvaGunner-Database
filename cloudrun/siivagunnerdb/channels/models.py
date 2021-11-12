@@ -1,5 +1,5 @@
-from django.db import models, migrations
 from django.contrib.auth.models import User
+from django.db import models, migrations
 
 class Channel(models.Model):
     ChannelStatus = models.TextChoices('WikiStatusChoice', 'Public Deleted')

@@ -1,3 +1,7 @@
+"""
+Settings loader for siivagunnerdb.
+"""
+
 try:
     from .prodsettings import *
     print("Loaded production settings!")

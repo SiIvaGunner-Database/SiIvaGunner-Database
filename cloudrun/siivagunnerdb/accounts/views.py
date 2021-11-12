@@ -11,10 +11,10 @@ from rest_framework import permissions
 from . import forms
 from .serializers import UserSerializer, GroupSerializer
 
-
-
-# The signup page
 def signupView(request):
+    """
+    The signup page.
+    """
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
 
@@ -30,10 +30,10 @@ def signupView(request):
 
     return render(request, 'accounts/signup.html', { 'form':form })
 
-
-
-# The login page
 def loginView(request):
+    """
+    The login page.
+    """
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
 
@@ -50,19 +50,19 @@ def loginView(request):
 
     return render(request, 'accounts/login.html', { 'form':form })
 
-
-
-# The logout redirect
 def logoutView(request):
+    """
+    The logout redirect.
+    """
     if request.method == 'POST':
         logout(request)
         return redirect('rips:list')
 
-
-
-# The account page
 @login_required()
 def myAccountView(request):
+    """
+    The account page.
+    """
     if request.method == 'POST':
         if 'saveUsername' in request.POST:
             form = forms.ChangeUsername(request.POST)
@@ -93,9 +93,6 @@ def myAccountView(request):
     passwordForm = PasswordChangeForm(request.user)
     return render(request, 'accounts/myAccount.html', { 'usernameForm':usernameForm, 'passwordForm': passwordForm })
 
-
-
-# The user API viewset
 class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -104,9 +101,6 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-
-
-# The group API viewset
 class GroupViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.

@@ -1,6 +1,10 @@
+"""
+Production Django settings for siivagunnerdb.
+"""
+
+import environ
 import io
 import os
-import environ
 import google.auth
 from google.cloud import secretmanager as sm
 from .basesettings import *
