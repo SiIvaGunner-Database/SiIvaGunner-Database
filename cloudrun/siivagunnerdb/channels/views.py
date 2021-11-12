@@ -1,12 +1,18 @@
-from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models.functions import Lower
-from django.utils.text import slugify
-from rips.models import Rip
+from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.utils.text import slugify
+
+from rest_framework import viewsets
+from rest_framework import permissions
+
 from urllib.parse import urlencode
-from .models import Channel
+
 from . import forms
+from .models import Channel
+from .serializers import ChannelSerializer
+from rips.models import Rip
 
 
 
@@ -126,3 +132,14 @@ def channelAdd(request):
         form = forms.AddChannel()
 
     return render(request, 'channels/channelAdd.html', { 'form':form })
+
+
+
+# The channel API viewset
+class ChannelViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows channels to be viewed or edited.
+    """
+    queryset = Channel.objects.all()
+    serializer_class = ChannelSerializer
+    permission_classes = [permissions.IsAuthenticated]

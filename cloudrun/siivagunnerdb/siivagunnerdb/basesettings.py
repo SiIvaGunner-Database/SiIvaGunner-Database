@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'accounts',
     'channels',
     'reports',
@@ -124,3 +125,11 @@ STATICFILES_DIRS = []
 
 MEDIA_URL = 'https://storage.googleapis.com/siivagunner-database-media/uploads/'
 MEDIA_ROOT = []
+
+
+# Django REST Framework
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}

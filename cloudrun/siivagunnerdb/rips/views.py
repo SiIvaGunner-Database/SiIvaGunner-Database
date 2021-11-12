@@ -1,12 +1,19 @@
-from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models.functions import Lower
-from django.utils.text import slugify
+from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.utils.text import slugify
+
+from rest_framework import viewsets
+from rest_framework import permissions
+
 from urllib.parse import urlencode
-from .models import Rip
+
 from . import forms
+from .models import Rip
+from .serializers import RipSerializer
+
 import datetime
 import math
 import re
@@ -235,3 +242,14 @@ def ripAdd(request):
         form = forms.AddRip()
 
     return render(request, 'rips/ripAdd.html', { 'form':form })
+
+
+
+# The rip API viewset
+class RipViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows rips to be viewed or edited.
+    """
+    queryset = Rip.objects.all()
+    serializer_class = RipSerializer
+    permission_classes = [permissions.IsAuthenticated]

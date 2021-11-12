@@ -1,10 +1,15 @@
-from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
+from django.shortcuts import render, redirect
+
+from rest_framework import viewsets
+from rest_framework import permissions
+
 from . import forms
+from .serializers import UserSerializer, GroupSerializer
 
 
 
@@ -87,3 +92,25 @@ def myAccountView(request):
     usernameForm = forms.ChangeUsername()
     passwordForm = PasswordChangeForm(request.user)
     return render(request, 'accounts/myAccount.html', { 'usernameForm':usernameForm, 'passwordForm': passwordForm })
+
+
+
+# The user API viewset
+class UserViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = User.objects.all().order_by('-date_joined')
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+
+# The group API viewset
+class GroupViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+    permission_classes = [permissions.IsAuthenticated]
