@@ -10,8 +10,6 @@ from django.urls import reverse
 from django.utils.text import slugify
 
 from rest_framework import viewsets
-from rest_framework import permissions
-
 from urllib.parse import urlencode
 
 from . import forms
@@ -249,4 +247,3 @@ class RipViewSet(viewsets.ModelViewSet):
     """
     queryset = Rip.objects.all()
     serializer_class = RipSerializer
-    permission_classes = [permissions.IsAuthenticated]

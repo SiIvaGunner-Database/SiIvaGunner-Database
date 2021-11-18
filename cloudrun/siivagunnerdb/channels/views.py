@@ -5,8 +5,6 @@ from django.urls import reverse
 from django.utils.text import slugify
 
 from rest_framework import viewsets
-from rest_framework import permissions
-
 from urllib.parse import urlencode
 
 from . import forms
@@ -140,4 +138,3 @@ class ChannelViewSet(viewsets.ModelViewSet):
     """
     queryset = Channel.objects.all()
     serializer_class = ChannelSerializer
-    permission_classes = [permissions.IsAuthenticated]

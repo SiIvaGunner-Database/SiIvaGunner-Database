@@ -3,8 +3,6 @@ from django.shortcuts import render, redirect
 from django.utils.text import slugify
 
 from rest_framework import viewsets
-from rest_framework import permissions
-
 from urllib.parse import urlencode
 
 from . import forms
@@ -37,4 +35,3 @@ class ReportViewSet(viewsets.ModelViewSet):
     """
     queryset = Report.objects.all()
     serializer_class = ReportSerializer
-    permission_classes = [permissions.IsAuthenticated]
