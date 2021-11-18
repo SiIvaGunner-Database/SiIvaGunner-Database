@@ -1,0 +1,11 @@
+{% extends 'baseLayout.html' %}
+{% block content%}
+  <h2>Generate an authentication token</h2>
+  <form class="siteForm" action="{% url 'api_token_auth' %}" method="post">
+    <label>Username:</label>
+    <input type="text" name="username" />
+    <label>Password:</label>
+    <input type="password" name="password" />
+    <input type="submit" value="Submit" />
+  </form>
+{% endblock %}

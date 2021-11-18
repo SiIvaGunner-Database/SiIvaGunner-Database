@@ -5,6 +5,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import path, include
 
 from rest_framework import routers
+from rest_framework.authtoken.views import obtain_auth_token
 
 from . import views
 from accounts import views as accountViews
@@ -24,11 +25,13 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls')),
+    path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
     path('channels/', include('channels.urls')),
-    path('generate/', views.generate, name="generate"),
+    path('generate/', views.generate, name='generate'),
+    path('token/', views.token, name='token'),
     path('reports/', include('reports.urls')),
     path('rips/', include('rips.urls')),
-    path('', ripViews.ripList, name="home"),
+    path('', ripViews.ripList, name='home'),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

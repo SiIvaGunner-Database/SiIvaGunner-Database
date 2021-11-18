@@ -32,13 +32,19 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    # Django
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # REST
     'rest_framework',
+    'rest_framework.authtoken',
+
+    # siivagunnerdb
     'accounts',
     'channels',
     'reports',
@@ -121,9 +127,17 @@ STATICFILES_DIRS = []
 MEDIA_URL = 'https://storage.googleapis.com/siivagunner-database-media/uploads/'
 MEDIA_ROOT = []
 
+# Auto primary key model fields
+
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'
+
 # Django REST Framework
 
 REST_FRAMEWORK = {
+    'PAGE_SIZE': 10,
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ],
 }
