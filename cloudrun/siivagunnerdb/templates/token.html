@@ -2,6 +2,7 @@
 {% block content%}
   <h2>Generate an authentication token</h2>
   <form class="siteForm" action="{% url 'api_token_auth' %}" method="post">
+    {% csrf_token %}
     <label>Username:</label>
     <input type="text" name="username" />
     <label>Password:</label>
