@@ -5,8 +5,8 @@ from . import models
 class AddRip(forms.ModelForm):
     class Meta:
         model = models.Rip
-        fields =  ['title', 'videoId', 'description', 'uploadDate',]
+        fields =  ['title', 'id', 'description', 'uploadDate',]
         labels = {
-            'videoId': _('Video ID'),
+            'id': _('Video ID'),
             'uploadDate': _('Upload Date'),
         }

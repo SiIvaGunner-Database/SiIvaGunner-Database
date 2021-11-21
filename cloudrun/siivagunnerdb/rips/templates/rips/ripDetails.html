@@ -4,10 +4,10 @@
     <h2>{{ rip.title }}</h2>
     <a class="smallText" href="https://{{ rip.channel.wiki }}.fandom.com/wiki/{{ rip.title }}" target="_blank">View on FANDOM</a>
     <br />
-    <a class="smallText" href="https://web.archive.org/web/*/https://www.youtube.com/watch?v={{ rip.videoId }}" target="_blank">View on the Wayback Machine</a>
+    <a class="smallText" href="https://web.archive.org/web/*/https://www.youtube.com/watch?v={{ rip.id }}" target="_blank">View on the Wayback Machine</a>
     <hr />
-    <iframe id="videoEmbed" width="560px" height="315px" src="https://www.youtube.com/embed/{{ rip.videoId }}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-    <p style="font-style: italic">Uploaded on {{ rip.uploadDate }} by <a href="{% url 'channels:details' rip.channel.slug %}">{{ rip.channel }}</a>.</p>
+    <iframe id="videoEmbed" width="560px" height="315px" src="https://www.youtube.com/embed/{{ rip.id }}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <p style="font-style: italic">Uploaded on {{ rip.uploadDate }} by <a href="{% url 'channels:details' rip.channel.id %}">{{ rip.channel }}</a>.</p>
     <p style="font-style: italic">At the last check, this video had {{ rip.viewCount }} views, {{ rip.likeCount }} likes, {{ rip.dislikeCount }} dislikes, and {{ rip.commentCount }} comments.</p>
     <p>{{ rip.description }}</p>
   </div>

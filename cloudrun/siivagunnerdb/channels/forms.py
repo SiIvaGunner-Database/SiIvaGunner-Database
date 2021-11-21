@@ -5,8 +5,8 @@ from . import models
 class AddChannel(forms.ModelForm):
     class Meta:
         model = models.Channel
-        fields =  ['name', 'channelId', 'description', 'joinDate',]
+        fields =  ['name', 'id', 'description', 'joinDate',]
         labels = {
-            'channelId': _('Channel ID'),
+            'id': _('Channel ID'),
             'joinDate': _('Join Date'),
         }

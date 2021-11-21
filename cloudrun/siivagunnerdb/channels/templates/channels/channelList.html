@@ -34,8 +34,8 @@
     </tr>
     {% for channel in channels %}
       <tr class="channel">
-        <td><a href="{% url 'channels:details' channel.slug %}">{{channel.name}}</a></td>
-        <td><a href="https://www.youtube.com/channel/{{ channel.channelId }}" target="_blank">{{ channel.channelId }}</a></td>
+        <td><a href="{% url 'channels:details' channel.id %}">{{channel.name}}</a></td>
+        <td><a href="https://www.youtube.com/channel/{{ channel.id }}" target="_blank">{{ channel.id }}</a></td>
         <td>{{ channel.channelStatus }}</td>
         <td>{{ channel.joinDate }}</td>
         <!--

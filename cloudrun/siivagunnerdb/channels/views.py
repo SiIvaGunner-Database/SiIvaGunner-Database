@@ -2,7 +2,6 @@ from django.contrib.auth.decorators import login_required
 from django.db.models.functions import Lower
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.utils.text import slugify
 
 from rest_framework import viewsets
 from urllib.parse import urlencode
@@ -73,7 +72,7 @@ def channelList(request):
 
         if search:
             channelsByName = Channel.objects.filter(visible=True, name__icontains=search)
-            channelsById = Channel.objects.filter(visible=True, channelId__icontains=search)
+            channelsById = Channel.objects.filter(visible=True, id__icontains=search)
             channels = (channelsByName | channelsById)
         else:
             channels = Channel.objects.filter(visible=True)
@@ -96,12 +95,12 @@ def channelList(request):
         # Return the page with the searched channels
         return render(request, 'channels/channelList.html', {'channels':channels })
 
-def channelDetails(request, channelSlug):
+def channelDetails(request, id):
     """
     The channel details page.
     """
-    channel = Channel.objects.get(slug=channelSlug)
-    rips = Rip.objects.filter(visible=True, channel__slug=channelSlug)
+    channel = Channel.objects.get(id=id)
+    rips = Rip.objects.filter(visible=True, channel__id=id)
     ripCount = rips.count()
     rips = rips.order_by('-uploadDate')[:10]
 
@@ -119,8 +118,7 @@ def channelAdd(request):
 
         if form.is_valid():
             instance = form.save(commit=False)
-            instance.slug = 'SLUG-' + instance.channelId
-            instance.channelId = 'ID-' + instance.channelId
+            instance.id = 'ID-' + instance.id
 
             if request.user.is_authenticated:
                 instance.author = request.user

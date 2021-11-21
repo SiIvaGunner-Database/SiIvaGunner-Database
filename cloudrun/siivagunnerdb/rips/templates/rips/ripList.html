@@ -49,12 +49,12 @@
     </tr>
     {% for rip in rips %}
       <tr class="rip">
-        <td><a href="{% url 'rips:details' rip.slug %}">{{rip.title}}</a></td>
-        <td><a href="https://www.youtube.com/watch?v={{ rip.videoId }}" target="_blank">{{ rip.videoId }}</a></td>
+        <td><a href="{% url 'rips:details' rip.id %}">{{rip.title}}</a></td>
+        <td><a href="https://www.youtube.com/watch?v={{ rip.id }}" target="_blank">{{ rip.id }}</a></td>
         <td>{{ rip.wikiStatus }}</td>
         <td>{{ rip.videoStatus }}</td>
         <td>{{ rip.uploadDate }}</td>
-        <td><a href="{% url 'channels:details' rip.channel.slug %}">{{ rip.channel }}</a></td>
+        <td><a href="{% url 'channels:details' rip.channel.id %}">{{ rip.channel }}</a></td>
         <td>{{ rip.length }}</td>
         <td>{{ rip.viewCount }}</td>
       </tr>

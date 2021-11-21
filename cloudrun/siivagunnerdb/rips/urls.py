@@ -6,5 +6,5 @@ app_name = 'rips'
 urlpatterns = [
     path('', views.ripList, name="list"),
     # path('add/', views.ripAdd, name="add"),
-    path('<slug:ripSlug>/', views.ripDetails, name="details"),
+    path('<slug:id>/', views.ripDetails, name="details"),
 ]

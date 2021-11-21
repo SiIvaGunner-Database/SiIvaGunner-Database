@@ -1,6 +1,5 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from django.utils.text import slugify
 
 from rest_framework import viewsets
 from urllib.parse import urlencode

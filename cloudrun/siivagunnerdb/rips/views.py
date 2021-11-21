@@ -7,7 +7,6 @@ from django.contrib.auth.decorators import login_required
 from django.db.models.functions import Lower
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from django.utils.text import slugify
 
 from rest_framework import viewsets
 from urllib.parse import urlencode
@@ -118,13 +117,13 @@ def ripList(request):
         if search:
             ripsByTitle = Rip.objects.filter(visible=True, title__icontains=search)
             ripsByChannel = Rip.objects.filter(visible=True, channel__name__icontains=search)
-            ripsById = Rip.objects.filter(visible=True, videoId__icontains=search)
+            ripsById = Rip.objects.filter(visible=True, id__icontains=search)
             rips = (ripsByTitle | ripsById | ripsByChannel)
         else:
             rips = Rip.objects.filter(visible=True)
 
         if channelId:
-            rips = rips & Rip.objects.filter(visible=True, channel__channelId=channelId)
+            rips = rips & Rip.objects.filter(visible=True, channel__id=channelId)
 
         if order == "descending":
             if sort != "title":
@@ -212,11 +211,11 @@ def ripList(request):
             }
         )
 
-def ripDetails(request, ripSlug):
+def ripDetails(request, id):
     """
     The rip details page.
     """
-    rip = Rip.objects.get(slug=ripSlug)
+    rip = Rip.objects.get(id=id)
     return render(request, 'rips/ripDetails.html', { 'rip':rip })
 
 def ripAdd(request):
@@ -228,8 +227,7 @@ def ripAdd(request):
 
         if form.is_valid():
             instance = form.save(commit=False)
-            instance.slug = 'SLUG-' + instance.videoId
-            instance.videoId = 'ID-' + instance.videoId
+            instance.id = 'ID-' + instance.id
 
             if request.user.is_authenticated:
                 instance.author = request.user
