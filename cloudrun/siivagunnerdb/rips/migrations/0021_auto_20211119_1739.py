@@ -45,11 +45,11 @@ class Migration(migrations.Migration):
             name='dislikeCount',
             field=models.PositiveIntegerField(),
         ),
-        migrations.AlterField(
-            model_name='rip',
-            name='length',
-            field=models.CharField(max_length=10),
-        ),
+        # migrations.AlterField(
+        #     model_name='rip',
+        #     name='length',
+        #     field=models.CharField(max_length=10),
+        # ),
         migrations.AlterField(
             model_name='rip',
             name='likeCount',

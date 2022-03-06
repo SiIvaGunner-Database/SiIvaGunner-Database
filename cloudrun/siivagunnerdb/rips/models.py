@@ -13,7 +13,7 @@ class Rip(models.Model):
     wikiStatus = models.CharField(choices=WikiStatus.choices, max_length=20)
     videoStatus = models.CharField(choices=VideoStatus.choices, max_length=20)
     uploadDate = models.DateTimeField(auto_now_add=False)
-    length = models.CharField(max_length=10)
+    length = models.CharField(max_length=20)
     description = models.TextField()
     viewCount = models.PositiveIntegerField()
     likeCount = models.PositiveIntegerField()
