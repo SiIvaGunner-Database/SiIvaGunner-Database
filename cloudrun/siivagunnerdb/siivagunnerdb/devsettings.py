@@ -1,5 +1,5 @@
 """
-Production Django settings for siivagunnerdb.
+Development Django settings for siivagunnerdb.
 """
 
 import environ
@@ -10,7 +10,8 @@ from google.cloud import secretmanager as sm
 from .settings import *
 
 # Pull django-environ settings file, stored in Secret Manager
-SECRET_SETTINGS = "siivagunnerdb-prod-secrets"
+# This variable is currently the only difference from prodsettings.py
+SECRET_SETTINGS = "siivagunnerdb-dev-secrets"
 
 _, project = google.auth.default()
 client = sm.SecretManagerServiceClient()
