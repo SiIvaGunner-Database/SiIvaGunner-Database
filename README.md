@@ -4,7 +4,7 @@
 
 ### Local Development
 
-Requires an active [Python virtual environment](https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/development_environment) and a database with matching tables. Navigate into ```cloudrun/siivagunnerdb/```, then use the following command:
+Requires an active [Python virtual environment](https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/development_environment) and a database with matching tables. Navigate into ```/siivagunnerdb/```, then use the following command:
 
     python manage.py runserver
 
