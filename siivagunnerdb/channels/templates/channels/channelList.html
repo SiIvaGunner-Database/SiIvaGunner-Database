@@ -1,0 +1,48 @@
+{% extends 'baseLayout.html' %}
+{% block content%}
+  <h2>Search the channel database</h2>
+  <p style="margin:0 0 4px 0;">Updates to the database will be paused for an indeterminate amount of time. Apologies for the inconvenience.</p>
+  <form action="{% url 'channels:list' %}" method="post">
+    {% csrf_token %}
+    {% if request.GET.search %}
+      <input type="text" name="searchTerms" placeholder="Search for title or ID" value="{{ request.GET.search }}"/>
+    {% else %}
+      <input type="text" name="searchTerms" placeholder="Search for title or ID"/>
+    {% endif %}
+    <input type="submit" value="Search"/>
+    <select name="sort">
+      <option value="joinDate">By join date</option>
+      <option value="name" {% if request.GET.sort == 'name' %} selected {% endif %}>By name</option>
+      <!--
+      <option value="subscriberCount">By subscribers</option>
+      -->
+    </select>
+    <select name="sortType">
+      <option value="descending">Descending</option>
+      <option value="ascending" {% if request.GET.order == 'ascending' %} selected {% endif %}>Ascending</option>
+    </select>
+  </form>
+  <a class="smallText" href="{% url 'rips:list' %}">Search for videos instead</a>
+  <table class="channels">
+    <tr class="channel">
+      <th>Channel Name</th>
+      <th>Channel ID</th>
+      <th>Status</th>
+      <th>Join Date</th>
+      <!--
+      <th>Subscribers</th>
+      -->
+    </tr>
+    {% for channel in channels %}
+      <tr class="channel">
+        <td><a href="{% url 'channels:details' channel.id %}">{{channel.name}}</a></td>
+        <td><a href="https://www.youtube.com/channel/{{ channel.id }}" target="_blank">{{ channel.id }}</a></td>
+        <td>{{ channel.channelStatus }}</td>
+        <td>{{ channel.joinDate }}</td>
+        <!--
+        <td>{{ channel.subscriberCount }}</td>
+        -->
+      </tr>
+    {% endfor %}
+  </table>
+{% endblock %}
