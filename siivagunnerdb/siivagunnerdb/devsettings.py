@@ -1,32 +1,34 @@
 """
-Development Django settings for siivagunnerdb.
+Django settings for siivagunnerdb development environment.
 """
 
 import environ
 import io
-import os
 import google.auth
-from google.cloud import secretmanager as sm
-from .settings import *
+from google.cloud import secretmanager
+from .basesettings import *
 
-# Pull django-environ settings file, stored in Secret Manager
-# This variable is currently the only difference from prodsettings.py
+# IMPORTANT: The below variables are the only ones different from prodsettings.py
 SECRET_SETTINGS = "siivagunnerdb-dev-secrets"
+STATIC_URL = 'https://storage.googleapis.com/siivagunnerdb-dev-media/static/'
+STATICFILES_DIRS = []
+MEDIA_URL = 'https://storage.googleapis.com/siivagunnerdb-dev-media/uploads/'
+MEDIA_ROOT = []
 
+# Get the environment from the secret manager
 _, project = google.auth.default()
-client = sm.SecretManagerServiceClient()
+client = secretmanager.SecretManagerServiceClient()
 name = f"projects/{project}/secrets/{SECRET_SETTINGS}/versions/latest"
 payload = client.access_secret_version(name=name).payload.data.decode("UTF-8")
-
 env = environ.Env()
 env.read_env(io.StringIO(payload))
 
-# Setting this value from django-environ
+# Security settings
+DEBUG = env("DEBUG")
 SECRET_KEY = env("SECRET_KEY")
-
-# Set this value from django-environ
 DATABASES = {"default": env.db()}
 
+# App settings
 INSTALLED_APPS += ["storages"] # for django-storages
 if "siivagunnerdb" not in INSTALLED_APPS:
     INSTALLED_APPS += ["siivagunnerdb"] # for custom data migration
