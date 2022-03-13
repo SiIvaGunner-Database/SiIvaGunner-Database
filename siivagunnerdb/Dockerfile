@@ -2,6 +2,8 @@
 # https://hub.docker.com/_/python
 FROM python:3.8-slim
 
+ARG ENV_NAME
+
 ENV APP_HOME /app
 WORKDIR $APP_HOME
 
