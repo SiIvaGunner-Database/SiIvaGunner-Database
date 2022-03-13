@@ -7,6 +7,7 @@ import io
 import os
 import google.auth
 from google.cloud import secretmanager
+from .basesettings import *
 
 ENV_NAME = os.environ.get("ENV_NAME")
 SECRET_SETTINGS = f"siivagunnerdb-{ENV_NAME}-secrets"
