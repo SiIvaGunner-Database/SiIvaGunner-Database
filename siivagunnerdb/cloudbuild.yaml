@@ -6,15 +6,11 @@ steps:
   args: ["push", "gcr.io/${PROJECT_ID}/siivagunnerdb-${_ENV_NAME}"]
 
 - name: "gcr.io/google-appengine/exec-wrapper"
-  env:
-    - "ENV_NAME=${_ENV_NAME}"
   args: ["-i", "gcr.io/${PROJECT_ID}/siivagunnerdb-${_ENV_NAME}",
          "-s", "${PROJECT_ID}:us-central1:myinstance",
          "--", "python", "manage.py", "migrate"]
 
 - name: "gcr.io/google-appengine/exec-wrapper"
-  env:
-    - "ENV_NAME=${_ENV_NAME}"
   args: ["-i", "gcr.io/${PROJECT_ID}/siivagunnerdb-${_ENV_NAME}",
          "-s", "${PROJECT_ID}:us-central1:myinstance",
          "--", "python", "manage.py", "collectstatic", "--no-input"]
