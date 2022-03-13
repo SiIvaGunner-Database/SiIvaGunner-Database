@@ -1,6 +1,6 @@
 steps:
 - name: "gcr.io/cloud-builders/docker"
-  args: ["build", "-t", "gcr.io/${PROJECT_ID}/siivagunnerdb-${_ENV_NAME}", "siivagunnerdb-${_ENV_NAME}"]
+  args: ["build", "-t", "gcr.io/${PROJECT_ID}/siivagunnerdb-${_ENV_NAME}", "siivagunnerdb"]
 
 - name: "gcr.io/cloud-builders/docker"
   args: ["push", "gcr.io/${PROJECT_ID}/siivagunnerdb-${_ENV_NAME}"]
