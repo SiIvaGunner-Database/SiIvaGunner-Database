@@ -1,18 +1,18 @@
 """
-Django settings for siivagunnerdb production environment.
+Django settings for cloud siivagunnerdb environments.
 """
 
 import environ
 import io
+import os
 import google.auth
 from google.cloud import secretmanager
-from .basesettings import *
 
-# IMPORTANT: The below variables are the only ones different from devsettings.py
-SECRET_SETTINGS = "siivagunnerdb-prod-secrets"
-STATIC_URL = 'https://storage.googleapis.com/siivagunnerdb-prod-media/static/'
+ENV_NAME = os.environ.get("ENV_NAME")
+SECRET_SETTINGS = f"siivagunnerdb-{ENV_NAME}-secrets"
+STATIC_URL = f"https://storage.googleapis.com/siivagunnerdb-{ENV_NAME}-media/static/"
 STATICFILES_DIRS = []
-MEDIA_URL = 'https://storage.googleapis.com/siivagunnerdb-prod-media/uploads/'
+MEDIA_URL = f"https://storage.googleapis.com/siivagunnerdb-{ENV_NAME}-media/uploads/"
 MEDIA_ROOT = []
 
 # Get the environment from the secret manager
@@ -34,7 +34,7 @@ if "siivagunnerdb" not in INSTALLED_APPS:
     INSTALLED_APPS += ["siivagunnerdb"] # for custom data migration
 
 # Define static storage via django-storages[google]
-GS_BUCKET_NAME = env("GS_BUCKET_NAME")
+GS_BUCKET_NAME = f"siivagunnerdb-{ENV_NAME}-media"
 DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
 STATICFILES_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
 GS_DEFAULT_ACL = "publicRead"
