@@ -11,9 +11,7 @@ SECRET_KEY = get_random_secret_key()
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# Database
-# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
+# Database connection
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -21,9 +19,6 @@ DATABASES = {
     }
 }
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.1/howto/static-files/
-
+# File serving URLs
 STATIC_URL = '/static/'
-
 MEDIA_URL = '/media/'
