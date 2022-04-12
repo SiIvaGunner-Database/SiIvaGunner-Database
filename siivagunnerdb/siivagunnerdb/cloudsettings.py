@@ -11,8 +11,8 @@ from .basesettings import *
 
 ENV_NAME = os.environ.get("ENV_NAME")
 SECRET_SETTINGS = f"siivagunnerdb-{ENV_NAME}-secrets"
-STATIC_URL = f"https://storage.googleapis.com/siivagunnerdb-{ENV_NAME}-media/siivagunnerdb/static/"
-MEDIA_URL = f"https://storage.googleapis.com/siivagunnerdb-{ENV_NAME}-media/usiivagunnerdb/ploads/"
+STATIC_URL = f"https://storage.googleapis.com/siivagunnerdb-{ENV_NAME}-media/"
+MEDIA_URL = f"https://storage.googleapis.com/siivagunnerdb-{ENV_NAME}-media/"
 
 # Get the environment from the secret manager
 _, project = google.auth.default()
