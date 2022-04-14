@@ -1,7 +1,9 @@
 {% extends 'baseLayout.html' %}
 {% block content%}
   <h2>Search the channel database</h2>
-  <p style="margin:0 0 4px 0;">Updates to the database will be paused for an indeterminate amount of time. Apologies for the inconvenience.</p>
+  <ul class="errorlist">
+    <li>Updates to the database will be paused for an indeterminate amount of time. Apologies for the inconvenience.</li>
+  </ul>
   <form action="{% url 'channels:list' %}" method="post">
     {% csrf_token %}
     {% if request.GET.search %}
