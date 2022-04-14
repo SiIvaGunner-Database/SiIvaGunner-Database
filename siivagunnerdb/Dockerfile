@@ -2,6 +2,8 @@
 # https://hub.docker.com/_/python
 FROM python:3.8-slim
 
+ARG ENV_NAME
+
 ENV APP_HOME /app
 WORKDIR $APP_HOME
 
@@ -19,6 +21,9 @@ ENV PORT 8080
 # Setting this ensures print statements and log messages
 # promptly appear in Cloud Logging.
 ENV PYTHONUNBUFFERED TRUE
+
+# Setting the current environment name for use with Django settings.
+ENV ENV_NAME $ENV_NAME
 
 # Run the web service on container startup. Here we use the gunicorn
 # webserver, with one worker process and 8 threads.

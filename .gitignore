@@ -1,6 +1,5 @@
 # Python cache files
 __pycache__
 
-# Local development files
-db.sqlite3
-virtual-environment
+# SQLite files
+*.sqlite3
