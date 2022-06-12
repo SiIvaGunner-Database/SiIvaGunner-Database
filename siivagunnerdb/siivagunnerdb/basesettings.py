@@ -35,6 +35,9 @@ INSTALLED_APPS = [
     # siivagunnerdb
     'accounts',
     'channels',
+    'contributors',
+    'logs',
+    'playlists',
     'reports',
     'rips',
 ]
