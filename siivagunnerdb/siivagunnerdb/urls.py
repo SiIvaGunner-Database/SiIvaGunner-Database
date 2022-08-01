@@ -8,10 +8,10 @@ from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
 
 from . import views
-from accounts import views as accountViews
-from channels import views as channelViews
-from reports import views as reportViews
-from rips import views as ripViews
+from siivagunnerdb.administration.accounts import views as accountViews
+from siivagunnerdb.administration.reports import views as reportViews
+from siivagunnerdb.youtube.channels import views as channelViews
+from siivagunnerdb.youtube.rips import views as ripViews
 
 router = routers.DefaultRouter()
 router.register(r'users', accountViews.UserViewSet)
@@ -21,16 +21,16 @@ router.register(r'reports', reportViews.ReportViewSet)
 router.register(r'rips', ripViews.RipViewSet)
 
 urlpatterns = [
-    path('accounts/', include('accounts.urls')),
+    path('accounts/', include('siivagunnerdb.administration.accounts.urls')),
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls')),
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
-    path('channels/', include('channels.urls')),
+    path('channels/', include('siivagunnerdb.youtube.channels.urls')),
     path('generate/', views.generate, name='generate'),
     path('token/', views.token, name='token'),
-    path('reports/', include('reports.urls')),
-    path('rips/', include('rips.urls')),
+    path('reports/', include('siivagunnerdb.administration.reports.urls')),
+    path('rips/', include('siivagunnerdb.youtube.rips.urls')),
     path('', ripViews.ripList, name='home'),
 ]
 

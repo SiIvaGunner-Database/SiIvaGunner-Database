@@ -33,13 +33,15 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
 
     # siivagunnerdb
-    'accounts',
-    'channels',
-    'contributors',
-    'logs',
-    'playlists',
-    'reports',
-    'rips',
+    'siivagunnerdb.administration.accounts',
+    'siivagunnerdb.administration.logs',
+    'siivagunnerdb.administration.reports',
+    'siivagunnerdb.community.collectives',
+    'siivagunnerdb.community.contributors',
+    'siivagunnerdb.youtube.channels',
+    'siivagunnerdb.youtube.playlists',
+    'siivagunnerdb.youtube.rips',
+    'siivagunnerdb.youtube.videos',
 ]
 
 MIDDLEWARE = [

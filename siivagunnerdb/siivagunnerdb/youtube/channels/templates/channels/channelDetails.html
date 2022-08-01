@@ -1,0 +1,41 @@
+{% extends 'baseLayout.html' %}
+{% block content%}
+  <div class="channel">
+    <h2>{{ channel.title }}</h2>
+    <a class="smallText" href="https://www.youtube.com/channel/{{ channel.id }}" target="_blank">View on YouTube</a>
+    <br />
+    <a class="smallText" href="https://web.archive.org/web/*/https://www.youtube.com/channel/{{ channel.id }}" target="_blank">View on the Wayback Machine</a>
+    <hr />
+    <p style="font-style: italic">Joined on {{ channel.publishedAt }}.</p>
+    <p style="font-style: italic">Has uploaded at least {{ ripCount }} videos.</p>
+    <p>{{ channel.description }}</p>
+    <!--
+    <p>At the time of the last check, this channel had {{ channel.subscriberCount }} subscribers.</p>
+    -->
+    <h4>Recent Uploads (<a href="{% url 'rips:list' %}?channel={{ channel.id }}">View All</a>)</h4>
+    <table class="rips">
+      <tr class="rip">
+        <th>Video Title</th>
+        <th>Video ID</th>
+        <th>Wiki Status</th>
+        <th>Video Status</th>
+        <th>Upload Date</th>
+        <th>Channel</th>
+        <th>Length</th>
+        <th>Views</th>
+      </tr>
+      {% for rip in rips %}
+        <tr class="rip">
+          <td><a href="{% url 'rips:details' rip.id %}">{{rip.title}}</a></td>
+          <td><a href="https://www.youtube.com/watch?v={{ rip.id }}" target="_blank">{{ rip.id }}</a></td>
+          <td>{{ rip.wikiStatus }}</td>
+          <td>{{ rip.videoStatus }}</td>
+          <td>{{ rip.uploadDate }}</td>
+          <td><a href="{% url 'channels:details' rip.channel.id %}">{{ rip.channel }}</a></td>
+          <td>{{ rip.length }}</td>
+          <td>{{ rip.viewCount }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+{% endblock %}
