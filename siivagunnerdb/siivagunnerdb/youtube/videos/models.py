@@ -40,14 +40,16 @@ class Video(models.Model):
     commentCount = models.PositiveIntegerField()
 
     # Custom
+    channel = models.ForeignKey(Channel, on_delete=models.PROTECT)
     wikiStatus = models.CharField(choices=WikiStatus.choices, max_length=20)
     videoStatus = models.CharField(choices=VideoStatus.choices, max_length=20)
 
-    #  Administration
-    channel = models.ForeignKey(Channel, on_delete=models.PROTECT)
+    # Administration
     author = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True)
     visible = models.BooleanField(blank=True, default=False)
+    notes = models.TextField(blank=True, default='')
     addDate = models.DateTimeField(auto_now_add=True)
+    updateDate = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.title

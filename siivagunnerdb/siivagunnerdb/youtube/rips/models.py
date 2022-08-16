@@ -2,12 +2,13 @@ from django.contrib.auth.models import User
 from django.db import models
 from siivagunnerdb.youtube.channels.models import Channel
 
+# Deprecated model. Use Video instead.
 class Rip(models.Model):
-    #  Custom field types
+    # Custom field types
     WikiStatus = models.TextChoices('WikiStatusChoice', 'Documented Undocumented')
     VideoStatus = models.TextChoices('VideoStatusChoice', 'Public Unlisted Unavailable Private Deleted')
 
-    #  Normal fields
+    # Normal fields
     id = models.CharField(primary_key=True, max_length=11)
     title = models.CharField(max_length=100)
     wikiStatus = models.CharField(choices=WikiStatus.choices, max_length=20)
@@ -20,7 +21,7 @@ class Rip(models.Model):
     dislikeCount = models.PositiveIntegerField()
     commentCount = models.PositiveIntegerField()
 
-    #  Hidden fields
+    # Hidden fields
     channel = models.ForeignKey(Channel, on_delete=models.PROTECT)
     author = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True)
     visible = models.BooleanField(blank=True, default=False)

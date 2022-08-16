@@ -30,10 +30,12 @@ class Channel(models.Model):
     bannerExternalUrl = models.CharField(max_length=100, blank=True, default='')
     channelStatus = models.CharField(choices=ChannelStatus.choices, max_length=20, blank=True, default='')
 
-    #  Administration
+    # Administration
     author = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True)
     visible = models.BooleanField(blank=True, default=False)
+    notes = models.TextField(blank=True, default='')
     addDate = models.DateTimeField(auto_now_add=True)
+    updateDate = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.title
