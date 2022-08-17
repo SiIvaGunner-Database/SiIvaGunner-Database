@@ -3,13 +3,12 @@ from django.db.models.functions import Lower
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
-from rest_framework import viewsets
+from rest_framework.viewsets import ModelViewSet
 from urllib.parse import urlencode
 
-from . import forms
+from siivagunnerdb.youtube.rips.models import Rip
 from .models import Channel
 from .serializers import ChannelSerializer
-from siivagunnerdb.youtube.rips.models import Rip
 
 
 def channelList(request):
@@ -57,7 +56,7 @@ def channelList(request):
 
         if request.GET.get('sort'):
             sort = request.GET.get('sort')
-            sortOptions = ['publishedAt', 'name']
+            sortOptions = ['publishedAt', 'title']
 
             if sort not in sortOptions:
                 sort = 'publishedAt'
@@ -72,26 +71,27 @@ def channelList(request):
         # Query the search using any given filters or sorting
 
         if search:
-            channelsByName = Channel.objects.filter(visible=True, name__icontains=search)
+            channelsByTitle = Channel.objects.filter(visible=True, title__icontains=search)
             channelsById = Channel.objects.filter(visible=True, id__icontains=search)
-            channels = (channelsByName | channelsById)
+            channels = (channelsByTitle | channelsById)
         else:
             channels = Channel.objects.filter(visible=True)
 
         if order == 'descending':
-            if sort != 'name':
+            if sort != 'title':
                 channels = channels.order_by('-' + sort)
             else:
                 channels = channels.order_by(Lower(sort).desc())
         else:
-            if sort != 'name':
+            if sort != 'title':
                 channels = channels.order_by(sort)
             else:
                 channels = channels.order_by(Lower(sort))
 
         # Format the join dates
         for channel in channels:
-            channel.publishedAt = channel.publishedAt.strftime('%Y-%m-%d   %H:%M:%S')
+            if channel.publishedAt:
+                channel.publishedAt = channel.publishedAt.strftime('%Y-%m-%d   %H:%M:%S')
 
         # Return the page with the searched channels
         return render(request, 'channels/channelList.html', {'channels':channels })
@@ -107,34 +107,13 @@ def channelDetails(request, id):
     rips = rips.order_by('-uploadDate')[:10]
 
     for rip in rips:
-        rip.uploadDate = rip.uploadDate.strftime('%Y-%m-%d   %H:%M:%S')
+        if rip.uploadDate:
+            rip.uploadDate = rip.uploadDate.strftime('%Y-%m-%d   %H:%M:%S')
 
     return render(request, 'channels/channelDetails.html', {'channel':channel, 'rips':rips, 'ripCount':ripCount})
 
 
-def channelAdd(request):
-    """
-    The channel submission page.
-    """
-    if request.method == 'POST':
-        form = forms.AddChannel(request.POST, request.FILES)
-
-        if form.is_valid():
-            instance = form.save(commit=False)
-            instance.id = 'ID-' + instance.id
-
-            if request.user.is_authenticated:
-                instance.author = request.user
-
-            instance.save()
-            return redirect('channels:list')
-    else:
-        form = forms.AddChannel()
-
-    return render(request, 'channels/channelAdd.html', { 'form':form })
-
-
-class ChannelViewSet(viewsets.ModelViewSet):
+class ChannelViewSet(ModelViewSet):
     """
     API endpoint that allows channels to be viewed or edited.
     """

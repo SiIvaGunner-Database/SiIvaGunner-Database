@@ -8,17 +8,24 @@ from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
 
 from . import views
-from siivagunnerdb.administration.accounts import views as accountViews
-from siivagunnerdb.administration.reports import views as reportViews
-from siivagunnerdb.youtube.channels import views as channelViews
-from siivagunnerdb.youtube.rips import views as ripViews
+from siivagunnerdb.administration.reports.views import ReportViewSet
+from siivagunnerdb.administration.logs.views import LogViewSet
+from siivagunnerdb.community.collectives.views import CollectiveViewSet
+from siivagunnerdb.community.contributors.views import ContributorViewSet
+from siivagunnerdb.youtube.channels.views import ChannelViewSet
+from siivagunnerdb.youtube.playlists.views import PlaylistViewSet
+from siivagunnerdb.youtube.rips.views import RipViewSet, ripList
+from siivagunnerdb.youtube.videos.views import VideoViewSet
 
 router = routers.DefaultRouter()
-router.register(r'users', accountViews.UserViewSet)
-router.register(r'groups', accountViews.GroupViewSet)
-router.register(r'channels', channelViews.ChannelViewSet)
-router.register(r'reports', reportViews.ReportViewSet)
-router.register(r'rips', ripViews.RipViewSet)
+router.register(r'channels', ChannelViewSet)
+router.register(r'collectives', CollectiveViewSet)
+router.register(r'contributors', ContributorViewSet)
+router.register(r'logs', LogViewSet)
+router.register(r'playlists', PlaylistViewSet)
+router.register(r'reports', ReportViewSet)
+router.register(r'rips', RipViewSet)
+router.register(r'videos', VideoViewSet)
 
 urlpatterns = [
     path('accounts/', include('siivagunnerdb.administration.accounts.urls')),
@@ -31,7 +38,7 @@ urlpatterns = [
     path('token/', views.token, name='token'),
     path('reports/', include('siivagunnerdb.administration.reports.urls')),
     path('rips/', include('siivagunnerdb.youtube.rips.urls')),
-    path('', ripViews.ripList, name='home'),
+    path('', ripList, name='home'),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

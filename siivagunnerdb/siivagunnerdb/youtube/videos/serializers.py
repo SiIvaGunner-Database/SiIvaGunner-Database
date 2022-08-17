@@ -1,8 +1,8 @@
 from rest_framework.serializers import ModelSerializer
-from .models import Report
+from .models import Video
 
 
-class ReportSerializer(ModelSerializer):
+class VideoSerializer(ModelSerializer):
     class Meta:
-        model = Report
+        model = Video
         fields = '__all__'

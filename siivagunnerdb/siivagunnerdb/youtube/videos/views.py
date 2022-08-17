@@ -8,10 +8,9 @@ from django.db.models.functions import Lower
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
-from rest_framework import viewsets
+from rest_framework.viewsets import ModelViewSet
 from urllib.parse import urlencode
 
-from . import forms
 from .models import Video
 from .serializers import VideoSerializer
 
@@ -117,7 +116,7 @@ def videoList(request):
 
         if search:
             videosByTitle = Video.objects.filter(visible=True, title__icontains=search)
-            videosByChannel = Video.objects.filter(visible=True, channel__name__icontains=search)
+            videosByChannel = Video.objects.filter(visible=True, channel__title__icontains=search)
             videosById = Video.objects.filter(visible=True, id__icontains=search)
             videos = (videosByTitle | videosById | videosByChannel)
         else:
@@ -199,7 +198,7 @@ def videoList(request):
 
         # Format the upload dates
         for video in videos:
-            if type(video.uploadDate) is datetime.datetime:
+            if video.uploadDate:
                 video.uploadDate = video.uploadDate.strftime('%Y-%m-%d   %H:%M:%S')
 
         # Return the page with the searched videos
@@ -221,29 +220,7 @@ def videoDetails(request, id):
     return render(request, 'videos/videoDetails.html', { 'video':video })
 
 
-def videoAdd(request):
-    """
-    The video submission page.
-    """
-    if request.method == 'POST':
-        form = forms.AddVideo(request.POST, request.FILES)
-
-        if form.is_valid():
-            instance = form.save(commit=False)
-            instance.id = 'ID-' + instance.id
-
-            if request.user.is_authenticated:
-                instance.author = request.user
-
-            instance.save()
-            return redirect('videos:list')
-    else:
-        form = forms.AddVideo()
-
-    return render(request, 'videos/videoAdd.html', { 'form':form })
-
-
-class VideoViewSet(viewsets.ModelViewSet):
+class VideoViewSet(ModelViewSet):
     """
     API endpoint that allows videos to be viewed or edited.
     """

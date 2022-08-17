@@ -1,8 +1,8 @@
 from rest_framework.serializers import ModelSerializer
-from .models import Report
+from .models import Playlist
 
 
-class ReportSerializer(ModelSerializer):
+class PlaylistSerializer(ModelSerializer):
     class Meta:
-        model = Report
+        model = Playlist
         fields = '__all__'

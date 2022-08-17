@@ -1,8 +1,8 @@
 from django import forms
-from . import models
+from .models import Report
 
 
-class AddReport(forms.ModelForm):
+class ReportAddForm(forms.ModelForm):
     class Meta:
-        model = models.Report
+        model = Report
         fields =  ['description',]

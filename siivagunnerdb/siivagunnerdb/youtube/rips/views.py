@@ -117,7 +117,7 @@ def ripList(request):
 
         if search:
             ripsByTitle = Rip.objects.filter(visible=True, title__icontains=search)
-            ripsByChannel = Rip.objects.filter(visible=True, channel__name__icontains=search)
+            ripsByChannel = Rip.objects.filter(visible=True, channel__title__icontains=search)
             ripsById = Rip.objects.filter(visible=True, id__icontains=search)
             rips = (ripsByTitle | ripsById | ripsByChannel)
         else:

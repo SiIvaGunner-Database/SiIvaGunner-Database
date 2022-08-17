@@ -14,7 +14,7 @@
     <input type="submit" value="Search"/>
     <select name="sort">
       <option value="publishedAt">By join date</option>
-      <option value="name" {% if request.GET.sort == 'name' %} selected {% endif %}>By name</option>
+      <option value="title" {% if request.GET.sort == 'title' %} selected {% endif %}>By title</option>
       <!--
       <option value="subscriberCount">By subscribers</option>
       -->
@@ -27,7 +27,7 @@
   <a class="smallText" href="{% url 'rips:list' %}">Search for videos instead</a>
   <table class="channels">
     <tr class="channel">
-      <th>Channel Name</th>
+      <th>Channel Title</th>
       <th>Channel ID</th>
       <th>Status</th>
       <th>Join Date</th>

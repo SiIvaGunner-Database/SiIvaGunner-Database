@@ -1,10 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-
 from rest_framework import viewsets
-from urllib.parse import urlencode
 
-from . import forms
+from .forms import ReportAddForm
 from .models import Report
 from .serializers import ReportSerializer
 
@@ -14,7 +12,7 @@ def reportAdd(request):
     The report submission page.
     """
     if request.method == 'POST':
-        form = forms.AddReport(request.POST, request.FILES)
+        form = ReportAddForm(request.POST, request.FILES)
 
         if form.is_valid():
             instance = form.save(commit=False)
@@ -25,7 +23,7 @@ def reportAdd(request):
             instance.save()
             return redirect('rips:list')
     else:
-        form = forms.AddReport()
+        form = ReportAddForm()
 
     return render(request, 'reports/reportAdd.html', { 'form':form })
 
