@@ -3,6 +3,7 @@ from django.db import models
 
 ChannelStatus = models.TextChoices('ChannelStatusChoice', 'Public Deleted')
 
+
 class Channel(models.Model):
     id = models.CharField(primary_key=True, max_length=24)
 

@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from siivagunnerdb.youtube.channels.models import Channel
 
+
 # Deprecated model. Use Video instead.
 class Rip(models.Model):
     # Custom field types

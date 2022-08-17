@@ -8,6 +8,7 @@ from . import forms
 from .models import Report
 from .serializers import ReportSerializer
 
+
 def reportAdd(request):
     """
     The report submission page.
@@ -27,6 +28,7 @@ def reportAdd(request):
         form = forms.AddReport()
 
     return render(request, 'reports/reportAdd.html', { 'form':form })
+
 
 class ReportViewSet(viewsets.ModelViewSet):
     """

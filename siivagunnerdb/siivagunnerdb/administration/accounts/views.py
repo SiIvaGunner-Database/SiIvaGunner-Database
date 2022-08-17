@@ -10,6 +10,7 @@ from rest_framework import viewsets
 from . import forms
 from .serializers import UserSerializer, GroupSerializer
 
+
 def signupView(request):
     """
     The signup page.
@@ -28,6 +29,7 @@ def signupView(request):
         form = UserCreationForm()
 
     return render(request, 'accounts/signup.html', { 'form':form })
+
 
 def loginView(request):
     """
@@ -49,6 +51,7 @@ def loginView(request):
 
     return render(request, 'accounts/login.html', { 'form':form })
 
+
 def logoutView(request):
     """
     The logout redirect.
@@ -56,6 +59,7 @@ def logoutView(request):
     if request.method == 'POST':
         logout(request)
         return redirect('rips:list')
+
 
 @login_required()
 def myAccountView(request):
@@ -92,12 +96,14 @@ def myAccountView(request):
     passwordForm = PasswordChangeForm(request.user)
     return render(request, 'accounts/myAccount.html', { 'usernameForm':usernameForm, 'passwordForm': passwordForm })
 
+
 class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
+
 
 class GroupViewSet(viewsets.ModelViewSet):
     """

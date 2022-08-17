@@ -4,7 +4,7 @@ Default settings file loads settings for the appropriate environment.
 
 import os
 
-ENV_NAME = os.environ.get("ENV_NAME")
+ENV_NAME = os.environ.get('ENV_NAME')
 
 if ENV_NAME:
     print(ENV_NAME + " environment set. Using cloud settings.")

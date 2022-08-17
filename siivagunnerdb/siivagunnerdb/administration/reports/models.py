@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+
 class Report(models.Model):
     # Custom
     description = models.TextField()
@@ -15,4 +16,4 @@ class Report(models.Model):
     updateDate = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.addDate.strftime("%y-%m-%d %H:%M")
+        return self.addDate.strftime('%y-%m-%d %H:%M')

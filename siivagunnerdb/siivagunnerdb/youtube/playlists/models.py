@@ -1,12 +1,13 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+
 class Playlist(models.Model):
     id = models.CharField(primary_key=True, max_length=34)
 
     # Snippet
     publishedAt = models.DateTimeField(auto_now_add=False)
-    # "channelId": string
+    # channelId: string
     title = models.CharField(max_length=100, blank=True, default='')
     description = models.TextField(blank=True, default='')
     thumbnails = models.JSONField(blank=True, default=dict)

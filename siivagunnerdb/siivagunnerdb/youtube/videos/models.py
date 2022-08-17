@@ -5,12 +5,13 @@ from siivagunnerdb.youtube.channels.models import Channel
 WikiStatus = models.TextChoices('WikiStatusChoice', 'Documented Undocumented')
 VideoStatus = models.TextChoices('VideoStatusChoice', 'Public Unlisted Unavailable Private Deleted')
 
+
 class Video(models.Model):
     id = models.CharField(primary_key=True, max_length=11)
 
     # Snippet
     publishedAt = models.DateTimeField(auto_now_add=False, blank=True, null=True)
-    # "channelId": string
+    # channelId: string
     title = models.CharField(max_length=100, blank=True, default='')
     description = models.TextField(blank=True, default='')
     thumbnails = models.JSONField(blank=True, default=dict)
@@ -54,12 +55,13 @@ class Video(models.Model):
     def __str__(self):
         return self.title
 
+
 # class VideoCategory(models.Model):
 #     id = models.CharField(primary_key=True, max_length=50)
 #
 #     # Snippet
 #     title = models.CharField(max_length=100, blank=True, default='')
-#     # "channelId": string -> "UCBR8-60-B28hp2BmDPdntcQ"
+#     # channelId: string -> 'UCBR8-60-B28hp2BmDPdntcQ'
 #     assignable = models.BooleanField(blank=True, default=True)
 #
 #     def __str__(self):

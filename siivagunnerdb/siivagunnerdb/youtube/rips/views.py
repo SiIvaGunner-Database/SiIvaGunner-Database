@@ -15,6 +15,7 @@ from . import forms
 from .models import Rip
 from .serializers import RipSerializer
 
+
 def ripList(request):
     """
     The rip search page.
@@ -72,26 +73,26 @@ def ripList(request):
         if request.GET.get('sort'):
             sort = request.GET.get('sort')
             urlParameters.append('sort=' + sort)
-            sortOptions = ["date", "title", "views"]
+            sortOptions = ['date', 'title', 'views']
 
             if sort not in sortOptions:
-                sort = "uploadDate"
+                sort = 'uploadDate'
 
-            if sort == "views":
-                sort = "viewCount"
+            if sort == 'views':
+                sort = 'viewCount'
         else:
-            sort = "uploadDate"
+            sort = 'uploadDate'
 
-        if request.GET.get('order') and request.GET.get('order') == "ascending":
-            order = "ascending"
+        if request.GET.get('order') and request.GET.get('order') == 'ascending':
+            order = 'ascending'
             urlParameters.append('order=' + order)
         else:
-            order = "descending"
+            order = 'descending'
 
         if request.GET.get('filter'):
             filter = request.GET.get('filter')
             urlParameters.append('filter=' + filter)
-            filterOptions = ["unfiltered", "documented", "undocumented", "public", "unlisted", "private", "deleted", "unavailable"]
+            filterOptions = ['unfiltered', 'documented', 'undocumented', 'public', 'unlisted', 'private', 'deleted', 'unavailable']
 
             if filter not in filterOptions:
                 filter = None
@@ -125,13 +126,13 @@ def ripList(request):
         if channelId:
             rips = rips & Rip.objects.filter(visible=True, channel__id=channelId)
 
-        if order == "descending":
-            if sort != "title":
+        if order == 'descending':
+            if sort != 'title':
                 rips = rips.order_by('-' + sort)
             else:
                 rips = rips.order_by(Lower(sort).desc())
         else:
-            if sort != "title":
+            if sort != 'title':
                 rips = rips.order_by(sort)
             else:
                 rips = rips.order_by(Lower(sort))
@@ -199,7 +200,7 @@ def ripList(request):
         # Format the upload dates
         for rip in rips:
             if type(rip.uploadDate) is datetime.datetime:
-                rip.uploadDate = rip.uploadDate.strftime("%Y-%m-%d   %H:%M:%S")
+                rip.uploadDate = rip.uploadDate.strftime('%Y-%m-%d   %H:%M:%S')
 
         # Return the page with the searched rips
         return render(request, 'rips/ripList.html', {
@@ -210,6 +211,7 @@ def ripList(request):
                 'pageNumbers':pageNumbers,
             }
         )
+
 
 def ripDetails(request, id):
     """
@@ -238,6 +240,7 @@ def ripAdd(request):
         form = forms.AddRip()
 
     return render(request, 'rips/ripAdd.html', { 'form':form })
+
 
 class RipViewSet(viewsets.ModelViewSet):
     """

@@ -11,6 +11,7 @@ from .models import Channel
 from .serializers import ChannelSerializer
 from siivagunnerdb.youtube.rips.models import Rip
 
+
 def channelList(request):
     """
     The channel search page.
@@ -56,17 +57,17 @@ def channelList(request):
 
         if request.GET.get('sort'):
             sort = request.GET.get('sort')
-            sortOptions = ["publishedAt", "name"]
+            sortOptions = ['publishedAt', 'name']
 
             if sort not in sortOptions:
-                sort = "publishedAt"
+                sort = 'publishedAt'
         else:
-            sort = "publishedAt"
+            sort = 'publishedAt'
 
-        if request.GET.get('order') and request.GET.get('order') == "ascending":
-            order = "ascending"
+        if request.GET.get('order') and request.GET.get('order') == 'ascending':
+            order = 'ascending'
         else:
-            order = "descending"
+            order = 'descending'
 
         # Query the search using any given filters or sorting
 
@@ -77,23 +78,24 @@ def channelList(request):
         else:
             channels = Channel.objects.filter(visible=True)
 
-        if order == "descending":
-            if sort != "name":
+        if order == 'descending':
+            if sort != 'name':
                 channels = channels.order_by('-' + sort)
             else:
                 channels = channels.order_by(Lower(sort).desc())
         else:
-            if sort != "name":
+            if sort != 'name':
                 channels = channels.order_by(sort)
             else:
                 channels = channels.order_by(Lower(sort))
 
         # Format the join dates
         for channel in channels:
-            channel.publishedAt = channel.publishedAt.strftime("%Y-%m-%d   %H:%M:%S")
+            channel.publishedAt = channel.publishedAt.strftime('%Y-%m-%d   %H:%M:%S')
 
         # Return the page with the searched channels
         return render(request, 'channels/channelList.html', {'channels':channels })
+
 
 def channelDetails(request, id):
     """
@@ -105,9 +107,10 @@ def channelDetails(request, id):
     rips = rips.order_by('-uploadDate')[:10]
 
     for rip in rips:
-        rip.uploadDate = rip.uploadDate.strftime("%Y-%m-%d   %H:%M:%S")
+        rip.uploadDate = rip.uploadDate.strftime('%Y-%m-%d   %H:%M:%S')
 
     return render(request, 'channels/channelDetails.html', {'channel':channel, 'rips':rips, 'ripCount':ripCount})
+
 
 def channelAdd(request):
     """
@@ -129,6 +132,7 @@ def channelAdd(request):
         form = forms.AddChannel()
 
     return render(request, 'channels/channelAdd.html', { 'form':form })
+
 
 class ChannelViewSet(viewsets.ModelViewSet):
     """
