@@ -1,8 +1,8 @@
-from rest_framework.serializers import ModelSerializer
+from siivagunnerdb.serializers import LoggedModelSerializer
 from .models import Channel
 
 
-class ChannelSerializer(ModelSerializer):
+class ChannelSerializer(LoggedModelSerializer):
     class Meta:
         model = Channel
         fields = '__all__'

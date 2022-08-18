@@ -1,8 +1,8 @@
-from rest_framework.serializers import ModelSerializer
+from siivagunnerdb.serializers import LoggedModelSerializer
 from .models import Collective
 
 
-class CollectiveSerializer(ModelSerializer):
+class CollectiveSerializer(LoggedModelSerializer):
     class Meta:
         model = Collective
         fields = '__all__'

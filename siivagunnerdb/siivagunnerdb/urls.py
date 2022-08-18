@@ -7,7 +7,6 @@ from django.urls import path, include
 from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
 
-from . import views
 from siivagunnerdb.administration.reports.views import ReportViewSet
 from siivagunnerdb.administration.logs.views import LogViewSet
 from siivagunnerdb.community.collectives.views import CollectiveViewSet
@@ -16,6 +15,8 @@ from siivagunnerdb.youtube.channels.views import ChannelViewSet
 from siivagunnerdb.youtube.playlists.views import PlaylistViewSet
 from siivagunnerdb.youtube.rips.views import RipViewSet, ripList
 from siivagunnerdb.youtube.videos.views import VideoViewSet
+
+from . import views
 
 router = routers.DefaultRouter()
 router.register(r'channels', ChannelViewSet)

@@ -1,8 +1,8 @@
-from rest_framework.serializers import ModelSerializer
+from siivagunnerdb.serializers import LoggedModelSerializer
 from .models import Contributor
 
 
-class ContributorSerializer(ModelSerializer):
+class ContributorSerializer(LoggedModelSerializer):
     class Meta:
         model = Contributor
         fields = '__all__'

@@ -1,8 +1,8 @@
-from rest_framework.serializers import ModelSerializer
+from siivagunnerdb.serializers import LoggedModelSerializer
 from .models import Report
 
 
-class ReportSerializer(ModelSerializer):
+class ReportSerializer(LoggedModelSerializer):
     class Meta:
         model = Report
         fields = '__all__'
