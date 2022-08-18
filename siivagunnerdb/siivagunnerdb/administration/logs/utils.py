@@ -1,5 +1,5 @@
 """
-Utilities for easily creating LogEntry objects. Experimental and incomplete.
+Utilities for easily creating LogEntry objects. Experimental.
 """
 
 from django.contrib.admin.models import CHANGE, ADDITION
@@ -18,6 +18,7 @@ def log_addition(request, object):
 def log_change(request, old_object, new_object):
     """
     Creates a change LogEntry.
+    Doesn't include the changed fields.
     """
     message = [{"changed": {}}]
     ModelAdmin.log_change(None, request, new_object, message)
