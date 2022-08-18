@@ -1,14 +1,14 @@
-from django.contrib.auth.models import User
 from django.db import models
+from siivagunnerdb.models import StandardModel
+from siivagunnerdb.youtube.channels.models import Channel
 
 
-class Playlist(models.Model):
+class Playlist(StandardModel):
     id = models.CharField(primary_key=True, max_length=34)
 
     # Snippet
-    publishedAt = models.DateTimeField(auto_now_add=False)
-    # channelId: string
-    title = models.CharField(max_length=100, blank=True, default='')
+    publishedAt = models.DateTimeField(auto_now_add=False, blank=True, null=True)
+    title = models.CharField(max_length=100, blank=True, default='placeholder')
     description = models.TextField(blank=True, default='')
     thumbnails = models.JSONField(blank=True, default=dict)
     channelTitle = models.CharField(max_length=100, blank=True, default='')
@@ -16,17 +16,10 @@ class Playlist(models.Model):
     localized = models.JSONField(blank=True, default=dict)
 
     # Content details
-    itemCount = models.PositiveIntegerField()
+    itemCount = models.PositiveIntegerField(blank=True, default=0)
 
     # Custom
-    # (nothing yet!)
-
-    # Administration
-    author = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True)
-    visible = models.BooleanField(blank=True, default=False)
-    notes = models.TextField(blank=True, default='')
-    addDate = models.DateTimeField(auto_now_add=True)
-    updateDate = models.DateTimeField(auto_now=True)
+    channel = models.ForeignKey(Channel, on_delete=models.PROTECT, blank=True, null=True)
 
     def __str__(self):
         return self.title

@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 
 from .forms import UsernameChangeForm
