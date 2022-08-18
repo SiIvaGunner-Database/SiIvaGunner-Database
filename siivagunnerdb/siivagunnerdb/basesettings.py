@@ -21,7 +21,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    # Django
+    # Django apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -29,11 +29,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sessions',
 
-    # REST
+    # Third party apps
     'rest_framework',
     'rest_framework.authtoken',
+    'reversion',
 
-    # siivagunnerdb
+    # Local apps
     'siivagunnerdb.administration.accounts',
     'siivagunnerdb.administration.logs',
     'siivagunnerdb.administration.reports',
