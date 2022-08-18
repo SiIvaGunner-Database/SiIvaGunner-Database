@@ -24,7 +24,7 @@ env = environ.Env()
 env.read_env(io.StringIO(payload))
 
 # Security settings
-DEBUG = env('DEBUG')
+DEBUG = False
 SECRET_KEY = env('SECRET_KEY')
 DATABASES = {'default': env.db()}
 
