@@ -9,13 +9,14 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 import os
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Allow all hosts to access Django site
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -33,10 +34,15 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
 
     # siivagunnerdb
-    'accounts',
-    'channels',
-    'reports',
-    'rips',
+    'siivagunnerdb.administration.accounts',
+    'siivagunnerdb.administration.logs',
+    'siivagunnerdb.administration.reports',
+    'siivagunnerdb.community.collectives',
+    'siivagunnerdb.community.contributors',
+    'siivagunnerdb.youtube.channels',
+    'siivagunnerdb.youtube.playlists',
+    'siivagunnerdb.youtube.rips',
+    'siivagunnerdb.youtube.videos',
 ]
 
 MIDDLEWARE = [
