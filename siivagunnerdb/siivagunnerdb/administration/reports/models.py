@@ -1,5 +1,4 @@
 from django.db import models
-
 from siivagunnerdb.models import StandardModel
 
 
