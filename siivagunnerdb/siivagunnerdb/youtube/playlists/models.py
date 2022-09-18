@@ -22,8 +22,8 @@ class Playlist(StandardModel):
 
     # Custom
     channel = models.ForeignKey(Channel, on_delete=models.PROTECT, blank=True, null=True)
-    prodSheet = models.ForeignKey(Sheet, related_name='playlists_prod_sheet', on_delete=models.PROTECT, blank=True, null=True)
-    devSheet = models.ForeignKey(Sheet, related_name='playlists_dev_sheet', on_delete=models.PROTECT, blank=True, null=True)
+    productionSheet = models.ForeignKey(Sheet, related_name='playlists_prod_sheet', on_delete=models.PROTECT, blank=True, null=True)
+    developmentSheet = models.ForeignKey(Sheet, related_name='playlists_dev_sheet', on_delete=models.PROTECT, blank=True, null=True)
 
     def __str__(self):
         return self.title

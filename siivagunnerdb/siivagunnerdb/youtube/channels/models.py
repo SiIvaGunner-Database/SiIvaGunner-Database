@@ -36,8 +36,8 @@ class Channel(StandardModel):
     wiki = models.CharField(max_length=50, blank=True, default='')
     collective = models.ForeignKey(Collective, on_delete=models.PROTECT, blank=True, null=True)
     contributors = models.ManyToManyField(Contributor, blank=True, default=[])
-    prodSheet = models.ForeignKey(Sheet, related_name='channels_prod_sheet', on_delete=models.PROTECT, blank=True, null=True)
-    devSheet = models.ForeignKey(Sheet, related_name='channels_dev_sheet', on_delete=models.PROTECT, blank=True, null=True)
+    productionSheet = models.ForeignKey(Sheet, related_name='channels_prod_sheet', on_delete=models.PROTECT, blank=True, null=True)
+    developmentSheet = models.ForeignKey(Sheet, related_name='channels_dev_sheet', on_delete=models.PROTECT, blank=True, null=True)
 
     def __str__(self):
         return self.title
