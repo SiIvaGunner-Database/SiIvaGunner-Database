@@ -11,6 +11,9 @@ from siivagunnerdb.administration.reports.views import ReportViewSet
 from siivagunnerdb.administration.logs.views import LogViewSet
 from siivagunnerdb.community.collectives.views import CollectiveViewSet
 from siivagunnerdb.community.contributors.views import ContributorViewSet
+from siivagunnerdb.drive.forms.views import FormViewSet
+from siivagunnerdb.drive.scripts.views import ScriptViewSet
+from siivagunnerdb.drive.sheets.views import SheetViewSet
 from siivagunnerdb.youtube.channels.views import ChannelViewSet
 from siivagunnerdb.youtube.playlists.views import PlaylistViewSet
 from siivagunnerdb.youtube.rips.views import RipViewSet, ripList
@@ -22,10 +25,13 @@ router = routers.DefaultRouter()
 router.register(r'channels', ChannelViewSet)
 router.register(r'collectives', CollectiveViewSet)
 router.register(r'contributors', ContributorViewSet)
+router.register(r'forms', FormViewSet)
 router.register(r'logs', LogViewSet)
 router.register(r'playlists', PlaylistViewSet)
 router.register(r'reports', ReportViewSet)
 router.register(r'rips', RipViewSet)
+router.register(r'scripts', ScriptViewSet)
+router.register(r'sheets', SheetViewSet)
 router.register(r'videos', VideoViewSet)
 
 urlpatterns = [

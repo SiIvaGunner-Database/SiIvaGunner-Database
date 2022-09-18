@@ -3,6 +3,7 @@ from siivagunnerdb.models import StandardModel
 
 
 class Form(StandardModel):
+    id = models.CharField(primary_key=True, max_length=44)
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True, default='')
 

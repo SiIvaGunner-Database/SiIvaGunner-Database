@@ -3,6 +3,7 @@ from django.db import models
 from siivagunnerdb.models import StandardModel
 from siivagunnerdb.community.collectives.models import Collective
 from siivagunnerdb.community.contributors.models import Contributor
+from siivagunnerdb.drive.sheets.models import Sheet
 
 ChannelStatus = models.TextChoices('ChannelStatusChoice', 'Public Deleted')
 
@@ -30,11 +31,13 @@ class Channel(StandardModel):
     videoCount = models.PositiveIntegerField(blank=True, default=0)
 
     # Custom
+    channelStatus = models.CharField(choices=ChannelStatus.choices, max_length=20, blank=True, default='')
+    bannerExternalUrl = models.CharField(max_length=100, blank=True, default='')
+    wiki = models.CharField(max_length=50, blank=True, default='')
     collective = models.ForeignKey(Collective, on_delete=models.PROTECT, blank=True, null=True)
     contributors = models.ManyToManyField(Contributor, blank=True, default=[])
-    wiki = models.CharField(max_length=50, blank=True, default='')
-    bannerExternalUrl = models.CharField(max_length=100, blank=True, default='')
-    channelStatus = models.CharField(choices=ChannelStatus.choices, max_length=20, blank=True, default='')
+    prodSheet = models.ForeignKey(Sheet, related_name='channels_prod_sheet', on_delete=models.PROTECT, blank=True, null=True)
+    devSheet = models.ForeignKey(Sheet, related_name='channels_dev_sheet', on_delete=models.PROTECT, blank=True, null=True)
 
     def __str__(self):
         return self.title
