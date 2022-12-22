@@ -2,7 +2,7 @@ from django.db import models
 
 from siivagunnerdb.models import StandardModel
 from siivagunnerdb.youtube.channels.models import Channel
-from siivagunnerdb.drive.sheets.models import Sheet
+from siivagunnerdb.drive.sheets.models import Spreadsheet
 
 
 class Playlist(StandardModel):
@@ -22,8 +22,8 @@ class Playlist(StandardModel):
 
     # Custom
     channel = models.ForeignKey(Channel, on_delete=models.PROTECT, blank=True, null=True)
-    productionSheet = models.ForeignKey(Sheet, related_name='playlists_prod_sheet', on_delete=models.PROTECT, blank=True, null=True)
-    developmentSheet = models.ForeignKey(Sheet, related_name='playlists_dev_sheet', on_delete=models.PROTECT, blank=True, null=True)
+    productionSpreadsheet = models.ForeignKey(Spreadsheet, related_name='playlists_prod_spreadsheet', on_delete=models.PROTECT, blank=True, null=True)
+    developmentSpreadsheet = models.ForeignKey(Spreadsheet, related_name='playlists_dev_spreadsheet', on_delete=models.PROTECT, blank=True, null=True)
 
     def __str__(self):
         return self.title

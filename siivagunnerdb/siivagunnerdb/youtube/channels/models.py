@@ -3,7 +3,7 @@ from django.db import models
 from siivagunnerdb.models import StandardModel
 from siivagunnerdb.community.collectives.models import Collective
 from siivagunnerdb.community.contributors.models import Contributor
-from siivagunnerdb.drive.sheets.models import Sheet
+from siivagunnerdb.drive.sheets.models import Spreadsheet
 
 ChannelStatus = models.TextChoices('ChannelStatusChoice', 'Public Deleted')
 
@@ -36,8 +36,8 @@ class Channel(StandardModel):
     wiki = models.CharField(max_length=50, blank=True, default='')
     collective = models.ForeignKey(Collective, on_delete=models.PROTECT, blank=True, null=True)
     contributors = models.ManyToManyField(Contributor, blank=True, default=[])
-    productionSheet = models.ForeignKey(Sheet, related_name='channels_prod_sheet', on_delete=models.PROTECT, blank=True, null=True)
-    developmentSheet = models.ForeignKey(Sheet, related_name='channels_dev_sheet', on_delete=models.PROTECT, blank=True, null=True)
+    productionSpreadsheet = models.ForeignKey(Spreadsheet, related_name='channels_prod_spreadsheet', on_delete=models.PROTECT, blank=True, null=True)
+    developmentSpreadsheet = models.ForeignKey(Spreadsheet, related_name='channels_dev_spreadsheet', on_delete=models.PROTECT, blank=True, null=True)
 
     def __str__(self):
         return self.title

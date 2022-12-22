@@ -1,7 +1,8 @@
 from django.contrib.admin.models import LogEntry
 from rest_framework.viewsets import ModelViewSet
 
-from .serializers import LogSerializer
+from .models import Alert
+from .serializers import LogSerializer, AlertSerializer
 
 
 class LogViewSet(ModelViewSet):
@@ -10,3 +11,10 @@ class LogViewSet(ModelViewSet):
     """
     queryset = LogEntry.objects.all()
     serializer_class = LogSerializer
+
+class AlertViewSet(ModelViewSet):
+    """
+    API endpoint that allows alerts to be viewed or edited.
+    """
+    queryset = Alert.objects.all()
+    serializer_class = AlertSerializer

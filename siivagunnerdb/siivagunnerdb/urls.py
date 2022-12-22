@@ -8,12 +8,12 @@ from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
 
 from siivagunnerdb.administration.reports.views import ReportViewSet
-from siivagunnerdb.administration.logs.views import LogViewSet
+from siivagunnerdb.administration.logs.views import LogViewSet, AlertViewSet
 from siivagunnerdb.community.collectives.views import CollectiveViewSet
 from siivagunnerdb.community.contributors.views import ContributorViewSet
 from siivagunnerdb.drive.forms.views import FormViewSet
 from siivagunnerdb.drive.scripts.views import ScriptViewSet
-from siivagunnerdb.drive.sheets.views import SheetViewSet
+from siivagunnerdb.drive.sheets.views import SpreadsheetViewSet, SheetViewSet
 from siivagunnerdb.youtube.channels.views import ChannelViewSet
 from siivagunnerdb.youtube.playlists.views import PlaylistViewSet
 from siivagunnerdb.youtube.rips.views import RipViewSet, ripList
@@ -22,6 +22,7 @@ from siivagunnerdb.youtube.videos.views import VideoViewSet
 from . import views
 
 router = routers.DefaultRouter()
+router.register(r'alerts', AlertViewSet)
 router.register(r'channels', ChannelViewSet)
 router.register(r'collectives', CollectiveViewSet)
 router.register(r'contributors', ContributorViewSet)
@@ -31,6 +32,7 @@ router.register(r'playlists', PlaylistViewSet)
 router.register(r'reports', ReportViewSet)
 router.register(r'rips', RipViewSet)
 router.register(r'scripts', ScriptViewSet)
+router.register(r'spreadsheets', SpreadsheetViewSet)
 router.register(r'sheets', SheetViewSet)
 router.register(r'videos', VideoViewSet)
 

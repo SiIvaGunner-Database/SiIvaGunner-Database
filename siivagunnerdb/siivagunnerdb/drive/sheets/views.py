@@ -1,9 +1,16 @@
 from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
 
-from .models import Sheet
-from .serializers import SheetSerializer
+from .models import Spreadsheet, Sheet
+from .serializers import SpreadsheetSerializer, SheetSerializer
 
+
+class SpreadsheetViewSet(ModelViewSet):
+    """
+    API endpoint that allows spreadsheets to be viewed or edited.
+    """
+    queryset = Spreadsheet.objects.all()
+    serializer_class = SpreadsheetSerializer
 
 class SheetViewSet(ModelViewSet):
     """
