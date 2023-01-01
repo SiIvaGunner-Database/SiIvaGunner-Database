@@ -1,6 +1,10 @@
 from django.db import models
+
 from siivagunnerdb.models import StandardModel
 from siivagunnerdb.youtube.channels.models import Channel
+from siivagunnerdb.drive.sheets.models import Spreadsheet
+
+PlaylistStatus = models.TextChoices('PlaylistStatusChoice', 'Public Unlisted Private Deleted')
 
 
 class Playlist(StandardModel):
@@ -19,7 +23,10 @@ class Playlist(StandardModel):
     itemCount = models.PositiveIntegerField(blank=True, default=0)
 
     # Custom
+    playlistStatus = models.CharField(choices=PlaylistStatus.choices, max_length=20, blank=True, default='')
     channel = models.ForeignKey(Channel, on_delete=models.PROTECT, blank=True, null=True)
+    productionSpreadsheet = models.ForeignKey(Spreadsheet, related_name='playlists_prod_spreadsheet', on_delete=models.PROTECT, blank=True, null=True)
+    developmentSpreadsheet = models.ForeignKey(Spreadsheet, related_name='playlists_dev_spreadsheet', on_delete=models.PROTECT, blank=True, null=True)
 
     def __str__(self):
         return self.title
