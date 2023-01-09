@@ -16,13 +16,13 @@ class Video(StandardModel):
     publishedAt = models.DateTimeField(auto_now_add=False, blank=True, null=True)
     title = models.CharField(max_length=100, blank=True, default='placeholder')
     description = models.TextField(blank=True, default='')
-    thumbnails = models.JSONField(blank=True, default=dict)
+    thumbnails = models.TextField(blank=True, default='')
     channelTitle = models.CharField(max_length=100, blank=True, default='')
-    tags = models.JSONField(blank=True, default=dict)
+    tags = models.TextField(blank=True, default='')
     categoryId = models.CharField(max_length=50, blank=True, default='')
     liveBroadcastContent = models.CharField(max_length=20, blank=True, default='')
     defaultLanguage = models.CharField(max_length=50, blank=True, default='')
-    localized = models.JSONField(blank=True, default=dict)
+    localized = models.TextField(blank=True, default='')
     defaultAudioLanguage = models.CharField(max_length=50, blank=True, default='')
 
     # Content details
@@ -31,8 +31,8 @@ class Video(StandardModel):
     definition = models.CharField(max_length=20, blank=True, default='')
     caption = models.CharField(max_length=20, blank=True, default='')
     licensedContent = models.BooleanField(blank=True, default=False)
-    regionRestriction = models.JSONField(blank=True, default=dict)
-    contentRating = models.JSONField(blank=True, default=dict)
+    regionRestriction = models.TextField(blank=True, default='')
+    contentRating = models.TextField(blank=True, default='')
     projection = models.CharField(max_length=20, blank=True, default='')
 
     # Statistics

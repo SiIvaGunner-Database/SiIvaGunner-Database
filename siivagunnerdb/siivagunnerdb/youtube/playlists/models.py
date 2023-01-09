@@ -14,10 +14,10 @@ class Playlist(StandardModel):
     publishedAt = models.DateTimeField(auto_now_add=False, blank=True, null=True)
     title = models.CharField(max_length=100, blank=True, default='placeholder')
     description = models.TextField(blank=True, default='')
-    thumbnails = models.JSONField(blank=True, default=dict)
+    thumbnails = models.TextField(blank=True, default='')
     channelTitle = models.CharField(max_length=100, blank=True, default='')
     defaultLanguage = models.CharField(max_length=50,blank=True, default='')
-    localized = models.JSONField(blank=True, default=dict)
+    localized = models.TextField(blank=True, default='')
 
     # Content details
     itemCount = models.PositiveIntegerField(blank=True, default=0)
