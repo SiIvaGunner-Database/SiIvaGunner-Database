@@ -1,10 +1,10 @@
-from rest_framework.viewsets import ModelViewSet
+from siivagunnerdb.views import MultipleModelViewSet
 
 from .models import Contributor
 from .serializers import ContributorSerializer
 
 
-class ContributorViewSet(ModelViewSet):
+class ContributorViewSet(MultipleModelViewSet):
     """
     API endpoint that allows contributors to be viewed or edited.
     """

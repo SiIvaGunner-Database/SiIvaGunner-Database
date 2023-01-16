@@ -1,11 +1,11 @@
 from django.shortcuts import render
-from rest_framework.viewsets import ModelViewSet
+from siivagunnerdb.views import MultipleModelViewSet
 
 from .models import Collective
 from .serializers import CollectiveSerializer
 
 
-class CollectiveViewSet(ModelViewSet):
+class CollectiveViewSet(MultipleModelViewSet):
     """
     API endpoint that allows collectives to be viewed or edited.
     """
