@@ -14,7 +14,7 @@ class Video(StandardModel):
 
     # Snippet
     publishedAt = models.DateTimeField(auto_now_add=False, blank=True, null=True)
-    title = models.CharField(max_length=100, blank=True, default='placeholder')
+    title = models.CharField(max_length=100, blank=True, default='')
     description = models.TextField(blank=True, default='')
     thumbnails = models.TextField(blank=True, default='')
     channelTitle = models.CharField(max_length=100, blank=True, default='')
