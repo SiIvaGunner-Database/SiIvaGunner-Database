@@ -121,7 +121,7 @@ DEFAULT_AUTO_FIELD='django.db.models.AutoField'
 
 # Django REST Framework
 REST_FRAMEWORK = {
-    'PAGE_SIZE': 10,
+    'PAGE_SIZE': 50,
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
@@ -130,6 +130,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAdminUser',
     ],
+    'EXCEPTION_HANDLER': 'siivagunnerdb.views.jsonExceptionHandler',
 }
 
 # File serving directories
