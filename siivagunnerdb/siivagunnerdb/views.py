@@ -52,16 +52,12 @@ class MultipleModelViewSet(ModelViewSet):
         """
         Update one or more objects.
         """
-        if isinstance(request.data, list):
-            return self.updateList(self, request, *args, **kwargs)
-        else:
-            return super().update(request, *args, **kwargs)
+        dataList = request.data
 
-    def updateList(self, request, *args, **kwargs):
-        """
-        Update a list of objects.
-        """
-        for object in request.data:
+        if not isinstance(dataList, list):
+            dataList = [dataList]
+
+        for object in dataList:
             instance = self.get_queryset().get(pk=object['id'])
             serializer = self.get_serializer(instance=instance, data=object)
 
