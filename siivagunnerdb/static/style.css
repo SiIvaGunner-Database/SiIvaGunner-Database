@@ -14,12 +14,13 @@ Input:#F0F0F0
 <hr/>:#DDDDDD
 Nav:  #BBBBBB
 Hover:#999999
-Text: #444444
+Html: #444444
 */
 
 html {
   padding: 0 calc((100% - 1024px)/2);
   height: 100%;
+  background-color: #444444;
 }
 
 body {
@@ -84,7 +85,6 @@ main {
   display: flex;
   flex-flow: column;
   flex-grow: 1;
-  color: #444444;
   background-color: #F8F8F8;
 }
 
@@ -192,6 +192,20 @@ th, td {
   display: grid;
   grid-template-columns: 3fr 1fr;
   margin-top:16px;
+}
+
+.gadget {
+  height: 200px;
+  width: auto;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  transition: opacity 8s ease-in 8s;
+}
+
+.gadget:hover {
+  opacity: 0;
+  transition: opacity 2s ease-out;
 }
 
 /* For computer viewing */
