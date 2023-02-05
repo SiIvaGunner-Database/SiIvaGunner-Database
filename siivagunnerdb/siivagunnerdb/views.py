@@ -1,6 +1,9 @@
 from django.shortcuts import render
 
+from django_filters.rest_framework import DjangoFilterBackend
+
 from rest_framework import status
+from rest_framework.filters import OrderingFilter
 from rest_framework.views import exception_handler
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
@@ -34,6 +37,9 @@ class MultipleModelViewSet(ModelViewSet):
     A view set with overriding create and update methods that allow content to be received as a single object or a list.
     Otherwise, this class is identical to the ModelViewSet class.
     """
+    filter_backends = [DjangoFilterBackend, OrderingFilter,]
+    filterset_fields = '__all__'
+    ordering_fields = '__all__'
 
     def create(self, request, *args, **kwargs):
         """
