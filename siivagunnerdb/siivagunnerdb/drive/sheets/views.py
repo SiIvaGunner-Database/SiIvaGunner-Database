@@ -1,18 +1,18 @@
 from django.shortcuts import render
-from rest_framework.viewsets import ModelViewSet
+from siivagunnerdb.views import MultipleModelViewSet
 
 from .models import Spreadsheet, Sheet
 from .serializers import SpreadsheetSerializer, SheetSerializer
 
 
-class SpreadsheetViewSet(ModelViewSet):
+class SpreadsheetViewSet(MultipleModelViewSet):
     """
     API endpoint that allows spreadsheets to be viewed or edited.
     """
     queryset = Spreadsheet.objects.all()
     serializer_class = SpreadsheetSerializer
 
-class SheetViewSet(ModelViewSet):
+class SheetViewSet(MultipleModelViewSet):
     """
     API endpoint that allows sheets to be viewed or edited.
     """

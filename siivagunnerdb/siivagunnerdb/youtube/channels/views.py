@@ -3,7 +3,7 @@ from django.db.models.functions import Lower
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
-from rest_framework.viewsets import ModelViewSet
+from siivagunnerdb.views import MultipleModelViewSet
 from urllib.parse import urlencode
 
 from siivagunnerdb.youtube.rips.models import Rip
@@ -113,7 +113,7 @@ def channelDetails(request, id):
     return render(request, 'channels/channelDetails.html', {'channel':channel, 'rips':rips, 'ripCount':ripCount})
 
 
-class ChannelViewSet(ModelViewSet):
+class ChannelViewSet(MultipleModelViewSet):
     """
     API endpoint that allows channels to be viewed or edited.
     """

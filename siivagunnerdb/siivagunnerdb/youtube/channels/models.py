@@ -12,17 +12,17 @@ class Channel(StandardModel):
     id = models.CharField(primary_key=True, max_length=24)
 
     # Snippet
-    title = models.CharField(max_length=100, blank=True, default='placeholder')
+    title = models.CharField(max_length=100, blank=True, default='')
     description = models.TextField(blank=True, default='')
     customUrl = models.CharField(max_length=100, blank=True, default='')
     publishedAt = models.DateTimeField(auto_now_add=False, blank=True, null=True)
-    thumbnails = models.JSONField(blank=True, default=dict)
+    thumbnails = models.TextField(blank=True, default='')
     defaultLanguage = models.CharField(max_length=50, blank=True, default='')
-    localized = models.JSONField(blank=True, default=dict)
+    localized = models.TextField(blank=True, default='')
     country = models.CharField(max_length=50, blank=True, default='')
 
     # Content details
-    relatedPlaylists = models.JSONField(blank=True, default=dict)
+    relatedPlaylists = models.TextField(blank=True, default='')
 
     # Statistics
     viewCount = models.PositiveIntegerField(blank=True, default=0)
