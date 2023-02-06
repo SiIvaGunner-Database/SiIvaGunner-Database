@@ -24,7 +24,7 @@ class LoggedModelSerializer(ModelSerializer):
         with reversion.create_revision():
             instance = super().create(validated_data)
             reversion.set_user(request.user)
-            reversion.set_comment("Created revision from POST request")
+            reversion.set_comment('Created revision from POST request')
 
         log_addition(request, instance)
         return instance
@@ -39,7 +39,7 @@ class LoggedModelSerializer(ModelSerializer):
         with reversion.create_revision():
             new_instance = super().update(instance, validated_data)
             reversion.set_user(request.user)
-            reversion.set_comment("Created revision from PUT request")
+            reversion.set_comment('Created revision from PUT request')
 
         log_change(request, instance, new_instance)
         return new_instance

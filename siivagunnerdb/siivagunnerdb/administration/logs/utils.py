@@ -11,7 +11,7 @@ def log_addition(request, object):
     """
     Creates an addition LogEntry.
     """
-    message = [{"added": {}}]
+    message = [{'added': {}}]
     ModelAdmin.log_addition(None, request, object, message)
 
 
@@ -20,5 +20,5 @@ def log_change(request, old_object, new_object):
     Creates a change LogEntry.
     Doesn't include the changed fields.
     """
-    message = [{"changed": {}}]
+    message = [{'changed': {}}]
     ModelAdmin.log_change(None, request, new_object, message)
