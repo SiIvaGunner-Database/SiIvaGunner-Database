@@ -1,5 +1,5 @@
 asgiref==3.3.2
-Django==3.2.17
+Django==3.2.18
 djangorestframework==3.11.2
 django-environ==0.4.5
 django-filter==22.1
