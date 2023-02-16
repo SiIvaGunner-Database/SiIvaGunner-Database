@@ -8,7 +8,7 @@ from django.db.models.functions import Lower
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
-from rest_framework.viewsets import ModelViewSet
+from siivagunnerdb.views import MultipleModelViewSet
 from urllib.parse import urlencode
 
 from .models import Video
@@ -220,7 +220,7 @@ def videoDetails(request, id):
     return render(request, 'videos/videoDetails.html', { 'video':video })
 
 
-class VideoViewSet(ModelViewSet):
+class VideoViewSet(MultipleModelViewSet):
     """
     API endpoint that allows videos to be viewed or edited.
     """

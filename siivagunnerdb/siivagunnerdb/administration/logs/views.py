@@ -1,18 +1,18 @@
 from django.contrib.admin.models import LogEntry
-from rest_framework.viewsets import ModelViewSet
+from siivagunnerdb.views import MultipleModelViewSet
 
 from .models import Alert
 from .serializers import LogSerializer, AlertSerializer
 
 
-class LogViewSet(ModelViewSet):
+class LogViewSet(MultipleModelViewSet):
     """
     API endpoint that allows logs to be viewed or edited.
     """
     queryset = LogEntry.objects.all()
     serializer_class = LogSerializer
 
-class AlertViewSet(ModelViewSet):
+class AlertViewSet(MultipleModelViewSet):
     """
     API endpoint that allows alerts to be viewed or edited.
     """

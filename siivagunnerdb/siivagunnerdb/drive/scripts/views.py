@@ -1,11 +1,11 @@
 from django.shortcuts import render
-from rest_framework.viewsets import ModelViewSet
+from siivagunnerdb.views import MultipleModelViewSet
 
 from .models import Script
 from .serializers import ScriptSerializer
 
 
-class ScriptViewSet(ModelViewSet):
+class ScriptViewSet(MultipleModelViewSet):
     """
     API endpoint that allows scripts to be viewed or edited.
     """

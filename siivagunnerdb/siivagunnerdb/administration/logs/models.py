@@ -4,7 +4,7 @@ from siivagunnerdb.models import StandardModel
 
 
 class Alert(StandardModel):
-    description = models.TextField(blank=True, default='')
+    description = models.TextField()
 
     @property
     def shortDescription(self):

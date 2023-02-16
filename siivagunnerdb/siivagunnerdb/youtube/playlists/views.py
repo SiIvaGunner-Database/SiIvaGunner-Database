@@ -1,10 +1,10 @@
-from rest_framework.viewsets import ModelViewSet
+from siivagunnerdb.views import MultipleModelViewSet
 
 from .models import Playlist
 from .serializers import PlaylistSerializer
 
 
-class PlaylistViewSet(ModelViewSet):
+class PlaylistViewSet(MultipleModelViewSet):
     """
     API endpoint that allows playlists to be viewed or edited.
     """
