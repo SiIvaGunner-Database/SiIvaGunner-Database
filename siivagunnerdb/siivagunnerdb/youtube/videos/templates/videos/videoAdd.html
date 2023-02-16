@@ -1,12 +1,12 @@
 {% extends 'baseLayout.html' %}
 {% block content%}
-  <div class="channelAdd">
-    <h2>Add a channel to the database</h2>
+  <div class="videoAdd">
+    <h2>Add a video to the database</h2>
     <span class="smallText">The information submitted will not be visible in the database until after it is manually verified.</span>
     <br />
-    <a class="smallText" href="{% url 'videos:add' %}">Add a rip instead</a>
+    <a class="smallText" href="{% url 'channels:add' %}">Add a channel instead</a>
     <hr />
-    <form class="siteForm" action="{% url 'channels:add' %}" method="post" enctype="multipart/form-data">
+    <form class="siteForm" action="{% url 'videos:add' %}" method="post" enctype="multipart/form-data">
       {% csrf_token %}
       {{ form }}
       <input type="submit" value="Add" />

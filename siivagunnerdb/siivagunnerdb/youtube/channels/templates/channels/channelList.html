@@ -24,7 +24,7 @@
       <option value="ascending" {% if request.GET.order == 'ascending' %} selected {% endif %}>Ascending</option>
     </select>
   </form>
-  <a class="smallText" href="{% url 'rips:list' %}">Search for videos instead</a>
+  <a class="smallText" href="{% url 'videos:list' %}">Search for videos instead</a>
   <table class="channels">
     <tr class="channel">
       <th>Channel Title</th>

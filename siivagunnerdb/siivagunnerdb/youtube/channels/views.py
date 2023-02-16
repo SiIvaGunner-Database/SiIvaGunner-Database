@@ -6,7 +6,7 @@ from django.urls import reverse
 from rest_framework.viewsets import ModelViewSet
 from urllib.parse import urlencode
 
-from siivagunnerdb.youtube.rips.models import Rip
+from siivagunnerdb.youtube.videos.models import Video
 from .models import Channel
 from .serializers import ChannelSerializer
 
@@ -102,15 +102,15 @@ def channelDetails(request, id):
     The channel details page.
     """
     channel = Channel.objects.get(id=id)
-    rips = Rip.objects.filter(visible=True, channel__id=id)
-    ripCount = rips.count()
-    rips = rips.order_by('-uploadDate')[:10]
+    videos = Video.objects.filter(visible=True, channel__id=id)
+    videoCount = videos.count()
+    videos = videos.order_by('-publishedAt')[:10]
 
-    for rip in rips:
-        if rip.uploadDate:
-            rip.uploadDate = rip.uploadDate.strftime('%Y-%m-%d   %H:%M:%S')
+    for video in videos:
+        if video.publishedAt:
+            video.publishedAt = video.publishedAt.strftime('%Y-%m-%d   %H:%M:%S')
 
-    return render(request, 'channels/channelDetails.html', {'channel':channel, 'rips':rips, 'ripCount':ripCount})
+    return render(request, 'channels/channelDetails.html', {'channel':channel, 'videos':videos, 'videoCount':videoCount})
 
 
 class ChannelViewSet(ModelViewSet):

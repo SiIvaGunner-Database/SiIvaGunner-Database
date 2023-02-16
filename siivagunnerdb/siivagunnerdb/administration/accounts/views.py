@@ -21,7 +21,7 @@ def signupView(request):
             rawPassword = form.cleaned_data['password1']
             user = authenticate(username=username, password=rawPassword)
             login(request, user)
-            return redirect('rips:list')
+            return redirect('videos:list')
     else:
         form = UserCreationForm()
 
@@ -42,7 +42,7 @@ def loginView(request):
             if 'next' in request.POST:
                 return redirect(request.POST.get('next'))
             else:
-                return redirect('rips:list')
+                return redirect('videos:list')
     else:
         form = AuthenticationForm()
 
@@ -55,7 +55,7 @@ def logoutView(request):
     """
     if request.method == 'POST':
         logout(request)
-        return redirect('rips:list')
+        return redirect('videos:list')
 
 
 @login_required()

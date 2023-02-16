@@ -16,8 +16,7 @@ from siivagunnerdb.drive.scripts.views import ScriptViewSet
 from siivagunnerdb.drive.sheets.views import SpreadsheetViewSet, SheetViewSet
 from siivagunnerdb.youtube.channels.views import ChannelViewSet
 from siivagunnerdb.youtube.playlists.views import PlaylistViewSet
-from siivagunnerdb.youtube.rips.views import RipViewSet, ripList
-from siivagunnerdb.youtube.videos.views import VideoViewSet
+from siivagunnerdb.youtube.videos.views import VideoViewSet, videoList
 
 from . import views
 
@@ -30,7 +29,6 @@ router.register(r'forms', FormViewSet)
 router.register(r'logs', LogViewSet)
 router.register(r'playlists', PlaylistViewSet)
 router.register(r'reports', ReportViewSet)
-router.register(r'rips', RipViewSet)
 router.register(r'scripts', ScriptViewSet)
 router.register(r'spreadsheets', SpreadsheetViewSet)
 router.register(r'sheets', SheetViewSet)
@@ -46,8 +44,9 @@ urlpatterns = [
     path('generate/', views.generate, name='generate'),
     path('token/', views.token, name='token'),
     path('reports/', include('siivagunnerdb.administration.reports.urls')),
-    path('rips/', include('siivagunnerdb.youtube.rips.urls')),
-    path('', ripList, name='home'),
+    path('rips/', include('siivagunnerdb.youtube.videos.urls')),
+    path('videos/', include('siivagunnerdb.youtube.videos.urls')),
+    path('', videoList, name='home'),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
