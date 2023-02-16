@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'siivagunnerdb.drive.sheets',
     'siivagunnerdb.youtube.channels',
     'siivagunnerdb.youtube.playlists',
-    'siivagunnerdb.youtube.rips',
     'siivagunnerdb.youtube.videos',
 ]
 
