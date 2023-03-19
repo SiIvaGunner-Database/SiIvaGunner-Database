@@ -1,9 +1,6 @@
 {% extends 'baseLayout.html' %}
 {% block content%}
   <h2>Search the video database</h2>
-  <ul class="errorlist">
-    <li>Updates to the database will be paused for an indeterminate amount of time. Apologies for the inconvenience.</li>
-  </ul>
   <form action="{% url 'videos:list' %}" method="post">
     {% csrf_token %}
     {% if request.GET.search %}

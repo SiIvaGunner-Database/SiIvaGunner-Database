@@ -110,7 +110,7 @@ main button, main input, main select, main textarea, .errorlist li, .messages li
   font-size: 1em;
 }
 
-main button:hover, main input:hover, main textarea:hover, tr:nth-child(even), .buttonStyleLink:hover {
+main button:hover, main input:hover, main select:hover, main textarea:hover, tr:nth-child(even), .buttonStyleLink:hover {
   background-color: #F0F0F0;
 }
 
