@@ -11,7 +11,7 @@ from django.urls import reverse
 from siivagunnerdb.views import MultipleModelViewSet
 from urllib.parse import urlencode
 
-from .models import Video
+from .models import Video, COMMON_VIDEO_FIELDS
 from .serializers import VideoSerializer
 
 
@@ -224,5 +224,7 @@ class VideoViewSet(MultipleModelViewSet):
     """
     API endpoint that allows videos to be viewed or edited.
     """
-    queryset = Video.objects.all()
+    queryset = Video.objects.select_related('channel').all()
     serializer_class = VideoSerializer
+    filterset_fields = COMMON_VIDEO_FIELDS
+    ordering_fields = COMMON_VIDEO_FIELDS
