@@ -224,7 +224,7 @@ class VideoViewSet(MultipleModelViewSet):
     """
     API endpoint that allows videos to be viewed or edited.
     """
-    queryset = Video.objects.select_related('channel').all()
+    queryset = Video.objects.select_related('channel')
     serializer_class = VideoSerializer
     filterset_fields = COMMON_VIDEO_FIELDS
     ordering_fields = COMMON_VIDEO_FIELDS
