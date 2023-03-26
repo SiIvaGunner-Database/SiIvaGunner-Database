@@ -53,14 +53,14 @@ class MultipleModelViewSet(ModelViewSet):
         Override GET serializer with modified fields parameter.
         """
         kwargs['fields'] = self.get_list_parameter('fields')
-        return self.serializer_class(*args, **kwargs)
+        return super().get_serializer(*args, **kwargs)
 
     def get_pagination_serializer(self, *args, **kwargs):
         """
         Override paginated GET serializer with modified fields parameter.
         """
         kwargs['fields'] = self.get_list_parameter('fields')
-        return self.pagination_serializer_class(*args, **kwargs)
+        return super().get_pagination_serializer(*args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         """

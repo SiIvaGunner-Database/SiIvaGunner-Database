@@ -8,16 +8,6 @@ from siivagunnerdb.youtube.playlists.models import Playlist
 WikiStatus = models.TextChoices('WikiStatusChoice', 'Documented Undocumented')
 VideoStatus = models.TextChoices('VideoStatusChoice', 'Public Unlisted Unavailable Private Deleted')
 
-# All fields except contributors and playlists
-COMMON_VIDEO_FIELDS = (
-    'id', 'publishedAt', 'title', 'description', 'thumbnails', 'channelTitle',
-    'tags', 'categoryId', 'liveBroadcastContent', 'defaultLanguage',
-    'localized', 'defaultAudioLanguage', 'duration', 'dimension', 'definition',
-    'caption', 'licensedContent', 'regionRestriction', 'contentRating',
-    'projection', 'viewCount', 'likeCount', 'dislikeCount', 'favoriteCount',
-    'commentCount', 'channel', 'wikiStatus', 'videoStatus'
-)
-
 
 class Video(StandardModel):
     id = models.CharField(primary_key=True, max_length=11)
