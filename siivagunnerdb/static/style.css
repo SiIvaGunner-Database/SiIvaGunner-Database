@@ -14,12 +14,15 @@ Input:#F0F0F0
 <hr/>:#DDDDDD
 Nav:  #BBBBBB
 Hover:#999999
-Text: #444444
+Html: #555555
 */
 
 html {
   padding: 0 calc((100% - 1024px)/2);
   height: 100%;
+  background-color: #555555;
+  background-image: linear-gradient(#444444, #666666);
+  background-attachment: fixed;
 }
 
 body {
@@ -84,7 +87,6 @@ main {
   display: flex;
   flex-flow: column;
   flex-grow: 1;
-  color: #444444;
   background-color: #F8F8F8;
 }
 
@@ -109,7 +111,7 @@ main button, main input, main select, main textarea, .errorlist li, .messages li
   font-size: 1em;
 }
 
-main button:hover, main input:hover, main textarea:hover, tr:nth-child(even), .buttonStyleLink:hover {
+main button:hover, main input:hover, main select:hover, main textarea:hover, tr:nth-child(even), .buttonStyleLink:hover {
   background-color: #F0F0F0;
 }
 
@@ -154,16 +156,16 @@ table {
   font-size: 0.9em;
 }
 
-table, p {
-  white-space: pre-wrap;
-}
-
 th, td {
   border: 2px solid #BBBBBB;
   padding: 4px;
   max-width: 200px;
   overflow: hidden;
   text-align: left;
+}
+
+p {
+  white-space: pre-wrap;
 }
 
 #headerTitle {
@@ -192,6 +194,20 @@ th, td {
   display: grid;
   grid-template-columns: 3fr 1fr;
   margin-top:16px;
+}
+
+.gadget {
+  height: 200px;
+  width: auto;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  transition: opacity 9s ease-in 30s;
+}
+
+.gadget:hover {
+  opacity: 0;
+  transition: opacity 2s ease-out;
 }
 
 /* For computer viewing */

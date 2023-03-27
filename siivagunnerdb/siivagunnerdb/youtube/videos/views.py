@@ -75,12 +75,12 @@ def videoList(request):
             sortOptions = ['date', 'title', 'views']
 
             if sort not in sortOptions:
-                sort = 'uploadDate'
+                sort = 'publishedAt'
 
             if sort == 'views':
                 sort = 'viewCount'
         else:
-            sort = 'uploadDate'
+            sort = 'publishedAt'
 
         if request.GET.get('order') and request.GET.get('order') == 'ascending':
             order = 'ascending'
@@ -198,8 +198,8 @@ def videoList(request):
 
         # Format the upload dates
         for video in videos:
-            if video.uploadDate:
-                video.uploadDate = video.uploadDate.strftime('%Y-%m-%d   %H:%M:%S')
+            if video.publishedAt:
+                video.publishedAt = video.publishedAt.strftime('%Y-%m-%d   %H:%M:%S')
 
         # Return the page with the searched videos
         return render(request, 'videos/videoList.html', {

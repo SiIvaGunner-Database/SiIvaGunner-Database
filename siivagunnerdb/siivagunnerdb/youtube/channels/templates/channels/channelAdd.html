@@ -4,7 +4,7 @@
     <h2>Add a channel to the database</h2>
     <span class="smallText">The information submitted will not be visible in the database until after it is manually verified.</span>
     <br />
-    <a class="smallText" href="{% url 'rips:add' %}">Add a rip instead</a>
+    <a class="smallText" href="{% url 'videos:add' %}">Add a rip instead</a>
     <hr />
     <form class="siteForm" action="{% url 'channels:add' %}" method="post" enctype="multipart/form-data">
       {% csrf_token %}

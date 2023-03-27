@@ -1,0 +1,18 @@
+{% extends 'baseLayout.html' %}
+{% block content%}
+  <div class="video">
+    <h2>{{ video.title }}</h2>
+    {% if video.channel is not None %}
+      <a class="smallText" href="https://{{ video.channel.wiki }}.fandom.com/wiki/{{ video.title }}" target="_blank">View on FANDOM</a>
+    {% endif %}
+    <br />
+    <a class="smallText" href="https://web.archive.org/web/*/https://www.youtube.com/watch?v={{ video.id }}" target="_blank">View on the Wayback Machine</a>
+    <hr />
+    <iframe id="videoEmbed" width="560px" height="315px" src="https://www.youtube.com/embed/{{ video.id }}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    {% if video.channel is not None %}
+      <p style="font-style: italic">Uploaded on {{ video.publishedAt }} by <a href="{% url 'channels:details' video.channel.id %}">{{ video.channel }}</a>.</p>
+    {% endif %}
+    <p style="font-style: italic">At the last check, this video had {{ video.viewCount }} views, {{ video.likeCount }} likes, {{ video.dislikeCount }} dislikes, and {{ video.commentCount }} comments.</p>
+    <p>{{ video.description }}</p>
+  </div>
+{% endblock %}

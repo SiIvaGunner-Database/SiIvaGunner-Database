@@ -21,7 +21,7 @@ def reportAdd(request):
                 instance.author = request.user
 
             instance.save()
-            return redirect('rips:list')
+            return redirect('videos:list')
     else:
         form = ReportAddForm()
 

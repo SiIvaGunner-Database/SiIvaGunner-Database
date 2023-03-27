@@ -1,9 +1,6 @@
 {% extends 'baseLayout.html' %}
 {% block content%}
   <h2>Search the channel database</h2>
-  <ul class="errorlist">
-    <li>Updates to the database will be paused for an indeterminate amount of time. Apologies for the inconvenience.</li>
-  </ul>
   <form action="{% url 'channels:list' %}" method="post">
     {% csrf_token %}
     {% if request.GET.search %}
@@ -24,7 +21,7 @@
       <option value="ascending" {% if request.GET.order == 'ascending' %} selected {% endif %}>Ascending</option>
     </select>
   </form>
-  <a class="smallText" href="{% url 'rips:list' %}">Search for videos instead</a>
+  <a class="smallText" href="{% url 'videos:list' %}">Search for videos instead</a>
   <table class="channels">
     <tr class="channel">
       <th>Channel Title</th>

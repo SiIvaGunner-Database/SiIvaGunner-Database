@@ -1,10 +1,7 @@
 {% extends 'baseLayout.html' %}
 {% block content%}
   <h2>Search the video database</h2>
-  <ul class="errorlist">
-    <li>Updates to the database will be paused for an indeterminate amount of time. Apologies for the inconvenience.</li>
-  </ul>
-  <form action="{% url 'rips:list' %}" method="post">
+  <form action="{% url 'videos:list' %}" method="post">
     {% csrf_token %}
     {% if request.GET.search %}
       <input type="text" name="searchTerms" placeholder="Search for title or ID" value="{{ request.GET.search }}"/>
@@ -39,8 +36,8 @@
     {% endif %}
   </form>
   <a class="smallText" href="{% url 'channels:list' %}">Search for channels instead</a>
-  <table class="rips">
-    <tr class="rip">
+  <table class="videos">
+    <tr class="video">
       <th>Video Title</th>
       <th>Video ID</th>
       <th>Wiki Status</th>
@@ -50,16 +47,20 @@
       <th>Length</th>
       <th>Views</th>
     </tr>
-    {% for rip in rips %}
-      <tr class="rip">
-        <td><a href="{% url 'rips:details' rip.id %}">{{rip.title}}</a></td>
-        <td><a href="https://www.youtube.com/watch?v={{ rip.id }}" target="_blank">{{ rip.id }}</a></td>
-        <td>{{ rip.wikiStatus }}</td>
-        <td>{{ rip.videoStatus }}</td>
-        <td>{{ rip.uploadDate }}</td>
-        <td><a href="{% url 'channels:details' rip.channel.id %}">{{ rip.channel }}</a></td>
-        <td>{{ rip.length }}</td>
-        <td>{{ rip.viewCount }}</td>
+    {% for video in videos %}
+      <tr class="video">
+        <td><a href="{% url 'videos:details' video.id %}">{{video.title}}</a></td>
+        <td><a href="https://www.youtube.com/watch?v={{ video.id }}" target="_blank">{{ video.id }}</a></td>
+        <td>{{ video.wikiStatus }}</td>
+        <td>{{ video.videoStatus }}</td>
+        <td>{{ video.publishedAt }}</td>
+        <td>
+          {% if video.channel is not None %}
+            <a href="{% url 'channels:details' video.channel.id %}">{{ video.channel }}</a>
+          {% endif %}
+        </td>
+        <td>{{ video.length }}</td>
+        <td>{{ video.viewCount }}</td>
       </tr>
     {% endfor %}
   </table>
