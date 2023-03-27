@@ -41,6 +41,27 @@ class MultipleModelViewSet(ModelViewSet):
     filterset_fields = '__all__'
     ordering_fields = '__all__'
 
+    def get_list_parameter(self, key):
+        """
+        Return a list from a GET parameter.
+        """
+        fields = self.request.GET.get(key, None)
+        return fields.split(',') if fields else None
+
+    def get_serializer(self, *args, **kwargs):
+        """
+        Override GET serializer with modified fields parameter.
+        """
+        kwargs['fields'] = self.get_list_parameter('fields')
+        return super().get_serializer(*args, **kwargs)
+
+    def get_pagination_serializer(self, *args, **kwargs):
+        """
+        Override paginated GET serializer with modified fields parameter.
+        """
+        kwargs['fields'] = self.get_list_parameter('fields')
+        return super().get_pagination_serializer(*args, **kwargs)
+
     def create(self, request, *args, **kwargs):
         """
         Create one or more objects.

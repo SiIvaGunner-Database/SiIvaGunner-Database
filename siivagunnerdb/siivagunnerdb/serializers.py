@@ -14,10 +14,25 @@ class LoggedModelSerializer(ModelSerializer):
     Otherwise, this class is identical to the ModelSerializer class.
     """
 
+    def __init__(self, *args, **kwargs):
+        """
+        Override the init method to allow dynamic field setting.
+        See https://www.django-rest-framework.org/api-guide/serializers/#dynamically-modifying-fields
+        """
+        fields = kwargs.pop('fields', None)
+        super().__init__(*args, **kwargs)
+
+        if fields is not None:
+            allowed = set(fields)
+            existing = set(self.fields)
+
+            # Remove any invalid fields
+            for field_name in existing - allowed:
+                self.fields.pop(field_name)
+
     def create(self, validated_data):
         """
-        Creates an addition LogEntry and Reversion.
-        Returns ModelSerializer.create(validated_data).
+        Create an addition LogEntry and Reversion.
         """
         request = self.context['request']
 
@@ -31,8 +46,7 @@ class LoggedModelSerializer(ModelSerializer):
 
     def update(self, instance, validated_data):
         """
-        Creates a change LogEntry and Reversion.
-        Returns ModelSerializer.update(instance, validated_data).
+        Create a change LogEntry and Reversion.
         """
         request = self.context['request']
 

@@ -226,3 +226,5 @@ class VideoViewSet(MultipleModelViewSet):
     """
     queryset = Video.objects.all()
     serializer_class = VideoSerializer
+    filterset_fields = '__all__'
+    ordering_fields = '__all__'

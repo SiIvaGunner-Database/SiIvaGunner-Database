@@ -1,3 +1,4 @@
+from rest_framework import serializers
 from siivagunnerdb.serializers import LoggedModelSerializer
 from .models import Video
 
