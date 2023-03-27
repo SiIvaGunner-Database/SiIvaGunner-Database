@@ -54,8 +54,11 @@
         <td>{{ video.wikiStatus }}</td>
         <td>{{ video.videoStatus }}</td>
         <td>{{ video.publishedAt }}</td>
-        <!-- BELOW LINE IS CAUSING ERROR -->
-        <td><a href="{% url 'channels:details' video.channel.id %}">{{ video.channel }}</a></td>
+        <td>
+          {% if video.channel is not None %}
+            <a href="{% url 'channels:details' video.channel.id %}">{{ video.channel }}</a>
+          {% endif %}
+        </td>
         <td>{{ video.length }}</td>
         <td>{{ video.viewCount }}</td>
       </tr>
