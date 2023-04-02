@@ -162,6 +162,7 @@ th, td {
   max-width: 200px;
   overflow: hidden;
   text-align: left;
+  white-space: nowrap;
 }
 
 p {
@@ -219,13 +220,18 @@ p {
 }
 
 /* For tablet and mobile viewing */
-@media only screen and (max-width: 1024px) {
+@media only screen and (max-device-width: 1024px) {
   html {
     padding: 0;
   }
 
   body {
     width: auto;
+    font-size: 1.1em;
+  }
+
+  th, td {
+    max-width: 100px;
   }
 
   iframe {
@@ -235,7 +241,7 @@ p {
 }
 
 /* For mobile viewing */
-@media only screen and (max-width: 768px) {
+@media only screen and (max-device-width: 768px) {
   body {
     font-size: 1.2em;
   }

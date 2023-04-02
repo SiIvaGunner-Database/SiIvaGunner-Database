@@ -59,7 +59,7 @@
             <a href="{% url 'channels:details' video.channel.id %}">{{ video.channel }}</a>
           {% endif %}
         </td>
-        <td>{{ video.length }}</td>
+        <td>{{ video.duration }}</td>
         <td>{{ video.viewCount }}</td>
       </tr>
     {% endfor %}

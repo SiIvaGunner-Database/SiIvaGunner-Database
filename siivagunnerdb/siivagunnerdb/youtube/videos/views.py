@@ -26,7 +26,7 @@ def videoList(request):
         # Check for search parameters
 
         if request.POST['searchTerms']:
-            queryString =  urlencode({'search': request.POST['searchTerms'].stvideo()})  # param=val
+            queryString =  urlencode({'search': request.POST['searchTerms'].strip()})  # param=val
             parameters.append(queryString)
 
         if request.POST['sort'] != 'date':

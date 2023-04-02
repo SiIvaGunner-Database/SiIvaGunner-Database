@@ -32,7 +32,7 @@
           <td>{{ video.videoStatus }}</td>
           <td>{{ video.publishedAt }}</td>
           <td><a href="{% url 'channels:details' video.channel.id %}">{{ video.channel }}</a></td>
-          <td>{{ video.length }}</td>
+          <td>{{ video.duration }}</td>
           <td>{{ video.viewCount }}</td>
         </tr>
       {% endfor %}
