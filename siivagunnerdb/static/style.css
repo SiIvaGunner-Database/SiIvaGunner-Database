@@ -165,6 +165,10 @@ th, td {
   white-space: nowrap;
 }
 
+th:hover, td:hover {
+  white-space: normal;
+}
+
 p {
   white-space: pre-wrap;
 }
@@ -232,6 +236,7 @@ p {
 
   th, td {
     max-width: 100px;
+    overflow: auto;
   }
 
   iframe {
@@ -243,6 +248,6 @@ p {
 /* For mobile viewing */
 @media only screen and (max-device-width: 768px) {
   body {
-    font-size: 1.2em;
+    font-size: 1.4em;
   }
 }

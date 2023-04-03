@@ -7,12 +7,9 @@
     <a class="smallText" href="https://web.archive.org/web/*/https://www.youtube.com/channel/{{ channel.id }}" target="_blank">View on the Wayback Machine</a>
     <hr />
     <p style="font-style: italic">Joined on {{ channel.publishedAt }}.</p>
-    <p style="font-style: italic">Has uploaded at least {{ videoCount }} videos.</p>
+    <p style="font-style: italic">At the last check, this channel had {{ videoCount }} videos and {{ channel.subscriberCount }} subscribers.</p>
     <p>{{ channel.description }}</p>
-    <!--
-    <p>At the time of the last check, this channel had {{ channel.subscriberCount }} subscribers.</p>
-    -->
-    <h4>Recent Uploads (<a href="{% url 'videos:list' %}?channel={{ channel.id }}">View All</a>)</h4>
+    <h4><a href="{% url 'videos:list' %}?channel={{ channel.id }}">Recent Uploads</a></h4>
     <table class="videos">
       <tr class="video">
         <th>Video Title</th>
@@ -26,7 +23,7 @@
       </tr>
       {% for video in videos %}
         <tr class="video">
-          <td><a href="{% url 'videos:details' video.id %}">{{video.title}}</a></td>
+          <td><a href="{% url 'videos:details' video.id %}">{{ video.title }}</a></td>
           <td><a href="https://www.youtube.com/watch?v={{ video.id }}" target="_blank">{{ video.id }}</a></td>
           <td>{{ video.wikiStatus }}</td>
           <td>{{ video.videoStatus }}</td>

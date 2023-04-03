@@ -12,7 +12,7 @@
     <select name="sort" selectedIndex=2>
       <option value="date">By upload date</option>
       <option value="title" {% if request.GET.sort == 'title' %} selected {% endif %}>By title</option>
-      <!--<option value="length" {% if request.GET.sort == 'length' %} selected {% endif %}>By length</option>-->
+      <!-- <option value="length" {% if request.GET.sort == 'length' %} selected {% endif %}>By length</option> -->
       <option value="views" {% if request.GET.sort == 'views' %} selected {% endif %}>By views</option>
     </select>
     <select name="sortType">
@@ -49,7 +49,7 @@
     </tr>
     {% for video in videos %}
       <tr class="video">
-        <td><a href="{% url 'videos:details' video.id %}">{{video.title}}</a></td>
+        <td><a href="{% url 'videos:details' video.id %}">{{ video.title }}</a></td>
         <td><a href="https://www.youtube.com/watch?v={{ video.id }}" target="_blank">{{ video.id }}</a></td>
         <td>{{ video.wikiStatus }}</td>
         <td>{{ video.videoStatus }}</td>
