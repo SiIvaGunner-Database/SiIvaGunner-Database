@@ -156,6 +156,14 @@ table {
   font-size: 0.9em;
 }
 
+tr {
+  white-space: nowrap;
+}
+
+tr:hover {
+  white-space: normal;
+}
+
 th, td {
   border: 2px solid #BBBBBB;
   padding: 4px;
@@ -219,13 +227,18 @@ p {
 }
 
 /* For tablet and mobile viewing */
-@media only screen and (max-width: 1024px) {
+@media only screen and (max-device-width: 1024px) {
   html {
     padding: 0;
   }
 
   body {
     width: auto;
+    font-size: 1.1em;
+  }
+
+  th:not(:first-child), td:not(:first-child) {
+    max-width: 100px;
   }
 
   iframe {
@@ -235,8 +248,8 @@ p {
 }
 
 /* For mobile viewing */
-@media only screen and (max-width: 768px) {
+@media only screen and (max-device-width: 768px) {
   body {
-    font-size: 1.2em;
+    font-size: 1.4em;
   }
 }
