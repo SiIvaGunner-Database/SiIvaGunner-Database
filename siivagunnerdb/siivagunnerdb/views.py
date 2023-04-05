@@ -40,6 +40,7 @@ class MultipleModelViewSet(ModelViewSet):
     filter_backends = [DjangoFilterBackend, OrderingFilter,]
     filterset_fields = '__all__'
     ordering_fields = '__all__'
+    ordering = 'id'
 
     def get_list_parameter(self, key):
         """
