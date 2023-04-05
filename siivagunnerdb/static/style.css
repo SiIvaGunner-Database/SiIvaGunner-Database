@@ -156,17 +156,20 @@ table {
   font-size: 0.9em;
 }
 
+tr {
+  white-space: nowrap;
+}
+
+tr:hover {
+  white-space: normal;
+}
+
 th, td {
   border: 2px solid #BBBBBB;
   padding: 4px;
   max-width: 200px;
   overflow: hidden;
   text-align: left;
-  white-space: nowrap;
-}
-
-th:hover, td:hover {
-  white-space: normal;
 }
 
 p {
@@ -234,9 +237,8 @@ p {
     font-size: 1.1em;
   }
 
-  th, td {
+  th:not(:first-child), td:not(:first-child) {
     max-width: 100px;
-    overflow: auto;
   }
 
   iframe {
