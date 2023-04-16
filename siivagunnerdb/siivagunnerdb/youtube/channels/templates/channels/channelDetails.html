@@ -6,7 +6,7 @@
     <br />
     <a class="smallText" href="https://web.archive.org/web/*/https://www.youtube.com/channel/{{ channel.id }}" target="_blank">View on the Wayback Machine</a>
     <hr />
-    <p style="font-style: italic">Joined on {{ channel.publishedAt }}.</p>
+    <p style="font-style: italic">Joined on {{ channel.publishedAt }}</p>
     <p style="font-style: italic">At the last check, this channel had {{ videoCount }} videos and {{ channel.subscriberCount }} subscribers.</p>
     <p>{{ channel.description }}</p>
     <h4><a href="{% url 'videos:list' %}?channel={{ channel.id }}">Recent Uploads</a></h4>

@@ -219,7 +219,7 @@ p {
 }
 
 /* For computer viewing */
-@media only screen and (min-width: 1024px) {
+@media only screen and (min-device-width: 1024px) {
   .gridDiv {
     display: grid;
     grid-template-columns: 1fr 1fr;
