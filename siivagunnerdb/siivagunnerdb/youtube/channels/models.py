@@ -38,6 +38,10 @@ class Channel(StandardModel):
     contributors = models.ManyToManyField(Contributor, blank=True, default=[])
     productionSpreadsheet = models.ForeignKey(Spreadsheet, related_name='channels_prod_spreadsheet', on_delete=models.PROTECT, blank=True, null=True)
     developmentSpreadsheet = models.ForeignKey(Spreadsheet, related_name='channels_dev_spreadsheet', on_delete=models.PROTECT, blank=True, null=True)
+    productionChangelogSpreadsheet = models.ForeignKey(Spreadsheet, related_name='channels_prod_changelog_spreadsheet', on_delete=models.PROTECT, blank=True, null=True)
+    developmentChangelogSpreadsheet = models.ForeignKey(Spreadsheet, related_name='channels_dev_changelog_spreadsheet', on_delete=models.PROTECT, blank=True, null=True)
+    productionUndocumentedRipsPlaylist = models.ForeignKey('playlists.Playlist', related_name='channels_prod_undocumented_rips_playlist', on_delete=models.PROTECT, blank=True, null=True)
+    developmentUndocumentedRipsPlaylist = models.ForeignKey('playlists.Playlist', related_name='channels_dev_undocumented_rips_playlist', on_delete=models.PROTECT, blank=True, null=True)
 
     def __str__(self):
         return self.title
