@@ -46,8 +46,8 @@ class Video(StandardModel):
     channel = models.ForeignKey(Channel, on_delete=models.PROTECT, blank=True, null=True)
     contributors = models.ManyToManyField(Contributor, blank=True, default=[])
     playlists = models.ManyToManyField(Playlist, blank=True, default=[])
-    wikiStatus = models.CharField(choices=WikiStatus.choices, max_length=20, blank=True, default='')
-    videoStatus = models.CharField(choices=VideoStatus.choices, max_length=20, blank=True, default='')
+    wikiStatus = models.CharField(choices=WikiStatus.choices, max_length=20, blank=True, default='Undocumented')
+    videoStatus = models.CharField(choices=VideoStatus.choices, max_length=20, blank=True, default='Public')
 
     def __str__(self):
         return self.title
