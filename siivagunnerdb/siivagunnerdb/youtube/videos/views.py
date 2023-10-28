@@ -226,5 +226,41 @@ class VideoViewSet(MultipleModelViewSet):
     """
     queryset = Video.objects.all()
     serializer_class = VideoSerializer
-    filterset_fields = '__all__'
+    filterset_fields =  {
+        'addDate': ['exact'],
+        'updateDate': ['exact'],
+        'visible': ['exact'],
+        'author': ['exact'],
+        'notes': ['exact'],
+        'id': ['exact', 'in'],
+        'publishedAt': ['exact'],
+        'title': ['exact'],
+        'description': ['exact'],
+        'thumbnails': ['exact'],
+        'channelTitle': ['exact'],
+        'tags': ['exact'],
+        'categoryId': ['exact'],
+        'liveBroadcastContent': ['exact'],
+        'defaultLanguage': ['exact'],
+        'localized': ['exact'],
+        'defaultAudioLanguage': ['exact'],
+        'duration': ['exact'],
+        'dimension': ['exact'],
+        'definition': ['exact'],
+        'caption': ['exact'],
+        'licensedContent': ['exact'],
+        'regionRestriction': ['exact'],
+        'contentRating': ['exact'],
+        'projection': ['exact'],
+        'viewCount': ['exact'],
+        'likeCount': ['exact'],
+        'dislikeCount': ['exact'],
+        'favoriteCount': ['exact'],
+        'commentCount': ['exact'],
+        'channel': ['exact'],
+        'contributors': ['exact'],
+        'playlists': ['exact'],
+        'wikiStatus': ['exact'],
+        'videoStatus': ['exact', 'in']
+    }
     ordering_fields = '__all__'
