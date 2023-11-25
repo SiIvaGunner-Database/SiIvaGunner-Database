@@ -196,14 +196,20 @@ def videoList(request):
         if resultCount > 0:
             videos = videos[currentPage * 100 - 100:currentPage * 100]
 
-        # Format the upload dates
+        # Format the upload dates and put the first 50 IDs into an array
+        first50Ids = []
+
         for video in videos:
+            if len(first50Ids) < 50:
+                first50Ids.append(video.id)
+
             if video.publishedAt:
                 video.publishedAt = video.publishedAt.strftime('%Y-%m-%d   %H:%M:%S')
 
         # Return the page with the searched videos
         return render(request, 'videos/videoList.html', {
                 'videos':videos,
+                'first50Ids':','.join(first50Ids),
                 'url':url,
                 'resultCount':resultCount,
                 'currentPage':currentPage,
