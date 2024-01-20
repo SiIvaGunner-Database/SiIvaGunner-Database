@@ -21,3 +21,4 @@ Finally, start the application on ```http://localhost:8000/```:
 ### See Also
 
 * [SiIvaGunner Wiki](https://siivagunner.fandom.com/wiki/SiIvaGunner_Wiki)
+* [SiIvaGunner Database Sheets](https://drive.google.com/drive/folders/1ElZaYVTRg7TfS8UsVteHja7M4N3C6_AS)
