@@ -15,6 +15,10 @@ def generate(request):
     return render(request, 'generate.html')
 
 
+def reports(request):
+    return render(request, 'reports.html')
+
+
 def token(request):
     return render(request, 'token.html')
 
