@@ -7,7 +7,6 @@ from django.urls import path, include
 from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
 
-from siivagunnerdb.administration.reports.views import ReportViewSet
 from siivagunnerdb.administration.logs.views import LogViewSet, AlertViewSet
 from siivagunnerdb.community.collectives.views import CollectiveViewSet
 from siivagunnerdb.community.contributors.views import ContributorViewSet
@@ -28,7 +27,6 @@ router.register(r'contributors', ContributorViewSet)
 router.register(r'forms', FormViewSet)
 router.register(r'logs', LogViewSet)
 router.register(r'playlists', PlaylistViewSet)
-router.register(r'reports', ReportViewSet)
 router.register(r'scripts', ScriptViewSet)
 router.register(r'spreadsheets', SpreadsheetViewSet)
 router.register(r'sheets', SheetViewSet)
@@ -43,7 +41,7 @@ urlpatterns = [
     path('channels/', include('siivagunnerdb.youtube.channels.urls')),
     path('generate/', views.generate, name='generate'),
     path('token/', views.token, name='token'),
-    path('reports/', include('siivagunnerdb.administration.reports.urls')),
+    path('reports/', views.reports, name='reports'),
     path('rips/', include('siivagunnerdb.youtube.videos.urls')),
     path('videos/', include('siivagunnerdb.youtube.videos.urls')),
     path('', videoList, name='home'),
