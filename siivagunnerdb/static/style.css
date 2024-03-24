@@ -90,7 +90,7 @@ main {
   background-color: #F8F8F8;
 }
 
-main, textarea:not(#template) {
+main, textarea:not(#template, #templateArea) {
   font-family: "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 }
 
