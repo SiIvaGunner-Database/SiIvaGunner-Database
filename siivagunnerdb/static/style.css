@@ -181,6 +181,10 @@ p {
   font-size: 2.4em;
 }
 
+.boldText {
+  font-weight: bold;
+}
+
 .wikiText {
   tab-size: 4;
 }
@@ -223,6 +227,7 @@ p {
   .gridDiv {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    gap: 10px;
   }
 }
 

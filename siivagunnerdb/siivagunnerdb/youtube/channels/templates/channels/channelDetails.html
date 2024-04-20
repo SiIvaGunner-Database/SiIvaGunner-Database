@@ -1,15 +1,33 @@
 {% extends 'baseLayout.html' %}
 {% block content%}
   <div class="channel">
-    <h2>{{ channel.title }}</h2>
-    <a class="smallText" href="https://www.youtube.com/channel/{{ channel.id }}" target="_blank">View on YouTube</a>
-    <br />
-    <a class="smallText" href="https://web.archive.org/web/*/https://www.youtube.com/channel/{{ channel.id }}" target="_blank">View on the Wayback Machine</a>
+    <h2>
+      {{ channel.title }}
+      <a href="https://www.youtube.com/channel/{{ channel.id }}" target="_blank"><img src="/static/YouTube_icon.svg" alt="YouTube icon" decoding="async" loading="lazy" width="25" height="25" /></a>
+      <a href="https://web.archive.org/web/*/https://www.youtube.com/channel/{{ channel.id }}" target="_blank"><img src="/static/Internet_Archive_icon.svg" alt="Internet Archive icon" decoding="async" loading="lazy" width="25" height="25" /></a>
+      {% if channel.wiki is not None %}
+        <a class="smallText" href="https://{{ channel.wiki }}.fandom.com/wiki/Main_Page" target="_blank"><img src="/static/Fandom_icon.png" alt="Fandom icon" decoding="async" loading="lazy" height="25" /></a>
+      {% endif %}
+    </h2>
     <hr />
-    <p style="font-style: italic">Joined on {{ channel.publishedAt }}</p>
-    <p style="font-style: italic">At the last check, this channel had {{ videoCount }} videos and {{ channel.subscriberCount }} subscribers.</p>
-    <p>{{ channel.description }}</p>
-    <h4><a href="{% url 'videos:list' %}?channel={{ channel.id }}">Recent Uploads</a></h4>
+    <div class="gridDiv">
+      <fieldset>
+        <legend class="boldText">Description</legend>
+        <p>{{ channel.description }}</p>
+      </fieldset>
+      <fieldset>
+        <legend class="boldText">Metadata</legend>
+        <p>Published At: <b>{{ channel.publishedAt|default:"N/A" }}</b></p>
+        <p>Status: <b>{{ channel.channelStatus|default:"N/A" }}</b></p>
+        <p>Custom URL: <b>{{ channel.customUrl|default:"N/A" }}</b></p>
+        <p>Country: <b>{{ channel.country|default:"N/A" }}</b></p>
+        <p>Default Language: <b>{{ channel.defaultLanguage|default:"N/A" }}</b></p>
+        <p>Video Count: <b>{{ channel.videoCount|default:"N/A" }}</b></p>
+        <p>View Count: <b>{{ channel.viewCount|default:"N/A" }}</b></p>
+        <p>Subscriber Count: <b>{{ channel.subscriberCount|default:"N/A" }}</b></p>
+      </fieldset>
+    </div>
+    <h4>Recent Uploads (<a href="{% url 'videos:list' %}?channel={{ channel.id }}">View All</a>)</h4>
     <table class="videos">
       <tr class="video">
         <th>Video Title</th>
