@@ -1,14 +1,15 @@
 {% extends 'baseLayout.html' %}
+{% load static %}
 {% block content%}
   <div class="video">
     <h2>
       {{ video.title }}
       <a class="smallText" href="https://web.archive.org/web/*/https://www.youtube.com/watch?v={{ video.id }}" target="_blank">
-        <img src="/static/Internet_Archive_icon.svg" alt="Internet Archive icon" decoding="async" loading="lazy" width="25" height="25" />
+        <img src="{% static 'Internet_Archive_icon.svg' %}" alt="Internet Archive icon" decoding="async" loading="lazy" width="25" height="25" />
       </a>
       {% if video.channel is not None and video.channel.wiki != "" %}
         <a class="smallText" href="https://{{ video.channel.wiki }}.fandom.com/wiki/{{ video.title }}" target="_blank">
-          <img src="/static/Fandom_icon.png" alt="Fandom icon" decoding="async" loading="lazy" height="25" />
+          <img src="{% static 'Fandom_icon.png' %}" alt="Fandom icon" decoding="async" loading="lazy" height="25" />
         </a>
       {% endif %}
     </h2>
