@@ -1,18 +1,50 @@
 {% extends 'baseLayout.html' %}
 {% block content%}
   <div class="video">
-    <h2>{{ video.title }}</h2>
-    {% if video.channel is not None %}
-      <a class="smallText" href="https://{{ video.channel.wiki }}.fandom.com/wiki/{{ video.title }}" target="_blank">View on FANDOM</a>
-    {% endif %}
-    <br />
-    <a class="smallText" href="https://web.archive.org/web/*/https://www.youtube.com/watch?v={{ video.id }}" target="_blank">View on the Wayback Machine</a>
+    <h2>
+      {{ video.title }}
+      <a class="smallText" href="https://web.archive.org/web/*/https://www.youtube.com/watch?v={{ video.id }}" target="_blank">
+        <img src="/static/Internet_Archive_icon.svg" alt="Internet Archive icon" decoding="async" loading="lazy" width="25" height="25" />
+      </a>
+      {% if video.channel is not None and video.channel.wiki != "" %}
+        <a class="smallText" href="https://{{ video.channel.wiki }}.fandom.com/wiki/{{ video.title }}" target="_blank">
+          <img src="/static/Fandom_icon.png" alt="Fandom icon" decoding="async" loading="lazy" height="25" />
+        </a>
+      {% endif %}
+    </h2>
     <hr />
-    <iframe id="videoEmbed" width="560px" height="315px" src="https://www.youtube.com/embed/{{ video.id }}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-    {% if video.channel is not None %}
-      <p style="font-style: italic">Uploaded on {{ video.publishedAt }} by <a href="{% url 'channels:details' video.channel.id %}">{{ video.channel }}</a>.</p>
-    {% endif %}
-    <p style="font-style: italic">At the last check, this video had {{ video.viewCount }} views, {{ video.likeCount }} likes, {{ video.dislikeCount }} dislikes, and {{ video.commentCount }} comments.</p>
-    <p>{{ video.description }}</p>
+    <div class="gridDiv">
+      <fieldset>
+        <legend class="boldText">Video</legend>
+        <iframe id="videoEmbed" width="100%" height="315px" src="https://www.youtube.com/embed/{{ video.id }}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </fieldset>
+      <fieldset>
+        <legend class="boldText">Description</legend>
+        <p>{{ video.description }}</p>
+      </fieldset>
+    </div>
+    <fieldset>
+      <legend class="boldText">Metadata</legend>
+      <p>Published At: <b>{{ video.publishedAt|default:"N/A" }}</b></p>
+      <p>Channel: <b><a href="{% url 'channels:details' video.channel.id %}">{{ video.channel|default:"N/A" }}</a></b></p>
+      <p>Video Status: <b>{{ video.videoStatus|default:"N/A" }}</b></p>
+      <p>Wiki Status: <b>{{ video.wikiStatus|default:"N/A" }}</b></p>
+      <p>Duration: <b>{{ video.duration|default:"N/A" }}</b></p>
+      <p>View Count: <b>{{ video.viewCount|default:"N/A" }}</b></p>
+      <p>Like Count: <b>{{ video.likeCount|default:"N/A" }}</b></p>
+      <p>Dislike Count: <b>{{ video.dislikeCount|default:"N/A" }}</b></p>
+      <p>Comment Count: <b>{{ video.commentCount|default:"N/A" }}</b></p>
+      <p>Category ID: <b>{{ video.categoryId|default:"N/A" }}</b></p>
+      <p>Tags: <b>{{ video.tags|default:"N/A" }}</b></p>
+      <p>Live Broadcast Content: <b>{{ video.liveBroadcastContent|default:"N/A" }}</b></p>
+      <p>Licensed Content: <b>{{ video.licensedContent|default:"N/A" }}</b></p>
+      <p>Region Restriction: <b>{{ video.regionRestriction|default:"N/A" }}</b></p>
+      <p>Content Rating: <b>{{ video.contentRating|default:"{}" }}</b></p>
+      <p>Default Language: <b>{{ video.defaultLanguage|default:"N/A" }}</b></p>
+      <p>Default Audio Language: <b>{{ video.defaultAudioLanguage|default:"N/A" }}</b></p>
+      <p>Dimension: <b>{{ video.dimension|default:"N/A" }}</b></p>
+      <p>Definition: <b>{{ video.definition|default:"N/A" }}</b></p>
+      <p>Projection: <b>{{ video.projection|default:"N/A" }}</b></p>
+    </fieldset>
   </div>
 {% endblock %}

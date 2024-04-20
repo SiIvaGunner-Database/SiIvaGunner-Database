@@ -3,10 +3,16 @@
   <div class="channel">
     <h2>
       {{ channel.title }}
-      <a href="https://www.youtube.com/channel/{{ channel.id }}" target="_blank"><img src="/static/YouTube_icon.svg" alt="YouTube icon" decoding="async" loading="lazy" width="25" height="25" /></a>
-      <a href="https://web.archive.org/web/*/https://www.youtube.com/channel/{{ channel.id }}" target="_blank"><img src="/static/Internet_Archive_icon.svg" alt="Internet Archive icon" decoding="async" loading="lazy" width="25" height="25" /></a>
-      {% if channel.wiki is not None %}
-        <a class="smallText" href="https://{{ channel.wiki }}.fandom.com/wiki/Main_Page" target="_blank"><img src="/static/Fandom_icon.png" alt="Fandom icon" decoding="async" loading="lazy" height="25" /></a>
+      <a href="https://www.youtube.com/channel/{{ channel.id }}" target="_blank">
+        <img src="/static/YouTube_icon.svg" alt="YouTube icon" decoding="async" loading="lazy" width="25" height="25" />
+      </a>
+      <a href="https://web.archive.org/web/*/https://www.youtube.com/channel/{{ channel.id }}" target="_blank">
+        <img src="/static/Internet_Archive_icon.svg" alt="Internet Archive icon" decoding="async" loading="lazy" width="25" height="25" />
+      </a>
+      {% if channel.wiki != "" %}
+        <a class="smallText" href="https://{{ channel.wiki }}.fandom.com/wiki/Main_Page" target="_blank">
+          <img src="/static/Fandom_icon.png" alt="Fandom icon" decoding="async" loading="lazy" height="25" />
+        </a>
       {% endif %}
     </h2>
     <hr />
@@ -22,6 +28,7 @@
         <p>Custom URL: <b>{{ channel.customUrl|default:"N/A" }}</b></p>
         <p>Country: <b>{{ channel.country|default:"N/A" }}</b></p>
         <p>Default Language: <b>{{ channel.defaultLanguage|default:"N/A" }}</b></p>
+        <p>Hidden Subscriber Count: <b>{{ channel.hiddenSubscriberCount|default:False }}</b></p>
         <p>Video Count: <b>{{ channel.videoCount|default:"N/A" }}</b></p>
         <p>View Count: <b>{{ channel.viewCount|default:"N/A" }}</b></p>
         <p>Subscriber Count: <b>{{ channel.subscriberCount|default:"N/A" }}</b></p>
