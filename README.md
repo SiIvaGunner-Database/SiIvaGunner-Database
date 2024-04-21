@@ -1,10 +1,10 @@
 # SiIvaGunner Database
 
-[siivagunnerdatabase.net](http://siivagunnerdatabase.net/) is a dynamic web application built with Django that runs on Google Cloud Run and Google Cloud SQL. It contains video metadata from SiIvaGunner related channels that can searched and sorted through, as well as a form for generating rip templates to use on the wiki. Data is added and updated by Google Apps Script triggers interfacing with the Django REST framework and maintained through Google Sheets and the Django admin site.
+[siivagunnerdatabase.net](http://siivagunnerdatabase.net/) is a dynamic web application built with Django that runs on Google Cloud Run and Google Cloud SQL. It contains video and channel metadata from SiIvaGunner related YouTube content that can searched, filtered, and sorted, as well as forms for submitting missing content and bug reports and for generating rip templates to use on the wiki. Data is added and updated by Google Apps Script triggers interfacing with the Django REST framework and maintained through Google Sheets and the Django admin site. The application's REST API is currently restricted to administrator accounts.
 
 ### Local Development
 
-Requires an active [Python virtual environment](https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/development_environment).
+Requires an active [Django development environment](https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/development_environment).
 
 Navigate into ```/siivagunnerdb/``` and install the dependencies:
 
