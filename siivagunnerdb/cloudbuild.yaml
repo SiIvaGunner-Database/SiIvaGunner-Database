@@ -22,3 +22,4 @@ substitutions:
 
 options:
     dynamic_substitutions: true
+    logging: "CLOUD_LOGGING_ONLY"

@@ -32,7 +32,7 @@ class Channel(StandardModel):
 
     # Custom
     channelStatus = models.CharField(choices=ChannelStatus.choices, max_length=20, blank=True, default='')
-    bannerExternalUrl = models.CharField(max_length=100, blank=True, default='')
+    bannerExternalUrl = models.CharField(max_length=200, blank=True, default='')
     wiki = models.CharField(max_length=50, blank=True, default='')
     collective = models.ForeignKey(Collective, on_delete=models.PROTECT, blank=True, null=True)
     contributors = models.ManyToManyField(Contributor, blank=True, default=[])

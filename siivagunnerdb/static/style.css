@@ -181,6 +181,27 @@ p {
   font-size: 2.4em;
 }
 
+#channelImageDiv {
+  position: relative;
+  height: 160px;
+}
+
+#thumbnailImage {
+  position: absolute;
+  height: 160px;
+  left: 0;
+}
+
+#bannerImage {
+  position: absolute;
+  height: 160px;
+  right: 0;
+}
+
+.boldText {
+  font-weight: bold;
+}
+
 .wikiText {
   tab-size: 4;
 }
@@ -223,6 +244,7 @@ p {
   .gridDiv {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    gap: 10px;
   }
 }
 
