@@ -2,13 +2,14 @@ from django.contrib.auth.decorators import login_required
 from django.db.models.functions import Lower
 from django.shortcuts import render, redirect
 from django.urls import reverse
-
 from siivagunnerdb.views import MultipleModelViewSet
 from urllib.parse import urlencode
 
 from siivagunnerdb.youtube.videos.models import Video
 from .models import Channel
 from .serializers import ChannelSerializer
+
+import json
 
 
 def channelList(request):
@@ -91,10 +92,10 @@ def channelList(request):
         # Format the join dates
         for channel in channels:
             if channel.publishedAt:
-                channel.publishedAt = channel.publishedAt.strftime('%Y-%m-%d   %H:%M:%S')
+                channel.publishedAt = channel.publishedAt.strftime('%Y-%m-%d %H:%M:%S')
 
         # Return the page with the searched channels
-        return render(request, 'channels/channelList.html', {'channels':channels })
+        return render(request, 'channels/channelList.html', {'channels':channels})
 
 
 def channelDetails(request, id):
@@ -105,12 +106,25 @@ def channelDetails(request, id):
     videos = Video.objects.filter(visible=True, channel__id=id)
     videoCount = videos.count()
     videos = videos.order_by('-publishedAt')[:10]
+    thumbnail = ""
+
+    if channel.thumbnails is not None and channel.thumbnails != "":
+        thumbnail = json.loads(channel.thumbnails)["high"]["url"]
+
+    if channel.publishedAt:
+        channel.publishedAt = channel.publishedAt.strftime('%Y-%m-%d %H:%M:%S')
 
     for video in videos:
         if video.publishedAt:
-            video.publishedAt = video.publishedAt.strftime('%Y-%m-%d   %H:%M:%S')
+            video.publishedAt = video.publishedAt.strftime('%Y-%m-%d %H:%M:%S')
 
-    return render(request, 'channels/channelDetails.html', {'channel':channel, 'videos':videos, 'videoCount':videoCount})
+    context = {
+        'channel': channel,
+        'videos': videos,
+        'videoCount': videoCount,
+        'thumbnail': thumbnail
+    }
+    return render(request, 'channels/channelDetails.html', context)
 
 
 class ChannelViewSet(MultipleModelViewSet):

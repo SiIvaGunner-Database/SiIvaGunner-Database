@@ -204,18 +204,18 @@ def videoList(request):
                 first50Ids.append(video.id)
 
             if video.publishedAt:
-                video.publishedAt = video.publishedAt.strftime('%Y-%m-%d   %H:%M:%S')
+                video.publishedAt = video.publishedAt.strftime('%Y-%m-%d %H:%M:%S')
 
         # Return the page with the searched videos
-        return render(request, 'videos/videoList.html', {
-                'videos':videos,
-                'first50Ids':','.join(first50Ids),
-                'url':url,
-                'resultCount':resultCount,
-                'currentPage':currentPage,
-                'pageNumbers':pageNumbers,
-            }
-        )
+        context = {
+            'videos':videos,
+            'first50Ids':','.join(first50Ids),
+            'url':url,
+            'resultCount':resultCount,
+            'currentPage':currentPage,
+            'pageNumbers':pageNumbers,
+        }
+        return render(request, 'videos/videoList.html', context)
 
 
 def videoDetails(request, id):
@@ -223,6 +223,10 @@ def videoDetails(request, id):
     The video details page.
     """
     video = Video.objects.get(id=id)
+
+    if video.publishedAt:
+        video.publishedAt = video.publishedAt.strftime('%Y-%m-%d %H:%M:%S')
+
     return render(request, 'videos/videoDetails.html', { 'video':video })
 
 

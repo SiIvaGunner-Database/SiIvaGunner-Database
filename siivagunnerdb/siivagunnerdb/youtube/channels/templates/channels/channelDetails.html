@@ -2,6 +2,20 @@
 {% load static %}
 {% block content%}
   <div class="channel">
+    {% if channel.channelStatus == "Public" and thumbnail != "" or channel.channelStatus == "Public" and channel.bannerExternalUrl != "" %}
+      <div id="channelImageDiv">
+        {% if channel.bannerExternalUrl != "" %}
+          <a href="{{ channel.bannerExternalUrl }}=w2120-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj" target="_blank">
+            <img id="bannerImage" src="{{ channel.bannerExternalUrl }}=w2120-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj" alt="YouTube channel banner" decoding="async" loading="lazy" />
+          </a>
+        {% endif %}
+        {% if thumbnail != "" %}
+          <a href="{{ thumbnail }}" target="_blank">
+            <img id="thumbnailImage" src="{{ thumbnail }}" alt="YouTube profile picture" decoding="async" loading="lazy" />
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
     <h2>
       {{ channel.title }}
       <a href="https://www.youtube.com/channel/{{ channel.id }}" target="_blank">
