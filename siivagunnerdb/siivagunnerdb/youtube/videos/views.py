@@ -270,6 +270,7 @@ class VideoViewSet(MultipleModelViewSet):
         'channel': ['exact'],
         'contributors': ['exact'],
         'playlists': ['exact'],
+        'wikiTitle': ['exact'],
         'wikiStatus': ['exact'],
         'videoStatus': ['exact', 'in']
     }
