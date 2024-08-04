@@ -49,12 +49,6 @@ class LoggedModelSerializer(ModelSerializer):
         Create a change LogEntry and Reversion.
         """
         request = self.context['request']
-
-        # 08/03/2024 - Commented out in effort to reduce database load and size
-        # with reversion.create_revision():
-        #     new_instance = super().update(instance, validated_data)
-        #     reversion.set_user(request.user)
-        #     reversion.set_comment('Created revision from PUT request')
-
+        new_instance = super().update(instance, validated_data)
         log_change(request, instance, new_instance)
         return new_instance
