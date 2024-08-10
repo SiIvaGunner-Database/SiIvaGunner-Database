@@ -29,6 +29,11 @@
       <option value="deleted" {% if request.GET.filter == 'deleted' %} selected {% endif %}>Deleted</option>
       <option value="unavailable" {% if request.GET.filter == 'unavailable' %} selected {% endif %}>Unavailable</option>
     </select>
+    {% if request.GET.minimumSubscribers %}
+      <input type="number" name="minimumSubscribers" placeholder="Minimum subscribers" value="{{ request.GET.minimumSubscribers }}"/>
+    {% else %}
+      <input type="number" name="minimumSubscribers" placeholder="Minimum subscribers"/>
+    {% endif %}
     {% if request.GET.channel %}
       <input type="hidden" name="channel" value="{{ request.GET.channel }}"/>
     {% else %}

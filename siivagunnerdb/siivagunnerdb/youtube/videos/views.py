@@ -1,4 +1,3 @@
-import datetime
 import math
 import re
 
@@ -39,6 +38,10 @@ def videoList(request):
 
         if request.POST['filter'] != 'unfiltered':
             queryString =  urlencode({'filter': request.POST['filter']})  # param=val
+            parameters.append(queryString)
+
+        if request.POST['minimumSubscribers']:
+            queryString =  urlencode({'minimumSubscribers': request.POST['minimumSubscribers']})  # param=val
             parameters.append(queryString)
 
         if request.POST['channel']:
@@ -98,6 +101,12 @@ def videoList(request):
         else:
             filter = None
 
+        if request.GET.get('minimumSubscribers'):
+            minimumSubscribers = request.GET.get('minimumSubscribers')
+            urlParameters.append('minimumSubscribers=' + minimumSubscribers)
+        else:
+            minimumSubscribers = 100
+
         if request.GET.get('channel'):
             channelId = request.GET.get('channel')
             urlParameters.append('channel=' + channelId)
@@ -143,6 +152,9 @@ def videoList(request):
                 videos = videos.filter(wikiStatus=filter)
             else:
                 videos = videos.filter(videoStatus=filter)
+
+        if minimumSubscribers:
+            videos = videos.filter(channel__subscriberCount__gte=minimumSubscribers)
 
         # Build the url
 

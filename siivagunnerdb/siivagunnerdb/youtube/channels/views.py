@@ -1,3 +1,6 @@
+import math
+import re
+
 from django.contrib.auth.decorators import login_required
 from django.db.models.functions import Lower
 from django.shortcuts import render, redirect
@@ -34,6 +37,10 @@ def channelList(request):
             queryString =  urlencode({'order': request.POST['sortType']})  # param=val
             parameters.append(queryString)
 
+        if request.POST['minimumSubscribers']:
+            queryString =  urlencode({'minimumSubscribers': request.POST['minimumSubscribers']})  # param=val
+            parameters.append(queryString)
+
         # Format the parameters in the URL
 
         url = reverse('channels:list')  # /channels/
@@ -49,6 +56,8 @@ def channelList(request):
     else:
         # Load the search parameters if they exist
         # Otherwise, load the defaults
+
+        urlParameters = []
 
         if request.GET.get('search'):
             search = request.GET.get('search')
@@ -68,6 +77,20 @@ def channelList(request):
             order = 'ascending'
         else:
             order = 'descending'
+
+        if request.GET.get('minimumSubscribers'):
+            minimumSubscribers = request.GET.get('minimumSubscribers')
+            urlParameters.append('minimumSubscribers=' + minimumSubscribers)
+        else:
+            minimumSubscribers = 100
+
+        try:
+            currentPage = int(request.GET.get('page'))
+
+            if currentPage < 1:
+                currentPage = 1
+        except:
+            currentPage = 1
 
         # Query the search using any given filters or sorting
 
@@ -89,13 +112,75 @@ def channelList(request):
             else:
                 channels = channels.order_by(Lower(sort))
 
+        if minimumSubscribers:
+            channels = channels.filter(subscriberCount__gte=minimumSubscribers)
+
+        # Build the url
+
+        url = request.get_full_path()
+        url = re.sub('\?.*', '?', url, flags=re.DOTALL)
+
+        try:
+            url.index('?')
+            pageStr = '&page='
+            for parameter in urlParameters:
+                url += parameter + '&'
+        except:
+            url += '?'
+
+        url += 'page='
+
+        # Determine the search page numbers
+
+        resultCount = channels.count()
+        pageCounter = resultCount
+        pageNumber = 0
+        pageNumbers = []
+        lastPage = math.ceil(resultCount / 100)
+
+        if lastPage < 1:
+            lastPage = 1
+
+        if currentPage > lastPage:
+            currentPage = lastPage
+
+        while pageCounter >= 0:
+            pageCounter -= 100
+            pageNumber += 1
+
+            if  (
+                    pageNumber <= 3 or pageNumber >= lastPage - 2
+                    or (pageNumber >= currentPage - 2 and pageNumber <= currentPage + 2)
+                ):
+                if pageNumber == currentPage:
+                    pageNumbers.append('current')
+                else:
+                    pageNumbers.append(pageNumber)
+            elif(
+                    pageNumber == currentPage - 3 or pageNumber == currentPage + 3
+                    or (pageNumber == 4 and currentPage == 1)
+                    or (pageNumber == lastPage - 3 and currentPage == lastPage)
+                ):
+                pageNumbers.append('skip')
+
+        # Use only the channels for the current page
+        if resultCount > 0:
+            channels = channels[currentPage * 100 - 100:currentPage * 100]
+
         # Format the join dates
         for channel in channels:
             if channel.publishedAt:
                 channel.publishedAt = channel.publishedAt.strftime('%Y-%m-%d %H:%M:%S')
 
         # Return the page with the searched channels
-        return render(request, 'channels/channelList.html', {'channels':channels})
+        context = {
+            'channels':channels,
+            'url':url,
+            'resultCount':resultCount,
+            'currentPage':currentPage,
+            'pageNumbers':pageNumbers,
+        }
+        return render(request, 'channels/channelList.html', context)
 
 
 def channelDetails(request, id):
