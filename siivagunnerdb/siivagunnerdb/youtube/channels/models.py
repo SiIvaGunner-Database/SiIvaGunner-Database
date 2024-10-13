@@ -6,6 +6,7 @@ from siivagunnerdb.community.contributors.models import Contributor
 from siivagunnerdb.drive.sheets.models import Spreadsheet
 
 ChannelStatus = models.TextChoices('ChannelStatusChoice', 'Public Deleted')
+ChannelType = models.TextChoices('ChannelTypeChoice', 'Original Derivative Influenced')
 
 
 class Channel(StandardModel):
@@ -32,6 +33,7 @@ class Channel(StandardModel):
 
     # Custom
     channelStatus = models.CharField(choices=ChannelStatus.choices, max_length=20, blank=True, default='')
+    channelType = models.CharField(choices=ChannelType.choices, max_length=20, blank=True, default='')
     bannerExternalUrl = models.CharField(max_length=200, blank=True, default='')
     wiki = models.CharField(max_length=50, blank=True, default='')
     collective = models.ForeignKey(Collective, on_delete=models.PROTECT, blank=True, null=True)
