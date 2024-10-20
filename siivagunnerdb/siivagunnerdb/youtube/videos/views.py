@@ -40,6 +40,10 @@ def videoList(request):
             queryString =  urlencode({'filter': request.POST['filter']})  # param=val
             parameters.append(queryString)
 
+        if request.POST['channelType'] != 'default':
+            queryString =  urlencode({'channelType': request.POST['channelType']})  # param=val
+            parameters.append(queryString)
+
         if request.POST['minimumSubscribers']:
             queryString =  urlencode({'minimumSubscribers': request.POST['minimumSubscribers']})  # param=val
             parameters.append(queryString)
@@ -101,11 +105,17 @@ def videoList(request):
         else:
             filter = None
 
+        if request.GET.get('channelType'):
+            channelType = request.GET.get('channelType')
+            urlParameters.append('channelType=' + channelType)
+        else:
+            channelType = None
+
         if request.GET.get('minimumSubscribers'):
             minimumSubscribers = request.GET.get('minimumSubscribers')
             urlParameters.append('minimumSubscribers=' + minimumSubscribers)
         else:
-            minimumSubscribers = 100
+            minimumSubscribers = None
 
         if request.GET.get('channel'):
             channelId = request.GET.get('channel')
@@ -152,6 +162,11 @@ def videoList(request):
                 videos = videos.filter(wikiStatus=filter)
             else:
                 videos = videos.filter(videoStatus=filter)
+
+        if channelType == 'original':
+            videos = videos.filter(channel__channelType='Original')
+        elif channelType != 'all':
+            videos = videos.exclude(channel__channelType='Influenced')
 
         if minimumSubscribers:
             videos = videos.filter(channel__subscriberCount__gte=minimumSubscribers)

@@ -37,6 +37,10 @@ def channelList(request):
             queryString =  urlencode({'order': request.POST['sortType']})  # param=val
             parameters.append(queryString)
 
+        if request.POST['channelType'] != 'default':
+            queryString =  urlencode({'channelType': request.POST['channelType']})  # param=val
+            parameters.append(queryString)
+
         if request.POST['minimumSubscribers']:
             queryString =  urlencode({'minimumSubscribers': request.POST['minimumSubscribers']})  # param=val
             parameters.append(queryString)
@@ -78,11 +82,17 @@ def channelList(request):
         else:
             order = 'descending'
 
+        if request.GET.get('channelType'):
+            channelType = request.GET.get('channelType')
+            urlParameters.append('channelType=' + channelType)
+        else:
+            channelType = None
+
         if request.GET.get('minimumSubscribers'):
             minimumSubscribers = request.GET.get('minimumSubscribers')
             urlParameters.append('minimumSubscribers=' + minimumSubscribers)
         else:
-            minimumSubscribers = 100
+            minimumSubscribers = None
 
         try:
             currentPage = int(request.GET.get('page'))
@@ -111,6 +121,11 @@ def channelList(request):
                 channels = channels.order_by(sort)
             else:
                 channels = channels.order_by(Lower(sort))
+
+        if channelType == 'original':
+            channels = channels.filter(channelType='Original')
+        elif channelType != 'all':
+            channels = channels.exclude(channelType='Influenced')
 
         if minimumSubscribers:
             channels = channels.filter(subscriberCount__gte=minimumSubscribers)

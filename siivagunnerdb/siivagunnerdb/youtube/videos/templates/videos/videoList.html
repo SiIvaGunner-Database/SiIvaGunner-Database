@@ -29,6 +29,12 @@
       <option value="deleted" {% if request.GET.filter == 'deleted' %} selected {% endif %}>Deleted</option>
       <option value="unavailable" {% if request.GET.filter == 'unavailable' %} selected {% endif %}>Unavailable</option>
     </select>
+    <!-- Channel type will remain commented out until all channels in the database are manually reviewed and updated -->
+    <select name="channelType" style="display:none;">
+      <option value="default">SiIvaGunner and fan channels</option>
+      <option value="original">SiIvaGunner channels</option>
+      <option value="all" {% if request.GET.channelType == 'all' %} selected {% endif %}>All channels</option>
+    </select>
     {% if request.GET.minimumSubscribers %}
       <input type="number" name="minimumSubscribers" placeholder="Minimum subscribers" value="{{ request.GET.minimumSubscribers }}"/>
     {% else %}
