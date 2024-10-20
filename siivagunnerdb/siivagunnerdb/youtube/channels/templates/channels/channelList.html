@@ -12,12 +12,23 @@
     <select name="sort">
       <option value="publishedAt">By join date</option>
       <option value="title" {% if request.GET.sort == 'title' %} selected {% endif %}>By title</option>
-      <!-- <option value="subscriberCount">By subscribers</option> -->
+      <option value="subscriberCount" {% if request.GET.sort == 'subscriberCount' %} selected {% endif %}>By subscribers</option>
     </select>
     <select name="sortType">
       <option value="descending">Descending</option>
       <option value="ascending" {% if request.GET.order == 'ascending' %} selected {% endif %}>Ascending</option>
     </select>
+    <!-- Channel type will remain commented out until all channels in the database are manually reviewed and updated -->
+    <select name="channelType" style="display:none;">
+      <option value="default">SiIvaGunner and fan channels</option>
+      <option value="original">SiIvaGunner channels</option>
+      <option value="all" {% if request.GET.channelType == 'all' %} selected {% endif %}>All channels</option>
+    </select>
+    {% if request.GET.minimumSubscribers %}
+      <input type="number" name="minimumSubscribers" placeholder="Minimum subscribers" value="{{ request.GET.minimumSubscribers }}"/>
+    {% else %}
+      <input type="number" name="minimumSubscribers" placeholder="Minimum subscribers"/>
+    {% endif %}
   </form>
   <a class="smallText" href="{% url 'videos:list' %}">Search for videos instead</a>
   <table class="channels">
@@ -26,7 +37,7 @@
       <th>Channel ID</th>
       <th>Status</th>
       <th>Join Date</th>
-      <!-- <th>Subscribers</th> -->
+      <th>Subscribers</th>
     </tr>
     {% for channel in channels %}
       <tr class="channel">
@@ -34,8 +45,24 @@
         <td><a href="https://www.youtube.com/channel/{{ channel.id }}" target="_blank">{{ channel.id }}</a></td>
         <td>{{ channel.channelStatus }}</td>
         <td>{{ channel.publishedAt }}</td>
-        <!-- <td>{{ channel.subscriberCount }}</td> -->
+        <td>{{ channel.subscriberCount }}</td>
       </tr>
     {% endfor %}
   </table>
+  <div class="pageDiv">
+    <div style="text-align:left;">
+      {% for page in pageNumbers %}
+        {% if page == "skip" %}
+          . . .
+        {% elif page == "current" %}
+          <span class="buttonStyleLinkActive">{{ currentPage }}</span>
+        {% else %}
+          <a class="buttonStyleLink" href="{{ url }}{{ page }}">{{ page }}</a>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div style="text-align:right;">
+      Found {{ resultCount }} results
+    </div>
+  </div>
 {% endblock %}
