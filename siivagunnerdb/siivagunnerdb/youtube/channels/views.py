@@ -202,7 +202,7 @@ def channelDetails(request, id):
     """
     The channel details page.
     """
-    channel = Channel.objects.get(id=id)
+    channel = Channel.objects.get(visible=True, id=id)
     videos = Video.objects.filter(visible=True, channel__id=id)
     videoCount = videos.count()
     videos = videos.order_by('-publishedAt')[:10]
