@@ -249,7 +249,7 @@ def videoDetails(request, id):
     """
     The video details page.
     """
-    video = Video.objects.get(visible=True, id=id)
+    video = Video.objects.get(visible=True, channel__visible=True, id=id)
 
     if video.publishedAt:
         video.publishedAt = video.publishedAt.strftime('%Y-%m-%d %H:%M:%S')
