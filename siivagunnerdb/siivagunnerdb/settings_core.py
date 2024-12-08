@@ -1,5 +1,5 @@
 """
-Base Django settings for all environments.
+Core Django settings for all environments.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/3.1/topics/settings/
