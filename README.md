@@ -8,7 +8,7 @@ Requires an active [Django development environment](https://developer.mozilla.or
 
 Navigate into ```/siivagunnerdb/``` and install the dependencies:
 
-    pip install -r requirements.txt
+    pip install -r requirements_min.txt
 
 Then create a local SQLite database:
 

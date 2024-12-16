@@ -8,7 +8,7 @@ ENV_NAME = os.environ.get('ENV_NAME')
 
 if ENV_NAME:
     print(ENV_NAME + ' environment set. Using cloud settings.')
-    from .cloudsettings import *
+    from .settings_cloud import *
 else:
     print('No environment set. Using local settings.')
-    from .localsettings import *
+    from .settings_local import *
