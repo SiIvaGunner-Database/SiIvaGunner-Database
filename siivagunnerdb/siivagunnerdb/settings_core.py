@@ -109,6 +109,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Trusted sites for POST requests with CSRF tokens
+CSRF_TRUSTED_ORIGINS = [
+    'https://siivagunnerdatabase.net',
+    'https://dev.siivagunnerdatabase.net',
+]
+
 # Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
