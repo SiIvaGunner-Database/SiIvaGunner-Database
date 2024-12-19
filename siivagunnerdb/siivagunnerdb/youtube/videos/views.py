@@ -1,4 +1,3 @@
-import math
 import re
 
 from django.contrib import messages
@@ -7,8 +6,9 @@ from django.db.models.functions import Lower
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
+from datetime import datetime
 from siivagunnerdb.views import MultipleModelViewSet
-from urllib.parse import urlencode
+from siivagunnerdb.search import convertFormParamsToQueryParams, getPageNumbers
 
 from .models import Video
 from .serializers import VideoSerializer
@@ -20,119 +20,42 @@ def videoList(request):
     """
     # If the search is being submitted
     if request.method == 'POST':
-        parameters = []
-
-        # Check for search parameters
-
-        if request.POST['searchTerms']:
-            queryString =  urlencode({'search': request.POST['searchTerms'].strip()})  # param=val
-            parameters.append(queryString)
-
-        if request.POST['sort'] != 'date':
-            queryString =  urlencode({'sort': request.POST['sort']})  # param=val
-            parameters.append(queryString)
-
-        if request.POST['sortType'] != 'descending':
-            queryString =  urlencode({'order': request.POST['sortType']})  # param=val
-            parameters.append(queryString)
-
-        if request.POST['filter'] != 'unfiltered':
-            queryString =  urlencode({'filter': request.POST['filter']})  # param=val
-            parameters.append(queryString)
-
-        if request.POST['channelType'] != 'default':
-            queryString =  urlencode({'channelType': request.POST['channelType']})  # param=val
-            parameters.append(queryString)
-
-        if request.POST['minimumSubscribers']:
-            queryString =  urlencode({'minimumSubscribers': request.POST['minimumSubscribers']})  # param=val
-            parameters.append(queryString)
-
-        if request.POST['channel']:
-            queryString =  urlencode({'channel': request.POST['channel']})  # param=val
-            parameters.append(queryString)
-
-        # Format the parameters in the URL
-
-        url = reverse('videos:list')  # /videos/
-        paramChar = '?'
-
-        for param in parameters:
-            url = url + paramChar + param  # /videos/?param=val&param=val
-            paramChar = '&'
-
+        parameterNames = [
+            'searchTerms', 'sort', 'sortType', 'filter', 'channelType',
+            'minimumSubscribers', 'channel',
+        ]
+         # "/videos/" + "?param=val&param=val"
+        url = reverse('videos:list') + convertFormParamsToQueryParams(request, parameterNames)
         return redirect(url)
 
     # Else the search is being loaded
     else:
-        # Load the search parameters if they exist
-        # Otherwise, load the defaults
+        startTime = datetime.utcnow()
 
-        urlParameters = []
+        # Get the search parameters
+        search = request.GET.get('search')
+        sort = request.GET.get('sort')
+        filter = request.GET.get('filter')
+        order = request.GET.get('order')
+        channelType = request.GET.get('channelType')
+        minimumSubscribers = request.GET.get('minimumSubscribers')
+        channelId = request.GET.get('channel')
+        currentPage = request.GET.get('page')
 
-        if request.GET.get('search'):
-            search = request.GET.get('search')
-            urlParameters.append('search=' + search)
-        else:
-            search = None
-
-        if request.GET.get('sort'):
-            sort = request.GET.get('sort')
-            urlParameters.append('sort=' + sort)
-            sortOptions = ['date', 'title', 'views']
-
-            if sort not in sortOptions:
-                sort = 'publishedAt'
-
-            if sort == 'views':
-                sort = 'viewCount'
-        else:
+        # Set applicable default parameter values
+        sortOptions = ['date', 'title', 'views']
+        if sort is None or sort not in sortOptions:
             sort = 'publishedAt'
-
-        if request.GET.get('order') and request.GET.get('order') == 'ascending':
-            order = 'ascending'
-            urlParameters.append('order=' + order)
-        else:
-            order = 'descending'
-
-        if request.GET.get('filter'):
-            filter = request.GET.get('filter')
-            urlParameters.append('filter=' + filter)
-            filterOptions = ['unfiltered', 'documented', 'undocumented', 'public', 'unlisted', 'private', 'deleted', 'unavailable']
-
-            if filter not in filterOptions:
-                filter = None
-        else:
+        filterOptions = ['unfiltered', 'documented', 'undocumented', 'public', 'unlisted', 'private', 'deleted', 'unavailable']
+        if filter is None not in filterOptions:
             filter = None
-
-        if request.GET.get('channelType'):
-            channelType = request.GET.get('channelType')
-            urlParameters.append('channelType=' + channelType)
+        if currentPage is not None:
+            currentPage = int(currentPage)
         else:
-            channelType = None
-
-        if request.GET.get('minimumSubscribers'):
-            minimumSubscribers = request.GET.get('minimumSubscribers')
-            urlParameters.append('minimumSubscribers=' + minimumSubscribers)
-        else:
-            minimumSubscribers = None
-
-        if request.GET.get('channel'):
-            channelId = request.GET.get('channel')
-            urlParameters.append('channel=' + channelId)
-        else:
-            channelId = None
-
-        try:
-            currentPage = int(request.GET.get('page'))
-
-            if currentPage < 1:
-                currentPage = 1
-        except:
             currentPage = 1
 
         # Query the search using any given filters or sorting
-
+        # TODO: move logic to search.py
         if search:
             videosByTitle = Video.objects.filter(visible=True, title__icontains=search)
             videosByChannel = Video.objects.filter(visible=True, channel__title__icontains=search)
@@ -140,10 +63,8 @@ def videoList(request):
             videos = (videosByTitle | videosById | videosByChannel)
         else:
             videos = Video.objects.filter(visible=True)
-
         if channelId:
             videos = videos & Video.objects.filter(visible=True, channel__id=channelId)
-
         if order == 'descending':
             if sort != 'title':
                 videos = videos.order_by('-' + sort)
@@ -154,70 +75,22 @@ def videoList(request):
                 videos = videos.order_by(sort)
             else:
                 videos = videos.order_by(Lower(sort))
-
         if filter:
             filter = filter.capitalize()
-
             if filter == 'Undocumented' or filter == 'Documented':
                 videos = videos.filter(wikiStatus=filter)
             else:
                 videos = videos.filter(videoStatus=filter)
-
         if channelType == 'original':
             videos = videos.filter(channel__channelType='Original')
         elif channelType != 'all':
             videos = videos.exclude(channel__channelType='Influenced')
-
         if minimumSubscribers:
             videos = videos.filter(channel__subscriberCount__gte=minimumSubscribers)
 
-        # Build the url
-
-        url = request.get_full_path()
-        url = re.sub('\?.*', '?', url, flags=re.DOTALL)
-
-        try:
-            url.index('?')
-            pageStr = '&page='
-            for parameter in urlParameters:
-                url += parameter + '&'
-        except:
-            url += '?'
-
-        url += 'page='
-
         # Determine the search page numbers
-
         resultCount = videos.count()
-        pageCounter = resultCount
-        pageNumber = 0
-        pageNumbers = []
-        lastPage = math.ceil(resultCount / 100)
-
-        if lastPage < 1:
-            lastPage = 1
-
-        if currentPage > lastPage:
-            currentPage = lastPage
-
-        while pageCounter >= 0:
-            pageCounter -= 100
-            pageNumber += 1
-
-            if  (
-                    pageNumber <= 3 or pageNumber >= lastPage - 2
-                    or (pageNumber >= currentPage - 2 and pageNumber <= currentPage + 2)
-                ):
-                if pageNumber == currentPage:
-                    pageNumbers.append('current')
-                else:
-                    pageNumbers.append(pageNumber)
-            elif(
-                    pageNumber == currentPage - 3 or pageNumber == currentPage + 3
-                    or (pageNumber == 4 and currentPage == 1)
-                    or (pageNumber == lastPage - 3 and currentPage == lastPage)
-                ):
-                pageNumbers.append('skip')
+        pageNumbers = getPageNumbers(resultCount, currentPage)
 
         # Use only the videos for the current page
         if resultCount > 0:
@@ -225,23 +98,26 @@ def videoList(request):
 
         # Format the upload dates and put the first 50 IDs into an array
         first50Ids = []
-
         for video in videos:
             if len(first50Ids) < 50:
                 first50Ids.append(video.id)
-
             if video.publishedAt:
                 video.publishedAt = video.publishedAt.strftime('%Y-%m-%d %H:%M:%S')
 
+        # TODO Remove page=0 from url
+        searchUrl = request.get_full_path()
+
         # Return the page with the searched videos
         context = {
-            'videos':videos,
-            'first50Ids':','.join(first50Ids),
-            'url':url,
-            'resultCount':resultCount,
-            'currentPage':currentPage,
-            'pageNumbers':pageNumbers,
+            'videos': videos,
+            'first50Ids': ','.join(first50Ids),
+            'searchUrl': searchUrl,
+            'resultCount': resultCount,
+            'currentPage': currentPage,
+            'pageNumbers': pageNumbers,
         }
+        endTime = datetime.utcnow()
+        print('Search execution time: ' + str((endTime - startTime).total_seconds()) + ' milliseconds')
         return render(request, 'videos/videoList.html', context)
 
 

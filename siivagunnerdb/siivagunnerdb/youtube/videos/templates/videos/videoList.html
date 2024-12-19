@@ -78,13 +78,13 @@
   </table>
   <div class="pageDiv">
     <div style="text-align:left;">
-      {% for page in pageNumbers %}
-        {% if page == "skip" %}
+      {% for pageNumber in pageNumbers %}
+        {% if pageNumber == "skip" %}
           . . .
-        {% elif page == "current" %}
+        {% elif pageNumber == "current" %}
           <span class="buttonStyleLinkActive">{{ currentPage }}</span>
         {% else %}
-          <a class="buttonStyleLink" href="{{ url }}{{ page }}">{{ page }}</a>
+          <a class="buttonStyleLink" href="{{ searchUrl }}&page={{ pageNumber }}">{{ pageNumber }}</a>
         {% endif %}
       {% endfor %}
     </div>
