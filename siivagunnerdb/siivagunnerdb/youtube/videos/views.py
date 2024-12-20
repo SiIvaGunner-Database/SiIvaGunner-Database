@@ -170,8 +170,6 @@ class VideoViewSet(MultipleModelViewSet):
         'favoriteCount': ['exact'],
         'commentCount': ['exact'],
         'channel': ['exact'],
-        'contributors': ['exact'],
-        'playlists': ['exact'],
         'wikiTitle': ['exact'],
         'wikiStatus': ['exact'],
         'videoStatus': ['exact', 'in']
