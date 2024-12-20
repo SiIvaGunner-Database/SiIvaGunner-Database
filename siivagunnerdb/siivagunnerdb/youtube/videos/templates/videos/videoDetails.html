@@ -27,7 +27,7 @@
     <fieldset>
       <legend class="boldText">Metadata</legend>
       <p>Published At: <b>{{ video.publishedAt|default:"N/A" }}</b></p>
-      <p>Channel: <b><a href="{% url 'channels:details' video.channel.id %}">{{ video.channel|default:"N/A" }}</a></b></p>
+      <p>Channel: <b><a href="{% url 'channels:details' video.channel_id %}">{{ video.channel|default:"N/A" }}</a></b></p>
       <p>Video Status: <b>{{ video.videoStatus|default:"N/A" }}</b></p>
       <p>Wiki Status: <b>{{ video.wikiStatus|default:"N/A" }}</b></p>
       <p>Duration: <b>{{ video.duration|default:"N/A" }}</b></p>

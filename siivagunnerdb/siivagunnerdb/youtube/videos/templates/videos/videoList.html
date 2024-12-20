@@ -67,8 +67,8 @@
         <td>{{ video.videoStatus }}</td>
         <td>{{ video.publishedAt }}</td>
         <td>
-          {% if video.channel is not None %}
-            <a href="{% url 'channels:details' video.channel.id %}">{{ video.channel }}</a>
+          {% if video.channel_id is not None %}
+            <a href="{% url 'channels:details' video.channel_id %}">{{ video.channelTitle|default:video.channel_id }}</a>
           {% endif %}
         </td>
         <td>{{ video.duration }}</td>
@@ -84,7 +84,7 @@
         {% elif pageNumber == "current" %}
           <span class="buttonStyleLinkActive">{{ currentPage }}</span>
         {% else %}
-          <a class="buttonStyleLink" href="{{ searchUrl }}&page={{ pageNumber }}">{{ pageNumber }}</a>
+          <a class="buttonStyleLink" href="{{ searchUrl }}page={{ pageNumber }}">{{ pageNumber }}</a>
         {% endif %}
       {% endfor %}
     </div>

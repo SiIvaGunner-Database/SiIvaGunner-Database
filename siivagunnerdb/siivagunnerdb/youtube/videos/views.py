@@ -8,7 +8,7 @@ from django.urls import reverse
 
 from datetime import datetime
 from siivagunnerdb.views import MultipleModelViewSet
-from siivagunnerdb.search import convertFormParamsToQueryParams, getPageNumbers
+from siivagunnerdb.search import *
 
 from .models import Video
 from .serializers import VideoSerializer
@@ -94,18 +94,17 @@ def videoList(request):
 
         # Use only the videos for the current page
         if resultCount > 0:
-            videos = videos[currentPage * 100 - 100:currentPage * 100]
+            videos = videos[currentPage * 50 - 50:currentPage * 50]
 
         # Format the upload dates and put the first 50 IDs into an array
         first50Ids = []
         for video in videos:
-            if len(first50Ids) < 50:
-                first50Ids.append(video.id)
+            first50Ids.append(video.id)
             if video.publishedAt:
                 video.publishedAt = video.publishedAt.strftime('%Y-%m-%d %H:%M:%S')
 
         # TODO Remove page=0 from url
-        searchUrl = request.get_full_path()
+        searchUrl = getPathWithoutPageParameter(request)
 
         # Return the page with the searched videos
         context = {
@@ -117,7 +116,7 @@ def videoList(request):
             'pageNumbers': pageNumbers,
         }
         endTime = datetime.utcnow()
-        print('Search execution time: ' + str((endTime - startTime).total_seconds()) + ' milliseconds')
+        print('Search execution time: ' + str((endTime - startTime).total_seconds()) + ' seconds')
         return render(request, 'videos/videoList.html', context)
 
 

@@ -1,4 +1,8 @@
 import math
+import re
+
+from urllib.parse import urlencode
+
 
 def convertFormParamsToQueryParams(request, parameterNames):
     parameters = []
@@ -6,7 +10,7 @@ def convertFormParamsToQueryParams(request, parameterNames):
     # Check for search parameters
     for name in parameterNames:
         if request.POST[name] is not None:
-            queryMap = { 'name': request.POST[name] }
+            queryMap = { name: request.POST[name] }
             queryString =  urlencode(queryMap) # param=val
             parameters.append(queryString)
 
@@ -25,11 +29,27 @@ def getOrderedFilteredObjects():
     return []
 
 
+def getPathWithoutPageParameter(request):
+    if not request.GET:
+        return request.get_full_path() + '?'
+    else:
+        url = request.get_full_path()
+        url = re.sub('\?.*', '?', url, flags=re.DOTALL)
+
+        for name in request.GET:
+            if name != 'page':
+                value = request.GET[name]
+                if value != '':
+                    url += name + '=' + value + '&'
+
+        return url
+
+
 def getPageNumbers(resultCount, currentPage):
     pageCounter = resultCount
     pageNumber = 0
     pageNumbers = []
-    lastPage = math.ceil(resultCount / 100)
+    lastPage = math.ceil(resultCount / 50)
 
     if lastPage < 1:
         lastPage = 1
@@ -38,7 +58,7 @@ def getPageNumbers(resultCount, currentPage):
         currentPage = lastPage
 
     while pageCounter >= 0:
-        pageCounter -= 100
+        pageCounter -= 50
         pageNumber += 1
 
         if  (
