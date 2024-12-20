@@ -4,9 +4,9 @@
   <form action="{% url 'channels:list' %}" method="post">
     {% csrf_token %}
     {% if request.GET.search %}
-      <input type="text" name="searchTerms" placeholder="Search for title or ID" value="{{ request.GET.search }}"/>
+      <input type="text" name="search" placeholder="Search for title or ID" value="{{ request.GET.search }}"/>
     {% else %}
-      <input type="text" name="searchTerms" placeholder="Search for title or ID"/>
+      <input type="text" name="search" placeholder="Search for title or ID"/>
     {% endif %}
     <input type="submit" value="Search"/>
     <select name="sort">
@@ -14,7 +14,7 @@
       <option value="title" {% if request.GET.sort == 'title' %} selected {% endif %}>By title</option>
       <option value="subscriberCount" {% if request.GET.sort == 'subscriberCount' %} selected {% endif %}>By subscribers</option>
     </select>
-    <select name="sortType">
+    <select name="order">
       <option value="descending">Descending</option>
       <option value="ascending" {% if request.GET.order == 'ascending' %} selected {% endif %}>Ascending</option>
     </select>
@@ -51,13 +51,13 @@
   </table>
   <div class="pageDiv">
     <div style="text-align:left;">
-      {% for page in pageNumbers %}
-        {% if page == "skip" %}
+      {% for pageNumber in pageNumbers %}
+        {% if pageNumber == "skip" %}
           . . .
-        {% elif page == "current" %}
+        {% elif pageNumber == "current" %}
           <span class="buttonStyleLinkActive">{{ currentPage }}</span>
         {% else %}
-          <a class="buttonStyleLink" href="{{ url }}{{ page }}">{{ page }}</a>
+          <a class="buttonStyleLink" href="{{ searchUrl }}page={{ pageNumber }}">{{ pageNumber }}</a>
         {% endif %}
       {% endfor %}
     </div>

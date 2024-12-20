@@ -1,12 +1,9 @@
-import re
+from datetime import datetime
 
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.db.models.functions import Lower
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
-from datetime import datetime
 from siivagunnerdb.views import MultipleModelViewSet
 from siivagunnerdb.search import *
 
@@ -20,10 +17,7 @@ def videoList(request):
     """
     # If the search is being submitted
     if request.method == 'POST':
-        parameterNames = [
-            'searchTerms', 'sort', 'sortType', 'filter', 'channelType',
-            'minimumSubscribers', 'channel',
-        ]
+        parameterNames = ['search', 'sort', 'order', 'filter', 'channelType', 'minimumSubscribers', 'channel',]
          # "/videos/" + "?param=val&param=val"
         url = reverse('videos:list') + convertFormParamsToQueryParams(request, parameterNames)
         return redirect(url)
@@ -35,19 +29,19 @@ def videoList(request):
         # Get the search parameters
         search = request.GET.get('search')
         sort = request.GET.get('sort')
-        filter = request.GET.get('filter')
         order = request.GET.get('order')
+        filter = request.GET.get('filter')
         channelType = request.GET.get('channelType')
         minimumSubscribers = request.GET.get('minimumSubscribers')
         channelId = request.GET.get('channel')
         currentPage = request.GET.get('page')
 
         # Set applicable default parameter values
-        sortOptions = ['date', 'title', 'views']
+        sortOptions = ['publishedAt', 'title', 'viewCount',]
         if sort is None or sort not in sortOptions:
             sort = 'publishedAt'
-        filterOptions = ['unfiltered', 'documented', 'undocumented', 'public', 'unlisted', 'private', 'deleted', 'unavailable']
-        if filter is None not in filterOptions:
+        filterOptions = ['unfiltered', 'documented', 'undocumented', 'public', 'unlisted', 'private', 'deleted', 'unavailable',]
+        if filter is None or filter == 'unfiltered' or filter not in filterOptions:
             filter = None
         if currentPage is not None:
             currentPage = int(currentPage)
@@ -55,7 +49,6 @@ def videoList(request):
             currentPage = 1
 
         # Query the search using any given filters or sorting
-        # TODO: move logic to search.py
         if search:
             videosByTitle = Video.objects.filter(visible=True, title__icontains=search)
             videosByChannel = Video.objects.filter(visible=True, channel__title__icontains=search)
@@ -103,20 +96,17 @@ def videoList(request):
             if video.publishedAt:
                 video.publishedAt = video.publishedAt.strftime('%Y-%m-%d %H:%M:%S')
 
-        # TODO Remove page=0 from url
-        searchUrl = getPathWithoutPageParameter(request)
-
         # Return the page with the searched videos
         context = {
             'videos': videos,
             'first50Ids': ','.join(first50Ids),
-            'searchUrl': searchUrl,
+            'searchUrl': getPathWithoutPageParameter(request),
             'resultCount': resultCount,
             'currentPage': currentPage,
             'pageNumbers': pageNumbers,
         }
-        endTime = datetime.utcnow()
-        print('Search execution time: ' + str((endTime - startTime).total_seconds()) + ' seconds')
+        executionTime = (datetime.utcnow() - startTime).total_seconds()
+        print('Video search execution time in seconds: ' + str(executionTime))
         return render(request, 'videos/videoList.html', context)
 
 
@@ -138,7 +128,7 @@ class VideoViewSet(MultipleModelViewSet):
     """
     queryset = Video.objects.all()
     serializer_class = VideoSerializer
-    filterset_fields =  {
+    filterset_fields = {
         'addDate': ['exact'],
         'updateDate': ['exact'],
         'visible': ['exact'],

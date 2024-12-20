@@ -4,18 +4,18 @@
   <form action="{% url 'videos:list' %}" method="post">
     {% csrf_token %}
     {% if request.GET.search %}
-      <input type="text" name="searchTerms" placeholder="Search for title or ID" value="{{ request.GET.search }}"/>
+      <input type="text" name="search" placeholder="Search for title or ID" value="{{ request.GET.search }}"/>
     {% else %}
-      <input type="text" name="searchTerms" placeholder="Search for title or ID"/>
+      <input type="text" name="search" placeholder="Search for title or ID"/>
     {% endif %}
     <input type="submit" value="Search"/>
     <select name="sort" selectedIndex=2>
-      <option value="date">By upload date</option>
+      <option value="publishedAt">By upload date</option>
       <option value="title" {% if request.GET.sort == 'title' %} selected {% endif %}>By title</option>
-      <!-- <option value="length" {% if request.GET.sort == 'length' %} selected {% endif %}>By length</option> -->
-      <option value="views" {% if request.GET.sort == 'views' %} selected {% endif %}>By views</option>
+      <!-- <option value="duration" {% if request.GET.sort == 'length' %} selected {% endif %}>By length</option> -->
+      <option value="viewCount" {% if request.GET.sort == 'views' %} selected {% endif %}>By views</option>
     </select>
-    <select name="sortType">
+    <select name="order">
       <option value="descending">Descending</option>
       <option value="ascending" {% if request.GET.order == 'ascending' %} selected {% endif %}>Ascending</option>
     </select>
