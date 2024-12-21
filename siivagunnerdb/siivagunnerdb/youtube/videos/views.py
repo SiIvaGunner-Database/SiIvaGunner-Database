@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 
 from siivagunnerdb.views import MultipleModelViewSet
-from siivagunnerdb.search import *
+from siivagunnerdb import search
 
 from .models import Video
 from .serializers import VideoSerializer
@@ -19,7 +19,7 @@ def videoList(request):
     if request.method == 'POST':
         parameterNames = ['search', 'sort', 'order', 'filter', 'channelType', 'minimumSubscribers', 'channel',]
          # "/videos/" + "?param=val&param=val"
-        url = reverse('videos:list') + convertFormParamsToQueryParams(request, parameterNames)
+        url = reverse('videos:list') + search.convertFormParamsToQueryParams(request, parameterNames)
         return redirect(url)
 
     # Else the search is being loaded
@@ -27,7 +27,7 @@ def videoList(request):
         startTime = datetime.utcnow()
 
         # Get the search parameters
-        search = request.GET.get('search')
+        searchTerms = request.GET.get('search')
         sort = request.GET.get('sort')
         order = request.GET.get('order')
         filter = request.GET.get('filter')
@@ -40,36 +40,37 @@ def videoList(request):
         sortOptions = ['publishedAt', 'title', 'viewCount',]
         if sort is None or sort not in sortOptions:
             sort = 'publishedAt'
-        filterOptions = ['unfiltered', 'documented', 'undocumented', 'public', 'unlisted', 'private', 'deleted', 'unavailable',]
-        if filter is None or filter == 'unfiltered' or filter not in filterOptions:
+        filterOptions = ['documented', 'undocumented', 'public', 'unlisted', 'private', 'deleted', 'unavailable',]
+        if filter not in filterOptions:
             filter = None
-        if currentPage is not None:
+        else:
+            filter = filter.capitalize()
+        if currentPage:
             currentPage = int(currentPage)
         else:
             currentPage = 1
 
         # Query the search using any given filters or sorting
-        if search:
-            videosByTitle = Video.objects.filter(visible=True, title__icontains=search)
-            videosByChannel = Video.objects.filter(visible=True, channel__title__icontains=search)
-            videosById = Video.objects.filter(visible=True, id__icontains=search)
+        if searchTerms:
+            videosByTitle = Video.objects.filter(visible=True, title__icontains=searchTerms)
+            videosByChannel = Video.objects.filter(visible=True, channel__title__icontains=searchTerms)
+            videosById = Video.objects.filter(visible=True, id__icontains=searchTerms)
             videos = (videosByTitle | videosById | videosByChannel)
         else:
             videos = Video.objects.filter(visible=True)
         if channelId:
             videos = videos & Video.objects.filter(visible=True, channel__id=channelId)
-        if order == 'descending':
-            if sort != 'title':
-                videos = videos.order_by('-' + sort)
-            else:
-                videos = videos.order_by(Lower(sort).desc())
-        else:
+        if order == 'ascending':
             if sort != 'title':
                 videos = videos.order_by(sort)
             else:
                 videos = videos.order_by(Lower(sort))
+        else:
+            if sort != 'title':
+                videos = videos.order_by('-' + sort)
+            else:
+                videos = videos.order_by(Lower(sort).desc())
         if filter:
-            filter = filter.capitalize()
             if filter == 'Undocumented' or filter == 'Documented':
                 videos = videos.filter(wikiStatus=filter)
             else:
@@ -83,7 +84,7 @@ def videoList(request):
 
         # Determine the search page numbers
         resultCount = videos.count()
-        pageNumbers = getPageNumbers(resultCount, currentPage)
+        pageNumbers = search.getPageNumbers(resultCount, currentPage)
 
         # Use only the videos for the current page
         if resultCount > 0:
@@ -100,7 +101,7 @@ def videoList(request):
         context = {
             'videos': videos,
             'first50Ids': ','.join(first50Ids),
-            'searchUrl': getPathWithoutPageParameter(request),
+            'searchUrl': search.getPathWithoutPageParameter(request),
             'resultCount': resultCount,
             'currentPage': currentPage,
             'pageNumbers': pageNumbers,

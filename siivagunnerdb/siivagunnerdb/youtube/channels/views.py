@@ -8,7 +8,7 @@ from django.urls import reverse
 
 from siivagunnerdb.views import MultipleModelViewSet
 from siivagunnerdb.youtube.videos.models import Video
-from siivagunnerdb.search import *
+from siivagunnerdb import search
 
 from .models import Channel
 from .serializers import ChannelSerializer
@@ -22,7 +22,7 @@ def channelList(request):
     if request.method == 'POST':
         parameterNames = ['search', 'sort', 'order', 'channelType', 'minimumSubscribers',]
          # "/channels/" + "?param=val&param=val"
-        url = reverse('channels:list') + convertFormParamsToQueryParams(request, parameterNames)
+        url = reverse('channels:list') + search.convertFormParamsToQueryParams(request, parameterNames)
         return redirect(url)
 
     # Else the search is being loaded
@@ -30,7 +30,7 @@ def channelList(request):
         startTime = datetime.utcnow()
 
         # Get the search parameters
-        search = request.GET.get('search')
+        searchTerms = request.GET.get('search')
         sort = request.GET.get('sort')
         order = request.GET.get('order')
         channelType = request.GET.get('channelType')
@@ -38,31 +38,31 @@ def channelList(request):
         currentPage = request.GET.get('page')
 
         # Set applicable default parameter values
-        sortOptions = ['publishedAt', 'title',]
+        sortOptions = ['publishedAt', 'title', 'subscriberCount',]
         if sort is None or sort not in sortOptions:
             sort = 'publishedAt'
-        if currentPage is not None:
+        if currentPage:
             currentPage = int(currentPage)
         else:
             currentPage = 1
 
         # Query the search using any given filters or sorting
-        if search:
-            channelsByTitle = Channel.objects.filter(visible=True, title__icontains=search)
-            channelsById = Channel.objects.filter(visible=True, id__icontains=search)
+        if searchTerms:
+            channelsByTitle = Channel.objects.filter(visible=True, title__icontains=searchTerms)
+            channelsById = Channel.objects.filter(visible=True, id__icontains=searchTerms)
             channels = (channelsByTitle | channelsById)
         else:
             channels = Channel.objects.filter(visible=True)
-        if order == 'descending':
-            if sort != 'title':
-                channels = channels.order_by('-' + sort)
-            else:
-                channels = channels.order_by(Lower(sort).desc())
-        else:
+        if order == 'ascending':
             if sort != 'title':
                 channels = channels.order_by(sort)
             else:
                 channels = channels.order_by(Lower(sort))
+        else:
+            if sort != 'title':
+                channels = channels.order_by('-' + sort)
+            else:
+                channels = channels.order_by(Lower(sort).desc())
         if channelType == 'original':
             channels = channels.filter(channelType='Original')
         elif channelType != 'all':
@@ -72,7 +72,7 @@ def channelList(request):
 
         # Determine the search page numbers
         resultCount = channels.count()
-        pageNumbers = getPageNumbers(resultCount, currentPage)
+        pageNumbers = search.getPageNumbers(resultCount, currentPage)
 
         # Use only the channels for the current page
         if resultCount > 0:
@@ -86,7 +86,7 @@ def channelList(request):
         # Return the page with the searched channels
         context = {
             'channels': channels,
-            'searchUrl': getPathWithoutPageParameter(request),
+            'searchUrl': search.getPathWithoutPageParameter(request),
             'resultCount': resultCount,
             'currentPage': currentPage,
             'pageNumbers': pageNumbers,
@@ -106,7 +106,7 @@ def channelDetails(request, id):
     videos = videos.order_by('-publishedAt')[:10]
     thumbnail = ""
 
-    if channel.thumbnails is not None and channel.thumbnails != "":
+    if channel.thumbnails and channel.thumbnails != "":
         thumbnail = json.loads(channel.thumbnails)["high"]["url"]
 
     if channel.publishedAt:

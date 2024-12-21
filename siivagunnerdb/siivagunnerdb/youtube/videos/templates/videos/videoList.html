@@ -12,8 +12,8 @@
     <select name="sort" selectedIndex=2>
       <option value="publishedAt">By upload date</option>
       <option value="title" {% if request.GET.sort == 'title' %} selected {% endif %}>By title</option>
-      <!-- <option value="duration" {% if request.GET.sort == 'length' %} selected {% endif %}>By length</option> -->
-      <option value="viewCount" {% if request.GET.sort == 'views' %} selected {% endif %}>By views</option>
+      <!-- <option value="duration" {% if request.GET.sort == 'duration' %} selected {% endif %}>By length</option> -->
+      <option value="viewCount" {% if request.GET.sort == 'viewCount' %} selected {% endif %}>By views</option>
     </select>
     <select name="order">
       <option value="descending">Descending</option>
