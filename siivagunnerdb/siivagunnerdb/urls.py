@@ -3,6 +3,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import path, include
+from django.views.generic.base import TemplateView
 
 from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
@@ -44,6 +45,7 @@ urlpatterns = [
     path('reports/', views.reports, name='reports'),
     path('rips/', include('siivagunnerdb.youtube.videos.urls')),
     path('videos/', include('siivagunnerdb.youtube.videos.urls')),
+    path('robots.txt', TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
     path('', videoList, name='home'),
 ]
 
