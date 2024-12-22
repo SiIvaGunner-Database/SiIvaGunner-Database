@@ -16,7 +16,7 @@ from siivagunnerdb.drive.scripts.views import ScriptViewSet
 from siivagunnerdb.drive.sheets.views import SpreadsheetViewSet, SheetViewSet
 from siivagunnerdb.youtube.channels.views import ChannelViewSet
 from siivagunnerdb.youtube.playlists.views import PlaylistViewSet
-from siivagunnerdb.youtube.videos.views import VideoViewSet, videoList
+from siivagunnerdb.youtube.videos.views import VideoViewSet
 
 from . import views
 
@@ -46,7 +46,7 @@ urlpatterns = [
     path('rips/', include('siivagunnerdb.youtube.videos.urls')),
     path('videos/', include('siivagunnerdb.youtube.videos.urls')),
     path('robots.txt', TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
-    path('', videoList, name='home'),
+    path('', views.index, name='home'),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

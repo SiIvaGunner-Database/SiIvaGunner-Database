@@ -1,0 +1,34 @@
+{% extends 'baseLayout.html' %}
+{% load static %}
+{% block content%}
+  <div>
+    <p>The SiIvaGunner Database is a fan project archiving metadata from SiIvaGunner related channels and videos. The project is not affilliated with the SiIvaGunner channel or any fan channels. If you would like to see a channel or video added to or removed from the database, please fill out a request under <a href="{% url 'reports' %}">"Submit forms"</a>.</p>
+    <h2>Randomly Selected Rip:
+      <a href="{% url 'videos:details' video.id %}">"{{ video.title }}"</a> by <a href="{% url 'channels:details' channel.id %}">{{ channel.title }}</a>
+    </h2>
+    {% if channel.channelStatus == "Public" and thumbnail != "" or channel.channelStatus == "Public" and channel.bannerExternalUrl != "" %}
+      <div id="channelImageDiv">
+        {% if channel.bannerExternalUrl != "" %}
+          <a href="{{ channel.bannerExternalUrl }}=w2120-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj" target="_blank">
+            <img id="bannerImage" src="{{ channel.bannerExternalUrl }}=w2120-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj" alt="YouTube channel banner" decoding="async" loading="lazy" />
+          </a>
+        {% endif %}
+        {% if thumbnail != "" %}
+          <a href="{{ thumbnail }}" target="_blank">
+            <img id="thumbnailImage" src="{{ thumbnail }}" alt="YouTube profile picture" decoding="async" loading="lazy" />
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+    <div class="gridDiv">
+      <fieldset>
+        <legend class="boldText">Video</legend>
+        <iframe id="videoEmbed" width="100%" height="315px" src="https://www.youtube.com/embed/{{ video.id }}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </fieldset>
+      <fieldset>
+        <legend class="boldText">Description</legend>
+        <p>{{ video.description }}</p>
+      </fieldset>
+    </div>
+  </div>
+{% endblock %}

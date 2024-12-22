@@ -1,3 +1,6 @@
+import json
+import random
+
 from django.shortcuts import render
 
 from django_filters.rest_framework import DjangoFilterBackend
@@ -9,6 +12,38 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 
 from siivagunnerdb.settings import DEBUG
+from siivagunnerdb.youtube.channels.models import Channel
+from siivagunnerdb.youtube.videos.models import Video
+
+
+def index(request):
+    # Find a random channel
+    channels = Channel.objects.filter(visible=True, subscriberCount__gte=100, channelStatus='Public', channelType__in=['Original', 'Derivative'])
+    channel = None
+    if channels.count() > 0:
+        channel = channels[random.randrange(channels.count())]
+    else:
+        channel = Channel.objects.get(visible=True, id='UC9ecwl3FTG66jIKA9JRDtmg') # SiIvaGunner
+    thumbnail = None
+    if channel.thumbnails and channel.thumbnails != "":
+        thumbnail = json.loads(channel.thumbnails)["high"]["url"]
+
+    # Find a random video
+    videos = Video.objects.filter(visible=True, channel__id=channel.id, videoStatus__in=['Public', 'Unlisted'])
+    video = None
+    if videos.count() > 0:
+        video = videos[random.randrange(videos.count())]
+    else:
+        channel = Channel.objects.get(visible=True, id='UC9ecwl3FTG66jIKA9JRDtmg') # SiIvaGunner
+        video = Video.objects.get(visible=True, id='NzoneDE0A2o') # The Inn - Fire Emblem
+
+    # Return the page with the randomized channel and video
+    context = {
+        'channel': channel,
+        'video': video,
+        'thumbnail': thumbnail,
+    }
+    return render(request, 'index.html', context)
 
 
 def generate(request):
