@@ -3,7 +3,7 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8" />
-    <meta name="description" content="A searchable database of information retrieved from SiIvaGunner videos." />
+    <meta name="description" content="A searchable database of archived metadata from SiIvaGunner related channels and videos." />
     <title>SiIvaGunner Database</title>
     <link rel="shortcut icon" type="image/ico" href="{% static 'favicon.ico' %}" />
     <link rel="stylesheet" href="{% static 'style.css' %}" />
@@ -40,9 +40,10 @@
     </header>
     <nav>
       <ul>
-        <li><a href="{% url 'home' %}">Search database</a></li>
+        <li><a href="{% url 'channels:list' %}">Search channels</a></li>
+        <li><a href="{% url 'videos:list' %}">Search videos</a></li>
         <li><a href="{% url 'generate' %}">Generate rip template</a></li>
-        <li><a href="{% url 'reports' %}">Submit data</a></li>
+        <li><a href="{% url 'reports' %}">Submit forms</a></li>
       </ul>
     </nav>
     <main>
@@ -57,8 +58,8 @@
       {% endblock %}
     </main>
     <footer>
-      <a target="_blank" href="https://drive.google.com/drive/u/0/folders/1ElZaYVTRg7TfS8UsVteHja7M4N3C6_AS">View Database Sheets</a>
-      <a target="_blank" href="https://github.com/SiIvaGunner-Database">View Project Files</a>
+      <a target="_blank" href="https://drive.google.com/drive/u/0/folders/1ElZaYVTRg7TfS8UsVteHja7M4N3C6_AS">Database Sheets</a>
+      <a target="_blank" href="https://github.com/SiIvaGunner-Database">Source Files</a>
     </footer>
   </body>
 </html>

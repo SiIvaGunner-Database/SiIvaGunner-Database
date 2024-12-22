@@ -68,7 +68,7 @@
           <td>{{ video.wikiStatus }}</td>
           <td>{{ video.videoStatus }}</td>
           <td>{{ video.publishedAt }}</td>
-          <td><a href="{% url 'channels:details' video.channel.id %}">{{ video.channel }}</a></td>
+          <td><a href="{% url 'channels:details' video.channel_id %}">{{ channel.title }}</a></td>
           <td>{{ video.duration }}</td>
           <td>{{ video.viewCount }}</td>
         </tr>

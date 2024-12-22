@@ -47,12 +47,11 @@ def channelList(request):
             currentPage = 1
 
         # Query the search using any given filters or sorting
+        channels = Channel.objects.filter(visible=True)
         if searchTerms:
-            channelsByTitle = Channel.objects.filter(visible=True, title__icontains=searchTerms)
-            channelsById = Channel.objects.filter(visible=True, id__icontains=searchTerms)
+            channelsByTitle = channels.filter(title__icontains=searchTerms)
+            channelsById = channels.filter(id__icontains=searchTerms)
             channels = (channelsByTitle | channelsById)
-        else:
-            channels = Channel.objects.filter(visible=True)
         if order == 'ascending':
             if sort != 'title':
                 channels = channels.order_by(sort)
