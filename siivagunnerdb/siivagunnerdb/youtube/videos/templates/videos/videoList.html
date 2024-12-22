@@ -1,6 +1,6 @@
 {% extends 'baseLayout.html' %}
 {% block content%}
-  <h2>Search the video database</h2>
+  <h2>Search for videos in the database</h2>
   <form action="{% url 'videos:list' %}" method="post">
     {% csrf_token %}
     {% if request.GET.search %}
@@ -46,7 +46,6 @@
       <input type="hidden" name="channel"/>
     {% endif %}
   </form>
-  <a class="smallText" href="{% url 'channels:list' %}">Search for channels instead</a>
   <a class="smallText" href="https://www.youtube.com/watch_videos?video_ids={{ first50Ids }}" target="_blank">View playlist of results</a>
   <table class="videos">
     <tr class="video">

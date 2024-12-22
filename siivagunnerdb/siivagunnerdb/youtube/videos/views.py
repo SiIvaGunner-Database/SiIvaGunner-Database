@@ -51,13 +51,12 @@ def videoList(request):
             currentPage = 1
 
         # Query the search using any given filters or sorting
+        videos = Video.objects.filter(visible=True, channel__visible=True)
         if searchTerms:
-            videosByTitle = Video.objects.filter(visible=True, title__icontains=searchTerms)
-            videosByChannel = Video.objects.filter(visible=True, channel__title__icontains=searchTerms)
-            videosById = Video.objects.filter(visible=True, id__icontains=searchTerms)
+            videosByTitle = videos.filter(title__icontains=searchTerms)
+            videosByChannel = videos.filter(channel__title__icontains=searchTerms)
+            videosById = videos.filter(id__icontains=searchTerms)
             videos = (videosByTitle | videosById | videosByChannel)
-        else:
-            videos = Video.objects.filter(visible=True)
         if channelId:
             videos = videos & Video.objects.filter(visible=True, channel__id=channelId)
         if order == 'ascending':

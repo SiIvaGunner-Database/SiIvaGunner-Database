@@ -1,6 +1,6 @@
 {% extends 'baseLayout.html' %}
 {% block content%}
-  <h2>Search the channel database</h2>
+  <h2>Search for channels in the database</h2>
   <form action="{% url 'channels:list' %}" method="post">
     {% csrf_token %}
     {% if request.GET.search %}
@@ -30,7 +30,6 @@
       <input type="number" name="minimumSubscribers" placeholder="Minimum subscribers"/>
     {% endif %}
   </form>
-  <a class="smallText" href="{% url 'videos:list' %}">Search for videos instead</a>
   <table class="channels">
     <tr class="channel">
       <th>Channel Title</th>
