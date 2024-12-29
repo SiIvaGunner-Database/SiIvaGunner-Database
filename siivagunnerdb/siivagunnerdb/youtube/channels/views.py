@@ -56,7 +56,7 @@ def channelList(request):
             channels = (channelsByTitle | channelsById)
         if channelType == 'original':
             channels = channels.filter(channelType='Original')
-        elif channelType != 'all':
+        elif channelType == 'derivative':
             channels = channels.exclude(channelType='Influenced')
         if minimumSubscribers:
             channels = channels.filter(subscriberCount__gte=minimumSubscribers)

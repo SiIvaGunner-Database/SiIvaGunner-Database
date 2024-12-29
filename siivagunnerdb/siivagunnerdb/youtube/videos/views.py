@@ -63,7 +63,7 @@ def videoList(request):
             videos = videos.filter(channel__id=channelId)
         elif channelType == 'original':
             videos = videos.filter(channel__channelType='Original')
-        elif channelType != 'all':
+        elif channelType == 'derivative':
             videos = videos.exclude(channel__channelType='Influenced')
         if filter:
             if filter == 'Undocumented' or filter == 'Documented':
