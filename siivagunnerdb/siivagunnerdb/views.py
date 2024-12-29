@@ -24,9 +24,6 @@ def index(request):
         channel = channels[random.randrange(channels.count())]
     else:
         channel = Channel.objects.get(visible=True, id='UC9ecwl3FTG66jIKA9JRDtmg') # SiIvaGunner
-    thumbnail = None
-    if channel.thumbnails and channel.thumbnails != "":
-        thumbnail = json.loads(channel.thumbnails)["high"]["url"]
 
     # Find a random video
     videos = Video.objects.filter(visible=True, channel__id=channel.id, videoStatus__in=['Public', 'Unlisted'])
@@ -36,6 +33,11 @@ def index(request):
     else:
         channel = Channel.objects.get(visible=True, id='UC9ecwl3FTG66jIKA9JRDtmg') # SiIvaGunner
         video = Video.objects.get(visible=True, id='NzoneDE0A2o') # The Inn - Fire Emblem
+
+    # Get the channel profile picture thumbnail
+    thumbnail = None
+    if channel.thumbnails and channel.thumbnails != "":
+        thumbnail = json.loads(channel.thumbnails)["high"]["url"]
 
     # Return the page with the randomized channel and video
     context = {

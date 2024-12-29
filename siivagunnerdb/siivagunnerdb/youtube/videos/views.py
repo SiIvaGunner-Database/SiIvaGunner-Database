@@ -46,9 +46,11 @@ def videoList(request):
         else:
             filter = filter.capitalize()
         if currentPage:
-            currentPage = int(currentPage)
+            currentPage = abs(int(currentPage))
         else:
             currentPage = 1
+        executionTime = (datetime.utcnow() - startTime).total_seconds()
+        print('Video search paramater execution time in seconds: ' + str(executionTime))
 
         # Query the search using any given filters or sorting
         videos = Video.objects.filter(visible=True, channel__visible=True)
@@ -58,7 +60,18 @@ def videoList(request):
             videosById = videos.filter(id__icontains=searchTerms)
             videos = (videosByTitle | videosById | videosByChannel)
         if channelId:
-            videos = videos & Video.objects.filter(visible=True, channel__id=channelId)
+            videos = videos.filter(channel__id=channelId)
+        elif channelType == 'original':
+            videos = videos.filter(channel__channelType='Original')
+        elif channelType == 'derivative':
+            videos = videos.exclude(channel__channelType='Influenced')
+        if filter:
+            if filter == 'Undocumented' or filter == 'Documented':
+                videos = videos.filter(wikiStatus=filter)
+            else:
+                videos = videos.filter(videoStatus=filter)
+        if minimumSubscribers:
+            videos = videos.filter(channel__subscriberCount__gte=minimumSubscribers)
         if order == 'ascending':
             if sort != 'title':
                 videos = videos.order_by(sort)
@@ -69,25 +82,20 @@ def videoList(request):
                 videos = videos.order_by('-' + sort)
             else:
                 videos = videos.order_by(Lower(sort).desc())
-        if filter:
-            if filter == 'Undocumented' or filter == 'Documented':
-                videos = videos.filter(wikiStatus=filter)
-            else:
-                videos = videos.filter(videoStatus=filter)
-        if channelType == 'original':
-            videos = videos.filter(channel__channelType='Original')
-        elif channelType != 'all':
-            videos = videos.exclude(channel__channelType='Influenced')
-        if minimumSubscribers:
-            videos = videos.filter(channel__subscriberCount__gte=minimumSubscribers)
+        executionTime = (datetime.utcnow() - startTime).total_seconds()
+        print('Video search filter execution time in seconds: ' + str(executionTime))
 
         # Determine the search page numbers
         resultCount = videos.count()
         pageNumbers = search.getPageNumbers(resultCount, currentPage)
+        executionTime = (datetime.utcnow() - startTime).total_seconds()
+        print('Video search pagination numbers execution time in seconds: ' + str(executionTime))
 
         # Use only the videos for the current page
         if resultCount > 0:
             videos = videos[currentPage * 50 - 50:currentPage * 50]
+        executionTime = (datetime.utcnow() - startTime).total_seconds()
+        print('Video search pagination data split execution time in seconds: ' + str(executionTime))
 
         # Format the upload dates and put the first 50 IDs into an array
         first50Ids = []
@@ -95,6 +103,8 @@ def videoList(request):
             first50Ids.append(video.id)
             if video.publishedAt:
                 video.publishedAt = video.publishedAt.strftime('%Y-%m-%d %H:%M:%S')
+        executionTime = (datetime.utcnow() - startTime).total_seconds()
+        print('Video search date formatting execution time in seconds: ' + str(executionTime))
 
         # Return the page with the searched videos
         context = {
@@ -106,7 +116,7 @@ def videoList(request):
             'pageNumbers': pageNumbers,
         }
         executionTime = (datetime.utcnow() - startTime).total_seconds()
-        print('Video search execution time in seconds: ' + str(executionTime))
+        print('Video search total execution time in seconds: ' + str(executionTime))
         return render(request, 'videos/videoList.html', context)
 
 

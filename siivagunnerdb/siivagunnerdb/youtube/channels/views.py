@@ -42,9 +42,11 @@ def channelList(request):
         if sort is None or sort not in sortOptions:
             sort = 'publishedAt'
         if currentPage:
-            currentPage = int(currentPage)
+            currentPage = abs(int(currentPage))
         else:
             currentPage = 1
+        executionTime = (datetime.utcnow() - startTime).total_seconds()
+        print('Channel search paramater execution time in seconds: ' + str(executionTime))
 
         # Query the search using any given filters or sorting
         channels = Channel.objects.filter(visible=True)
@@ -52,6 +54,12 @@ def channelList(request):
             channelsByTitle = channels.filter(title__icontains=searchTerms)
             channelsById = channels.filter(id__icontains=searchTerms)
             channels = (channelsByTitle | channelsById)
+        if channelType == 'original':
+            channels = channels.filter(channelType='Original')
+        elif channelType == 'derivative':
+            channels = channels.exclude(channelType='Influenced')
+        if minimumSubscribers:
+            channels = channels.filter(subscriberCount__gte=minimumSubscribers)
         if order == 'ascending':
             if sort != 'title':
                 channels = channels.order_by(sort)
@@ -62,25 +70,27 @@ def channelList(request):
                 channels = channels.order_by('-' + sort)
             else:
                 channels = channels.order_by(Lower(sort).desc())
-        if channelType == 'original':
-            channels = channels.filter(channelType='Original')
-        elif channelType != 'all':
-            channels = channels.exclude(channelType='Influenced')
-        if minimumSubscribers:
-            channels = channels.filter(subscriberCount__gte=minimumSubscribers)
+        executionTime = (datetime.utcnow() - startTime).total_seconds()
+        print('Channel search filter execution time in seconds: ' + str(executionTime))
 
         # Determine the search page numbers
         resultCount = channels.count()
         pageNumbers = search.getPageNumbers(resultCount, currentPage)
+        executionTime = (datetime.utcnow() - startTime).total_seconds()
+        print('Channel search pagination numbers execution time in seconds: ' + str(executionTime))
 
         # Use only the channels for the current page
         if resultCount > 0:
             channels = channels[currentPage * 50 - 50:currentPage * 50]
+        executionTime = (datetime.utcnow() - startTime).total_seconds()
+        print('Channel search pagination data split execution time in seconds: ' + str(executionTime))
 
         # Format the join dates
         for channel in channels:
             if channel.publishedAt:
                 channel.publishedAt = channel.publishedAt.strftime('%Y-%m-%d %H:%M:%S')
+        executionTime = (datetime.utcnow() - startTime).total_seconds()
+        print('Channel search date formatting execution time in seconds: ' + str(executionTime))
 
         # Return the page with the searched channels
         context = {
@@ -91,7 +101,7 @@ def channelList(request):
             'pageNumbers': pageNumbers,
         }
         executionTime = (datetime.utcnow() - startTime).total_seconds()
-        print('Channel search execution time in seconds: ' + str(executionTime))
+        print('Channel search total execution time in seconds: ' + str(executionTime))
         return render(request, 'channels/channelList.html', context)
 
 
