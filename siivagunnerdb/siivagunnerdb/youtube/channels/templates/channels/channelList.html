@@ -18,10 +18,9 @@
       <option value="descending">Descending</option>
       <option value="ascending" {% if request.GET.order == 'ascending' %} selected {% endif %}>Ascending</option>
     </select>
-    <!-- Channel type will remain commented out until all channels in the database are manually reviewed and updated -->
-    <select name="channelType" style="display:none;">
+    <select name="channelType">
       <option value="default">SiIvaGunner and fan channels</option>
-      <option value="original">SiIvaGunner channels</option>
+      <option value="original" {% if request.GET.channelType == 'original' %} selected {% endif %}>SiIvaGunner channels</option>
       <option value="all" {% if request.GET.channelType == 'all' %} selected {% endif %}>All channels</option>
     </select>
     {% if request.GET.minimumSubscribers %}
