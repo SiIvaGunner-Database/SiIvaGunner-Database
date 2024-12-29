@@ -46,7 +46,7 @@ def videoList(request):
         else:
             filter = filter.capitalize()
         if currentPage:
-            currentPage = int(currentPage)
+            currentPage = abs(int(currentPage))
         else:
             currentPage = 1
         executionTime = (datetime.utcnow() - startTime).total_seconds()

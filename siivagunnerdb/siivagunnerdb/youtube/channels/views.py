@@ -42,7 +42,7 @@ def channelList(request):
         if sort is None or sort not in sortOptions:
             sort = 'publishedAt'
         if currentPage:
-            currentPage = int(currentPage)
+            currentPage = abs(int(currentPage))
         else:
             currentPage = 1
         executionTime = (datetime.utcnow() - startTime).total_seconds()
@@ -101,7 +101,7 @@ def channelList(request):
             'pageNumbers': pageNumbers,
         }
         executionTime = (datetime.utcnow() - startTime).total_seconds()
-        print('Channel search execution time in seconds: ' + str(executionTime))
+        print('Channel search total execution time in seconds: ' + str(executionTime))
         return render(request, 'channels/channelList.html', context)
 
 

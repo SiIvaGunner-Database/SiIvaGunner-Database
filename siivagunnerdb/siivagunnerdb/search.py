@@ -36,38 +36,48 @@ def getPageNumbers(resultCount, currentPage):
     """
     pageCounter = resultCount
     pageNumber = 0
-    pageNumbers = []
+    pageNumbers = {}
     lastPage = math.ceil(resultCount / 50)
 
+    # Ensure the current and last page numbers are valid
     if lastPage < 1:
         lastPage = 1
-
-    if currentPage > lastPage:
+    if currentPage < 1:
+        currentPage = 1
+    elif currentPage > lastPage:
         currentPage = lastPage
 
-    # Loop through increments of 50 results per page
-    while pageCounter >= 0:
-        pageCounter -= 50
-        pageNumber += 1
+    # List all possible page numbers that might be used
+    possiblePageNumbers = [1, 2, 3,
+        currentPage - 3, currentPage - 2, currentPage - 1,
+        currentPage,
+        currentPage + 1, currentPage + 2, currentPage + 3,
+        lastPage - 2, lastPage - 1, lastPage,
+    ]
 
+    # Loop through the possible page numbers
+    for pageNumber in possiblePageNumbers:
+        # If the page number is invalid, skip it
+        if pageNumber < 1 or pageNumber > lastPage:
+            continue
         # If the page is one of the first three pages, last three pages, or within two pages of the current page
         if  (
                 pageNumber <= 3 or pageNumber >= lastPage - 2
                 or (pageNumber >= currentPage - 2 and pageNumber <= currentPage + 2)
             ):
             if pageNumber == currentPage:
-                pageNumbers.append('current')
+                pageNumbers[pageNumber] = 'current'
             else:
-                pageNumbers.append(pageNumber)
+                pageNumbers[pageNumber] = pageNumber
         # Else if the page is three pages from the current page, first page, or last page
         elif(
                 pageNumber == currentPage - 3 or pageNumber == currentPage + 3
                 or (pageNumber == 4 and currentPage == 1)
                 or (pageNumber == lastPage - 3 and currentPage == lastPage)
             ):
-            pageNumbers.append('skip')
+            pageNumbers[pageNumber] = 'skip'
 
-    return pageNumbers
+    return pageNumbers.values()
 
 
 def getPathWithoutPageParameter(request):
