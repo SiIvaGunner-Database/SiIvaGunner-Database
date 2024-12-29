@@ -3,46 +3,40 @@
   <h2>Search for videos in the database</h2>
   <form action="{% url 'videos:list' %}" method="post">
     {% csrf_token %}
-    {% if request.GET.search %}
-      <input type="text" name="search" placeholder="Search for title or ID" value="{{ request.GET.search }}"/>
-    {% else %}
-      <input type="text" name="search" placeholder="Search for title or ID"/>
-    {% endif %}
-    <input type="submit" value="Search"/>
-    <select name="sort" selectedIndex=2>
-      <option value="publishedAt">By upload date</option>
-      <option value="title" {% if request.GET.sort == 'title' %} selected {% endif %}>By title</option>
-      <option value="viewCount" {% if request.GET.sort == 'viewCount' %} selected {% endif %}>By views</option>
-    </select>
-    <select name="order">
-      <option value="descending">Descending</option>
-      <option value="ascending" {% if request.GET.order == 'ascending' %} selected {% endif %}>Ascending</option>
-    </select>
-    <select name="filter">
-      <option value="unfiltered">No filter</option>
-      <option value="documented" {% if request.GET.filter == 'documented' %} selected {% endif %}>Documented</option>
-      <option value="undocumented" {% if request.GET.filter == 'undocumented' %} selected {% endif %}>Undocumented</option>
-      <option value="public" {% if request.GET.filter == 'public' %} selected {% endif %}>Public</option>
-      <option value="unlisted" {% if request.GET.filter == 'unlisted' %} selected {% endif %}>Unlisted</option>
-      <option value="private" {% if request.GET.filter == 'private' %} selected {% endif %}>Private</option>
-      <option value="deleted" {% if request.GET.filter == 'deleted' %} selected {% endif %}>Deleted</option>
-      <option value="unavailable" {% if request.GET.filter == 'unavailable' %} selected {% endif %}>Unavailable</option>
-    </select>
-    <select name="channelType">
-      <option value="default">SiIvaGunner and fan channels</option>
-      <option value="original" {% if request.GET.channelType == 'original' %} selected {% endif %}>SiIvaGunner channels</option>
-      <option value="all" {% if request.GET.channelType == 'all' %} selected {% endif %}>All channels</option>
-    </select>
-    {% if request.GET.minimumSubscribers %}
-      <input type="number" name="minimumSubscribers" placeholder="Minimum subscribers" value="{{ request.GET.minimumSubscribers }}"/>
-    {% else %}
-      <input type="number" name="minimumSubscribers" placeholder="Minimum subscribers"/>
-    {% endif %}
-    {% if request.GET.channel %}
-      <input type="hidden" name="channel" value="{{ request.GET.channel }}"/>
-    {% else %}
-      <input type="hidden" name="channel"/>
-    {% endif %}
+    <div>
+      <input type="text" name="search" placeholder="Search for title or ID" {% if request.GET.search %} value="{{ request.GET.search }}" {% endif %}/>
+      <input type="submit" value="Search" class="boldText"/>
+      <select name="filter">
+        <option value="unfiltered">No status filter</option>
+        <option value="documented" {% if request.GET.filter == 'documented' %} selected {% endif %}>Documented</option>
+        <option value="undocumented" {% if request.GET.filter == 'undocumented' %} selected {% endif %}>Undocumented</option>
+        <option value="public" {% if request.GET.filter == 'public' %} selected {% endif %}>Public</option>
+        <option value="unlisted" {% if request.GET.filter == 'unlisted' %} selected {% endif %}>Unlisted</option>
+        <option value="private" {% if request.GET.filter == 'private' %} selected {% endif %}>Private</option>
+        <option value="deleted" {% if request.GET.filter == 'deleted' %} selected {% endif %}>Deleted</option>
+        <option value="unavailable" {% if request.GET.filter == 'unavailable' %} selected {% endif %}>Unavailable</option>
+      </select>
+    </div>
+    <div>
+      <input type="number" name="minimumSubscribers" placeholder="Minimum subscribers" {% if request.GET.minimumSubscribers %} value="{{ request.GET.minimumSubscribers }}" {% endif %}/>
+      <select name="channelType">
+        <option value="default">SiIvaGunner and fan channels</option>
+        <option value="original" {% if request.GET.channelType == 'original' %} selected {% endif %}>SiIvaGunner channels</option>
+        <option value="all" {% if request.GET.channelType == 'all' %} selected {% endif %}>All channels</option>
+      </select>
+      <input type="hidden" name="channel" {% if request.GET.channel %} value="{{ request.GET.channel }}" {% endif %}/>
+    </div>
+    <div>
+      <select name="sort" selectedIndex=2>
+        <option value="publishedAt">Sort by upload date</option>
+        <option value="title" {% if request.GET.sort == 'title' %} selected {% endif %}>Sort by title</option>
+        <option value="viewCount" {% if request.GET.sort == 'viewCount' %} selected {% endif %}>Sort by views</option>
+      </select>
+      <select name="order">
+        <option value="descending">In descending order</option>
+        <option value="ascending" {% if request.GET.order == 'ascending' %} selected {% endif %}>In ascending order</option>
+      </select>
+    </div>
   </form>
   <a class="smallText" href="https://www.youtube.com/watch_videos?video_ids={{ first50Ids }}" target="_blank">View playlist of results</a>
   <table class="videos">

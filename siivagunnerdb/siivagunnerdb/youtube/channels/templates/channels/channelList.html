@@ -3,31 +3,29 @@
   <h2>Search for channels in the database</h2>
   <form action="{% url 'channels:list' %}" method="post">
     {% csrf_token %}
-    {% if request.GET.search %}
-      <input type="text" name="search" placeholder="Search for title or ID" value="{{ request.GET.search }}"/>
-    {% else %}
-      <input type="text" name="search" placeholder="Search for title or ID"/>
-    {% endif %}
-    <input type="submit" value="Search"/>
-    <select name="sort">
-      <option value="publishedAt">By join date</option>
-      <option value="title" {% if request.GET.sort == 'title' %} selected {% endif %}>By title</option>
-      <option value="subscriberCount" {% if request.GET.sort == 'subscriberCount' %} selected {% endif %}>By subscribers</option>
-    </select>
-    <select name="order">
-      <option value="descending">Descending</option>
-      <option value="ascending" {% if request.GET.order == 'ascending' %} selected {% endif %}>Ascending</option>
-    </select>
-    <select name="channelType">
-      <option value="default">SiIvaGunner and fan channels</option>
-      <option value="original" {% if request.GET.channelType == 'original' %} selected {% endif %}>SiIvaGunner channels</option>
-      <option value="all" {% if request.GET.channelType == 'all' %} selected {% endif %}>All channels</option>
-    </select>
-    {% if request.GET.minimumSubscribers %}
-      <input type="number" name="minimumSubscribers" placeholder="Minimum subscribers" value="{{ request.GET.minimumSubscribers }}"/>
-    {% else %}
-      <input type="number" name="minimumSubscribers" placeholder="Minimum subscribers"/>
-    {% endif %}
+    <div>
+      <input type="text" name="search" placeholder="Search for title or ID" {% if request.GET.search %} value="{{ request.GET.search }}" {% endif %}/>
+      <input type="submit" value="Search" class="boldText"/>
+    </div>
+    <div>
+      <input type="number" name="minimumSubscribers" placeholder="Minimum subscribers" {% if request.GET.minimumSubscribers %} value="{{ request.GET.minimumSubscribers }}" {% endif %}/>
+      <select name="channelType">
+        <option value="default">SiIvaGunner and fan channels</option>
+        <option value="original" {% if request.GET.channelType == 'original' %} selected {% endif %}>SiIvaGunner channels</option>
+        <option value="all" {% if request.GET.channelType == 'all' %} selected {% endif %}>All channels</option>
+      </select>
+    </div>
+    <div>
+      <select name="sort">
+        <option value="publishedAt">Sort by join date</option>
+        <option value="title" {% if request.GET.sort == 'title' %} selected {% endif %}>Sort by title</option>
+        <option value="subscriberCount" {% if request.GET.sort == 'subscriberCount' %} selected {% endif %}>Sort by subscribers</option>
+      </select>
+      <select name="order">
+        <option value="descending">In descending order</option>
+        <option value="ascending" {% if request.GET.order == 'ascending' %} selected {% endif %}>In ascending order</option>
+      </select>
+    </div>
   </form>
   <table class="channels">
     <tr class="channel">
