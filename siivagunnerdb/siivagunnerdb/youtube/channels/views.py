@@ -52,6 +52,12 @@ def channelList(request):
             channelsByTitle = channels.filter(title__icontains=searchTerms)
             channelsById = channels.filter(id__icontains=searchTerms)
             channels = (channelsByTitle | channelsById)
+        if channelType == 'original':
+            channels = channels.filter(channelType='Original')
+        elif channelType != 'all':
+            channels = channels.exclude(channelType='Influenced')
+        if minimumSubscribers:
+            channels = channels.filter(subscriberCount__gte=minimumSubscribers)
         if order == 'ascending':
             if sort != 'title':
                 channels = channels.order_by(sort)
@@ -62,12 +68,6 @@ def channelList(request):
                 channels = channels.order_by('-' + sort)
             else:
                 channels = channels.order_by(Lower(sort).desc())
-        if channelType == 'original':
-            channels = channels.filter(channelType='Original')
-        elif channelType != 'all':
-            channels = channels.exclude(channelType='Influenced')
-        if minimumSubscribers:
-            channels = channels.filter(subscriberCount__gte=minimumSubscribers)
 
         # Determine the search page numbers
         resultCount = channels.count()

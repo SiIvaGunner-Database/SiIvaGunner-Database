@@ -58,17 +58,7 @@ def videoList(request):
             videosById = videos.filter(id__icontains=searchTerms)
             videos = (videosByTitle | videosById | videosByChannel)
         if channelId:
-            videos = videos & Video.objects.filter(visible=True, channel__id=channelId)
-        if order == 'ascending':
-            if sort != 'title':
-                videos = videos.order_by(sort)
-            else:
-                videos = videos.order_by(Lower(sort))
-        else:
-            if sort != 'title':
-                videos = videos.order_by('-' + sort)
-            else:
-                videos = videos.order_by(Lower(sort).desc())
+            videos = videos.filter(channel__id=channelId)
         if filter:
             if filter == 'Undocumented' or filter == 'Documented':
                 videos = videos.filter(wikiStatus=filter)
@@ -80,6 +70,16 @@ def videoList(request):
             videos = videos.exclude(channel__channelType='Influenced')
         if minimumSubscribers:
             videos = videos.filter(channel__subscriberCount__gte=minimumSubscribers)
+        if order == 'ascending':
+            if sort != 'title':
+                videos = videos.order_by(sort)
+            else:
+                videos = videos.order_by(Lower(sort))
+        else:
+            if sort != 'title':
+                videos = videos.order_by('-' + sort)
+            else:
+                videos = videos.order_by(Lower(sort).desc())
 
         # Determine the search page numbers
         resultCount = videos.count()
