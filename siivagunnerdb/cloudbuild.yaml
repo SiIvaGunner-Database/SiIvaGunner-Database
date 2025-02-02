@@ -9,6 +9,11 @@ steps:
 - name: "gcr.io/google-appengine/exec-wrapper"
   args: ["-i", "${_IMAGE_NAME}",
          "-s", "${_INSTANCE_NAME}",
+         "--", "python", "manage.py", "deleterevisions"]
+
+- name: "gcr.io/google-appengine/exec-wrapper"
+  args: ["-i", "${_IMAGE_NAME}",
+         "-s", "${_INSTANCE_NAME}",
          "--", "python", "manage.py", "migrate"]
 
 - name: "gcr.io/google-appengine/exec-wrapper"
