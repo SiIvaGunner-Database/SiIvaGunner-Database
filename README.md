@@ -10,13 +10,19 @@ Navigate into ```/siivagunnerdb/``` and install the dependencies:
 
     pip install -r requirements_min.txt
 
-Then create a local SQLite database:
+Create a local SQLite database:
 
     python manage.py migrate
 
-Finally, start the application on ```http://localhost:8000/```:
+Create a new super user:
+
+    python manage.py createsuperuser
+
+Start the application on ```http://localhost:8000/```:
 
     python manage.py runserver
+
+Log in to ```http://localhost:8000/admin/``` to manually populate the local database with data.
 
 ### See Also
 
