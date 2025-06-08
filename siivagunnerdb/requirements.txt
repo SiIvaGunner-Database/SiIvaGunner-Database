@@ -11,7 +11,7 @@ django-environ==0.11.2
 django-storages[google]==1.14.4
 google-auth==2.37.0
 google-cloud-secret-manager==2.22.0
-gunicorn==22.0.0
+gunicorn==23.0.0
 Pillow==10.4.0
 psycopg2-binary==2.9.10
 pytz==2024.2
