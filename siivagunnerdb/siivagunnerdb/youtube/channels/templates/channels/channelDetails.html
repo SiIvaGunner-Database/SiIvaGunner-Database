@@ -24,7 +24,11 @@
       <a href="https://web.archive.org/web/*/https://www.youtube.com/channel/{{ channel.id }}" target="_blank">
         <img src="{% static 'Internet_Archive_icon.svg' %}" alt="Internet Archive icon" decoding="async" loading="lazy" width="25" height="25" />
       </a>
-      {% if channel.wiki != "" %}
+      {% if channel.wiki != "" and "https" in channel.wiki %}
+        <a class="smallText" href="{{ channel.wiki }}" target="_blank">
+          <img src="{% static '90px-Meme_icon.svg.png' %}" alt="Wiki icon" decoding="async" loading="lazy" height="25" />
+        </a>
+      {% elif channel.wiki != "" %}
         <a class="smallText" href="https://{{ channel.wiki }}.fandom.com/wiki/Main_Page" target="_blank">
           <img src="{% static 'Fandom_icon.png' %}" alt="Fandom icon" decoding="async" loading="lazy" height="25" />
         </a>
