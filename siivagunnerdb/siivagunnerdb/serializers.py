@@ -5,13 +5,13 @@ Custom serializer classes. Experimental.
 from rest_framework.serializers import ModelSerializer
 from siivagunnerdb.administration.logs.utils import log_addition, log_change
 
-import reversion
-
 
 class LoggedModelSerializer(ModelSerializer):
     """
-    A serializer with overriding create and update methods that create a LogEntry and Reversion for each request.
-    Otherwise, this class is identical to the ModelSerializer class.
+    Originally designed as a model serializer with overriding create and update
+    methods to create a LogEntry and Reversion for each request. However, most
+    of this functionality has been removed because of the amount of database
+    storage it was taking up.
     """
 
     def __init__(self, *args, **kwargs):
@@ -32,23 +32,17 @@ class LoggedModelSerializer(ModelSerializer):
 
     def create(self, validated_data):
         """
-        Create an addition LogEntry and Reversion.
+        Create an addition LogEntry.
         """
         request = self.context['request']
-
-        with reversion.create_revision():
-            instance = super().create(validated_data)
-            reversion.set_user(request.user)
-            reversion.set_comment('Created revision from POST request')
-
+        instance = super().create(validated_data)
         log_addition(request, instance)
         return instance
 
     def update(self, instance, validated_data):
         """
-        Create a change LogEntry and Reversion.
+        Identical to ModelSerializer.update().
         """
         request = self.context['request']
         new_instance = super().update(instance, validated_data)
-        log_change(request, instance, new_instance)
         return new_instance
