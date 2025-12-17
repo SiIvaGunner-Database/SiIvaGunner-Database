@@ -1,5 +1,5 @@
 {% extends 'baseLayout.html' %}
-{% block content%}
+{% block content %}
   <h2>Generate an authentication token</h2>
   <form class="siteForm" action="{% url 'api_token_auth' %}" method="post">
     {% csrf_token %}

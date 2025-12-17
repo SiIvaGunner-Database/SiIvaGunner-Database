@@ -1,6 +1,6 @@
 {% extends 'baseLayout.html' %}
 {% load static %}
-{% block content%}
+{% block content %}
   <div>
     <p>The SiIvaGunner Database is a fan project archiving metadata from SiIvaGunner related channels and videos. The project is not affilliated with the SiIvaGunner channel or any fan channels. If you would like to see a channel or video added to or removed from the database, please fill out a request under <a href="{% url 'reports' %}">"Submit forms"</a>.</p>
     <h2>Randomly Selected Rip:
@@ -23,7 +23,10 @@
     <div class="gridDiv">
       <fieldset>
         <legend class="boldText">Video</legend>
-        <iframe id="videoEmbed" width="100%" height="315px" src="https://www.youtube.com/embed/{{ video.id }}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <iframe id="videoEmbed" width="100%" height="315px"
+          src="https://www.youtube.com/embed/{{ video.id }}" frameborder="0"
+          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+          referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
       </fieldset>
       <fieldset>
         <legend class="boldText">Description</legend>

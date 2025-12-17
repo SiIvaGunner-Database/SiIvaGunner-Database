@@ -21,11 +21,15 @@ def signupView(request):
             rawPassword = form.cleaned_data['password1']
             user = authenticate(username=username, password=rawPassword)
             login(request, user)
-            return redirect('videos:list')
+            return redirect('home')
     else:
         form = UserCreationForm()
 
-    return render(request, 'accounts/signup.html', { 'form':form })
+    context = {
+        'title': 'Sign Up',
+        'form': form,
+    }
+    return render(request, 'accounts/signup.html', context)
 
 
 def loginView(request):
@@ -42,11 +46,15 @@ def loginView(request):
             if 'next' in request.POST:
                 return redirect(request.POST.get('next'))
             else:
-                return redirect('videos:list')
+                return redirect('home')
     else:
         form = AuthenticationForm()
 
-    return render(request, 'accounts/login.html', { 'form':form })
+    context = {
+        'title': 'Log In',
+        'form': form,
+    }
+    return render(request, 'accounts/login.html', context)
 
 
 def logoutView(request):
@@ -55,7 +63,7 @@ def logoutView(request):
     """
     if request.method == 'POST':
         logout(request)
-        return redirect('videos:list')
+        return redirect('home')
 
 
 @login_required()
@@ -89,6 +97,9 @@ def myAccountView(request):
             else:
                 messages.error(request, 'An error occurred. Please make sure the password fits the criteria.')
 
-    usernameForm = UsernameChangeForm()
-    passwordForm = PasswordChangeForm(request.user)
-    return render(request, 'accounts/myAccount.html', { 'usernameForm':usernameForm, 'passwordForm': passwordForm })
+    context = {
+        'title': 'Account',
+        'usernameForm': UsernameChangeForm(),
+        'passwordForm': PasswordChangeForm(request.user),
+    }
+    return render(request, 'accounts/myAccount.html', context)

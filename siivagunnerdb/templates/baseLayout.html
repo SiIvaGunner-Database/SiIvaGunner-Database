@@ -4,7 +4,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="description" content="A searchable database of archived metadata from SiIvaGunner related channels and videos." />
-    <title>SiIvaGunner Database</title>
+    {% if title is not None %}
+      <title>{{ title }} - SiIvaGunner Database</title>
+    {% else %}
+      <title>SiIvaGunner Database</title>
+    {% endif %}
     <link rel="shortcut icon" type="image/ico" href="{% static 'favicon.ico' %}" />
     <link rel="stylesheet" href="{% static 'style.css' %}" />
     <!-- Google tag (gtag.js) -->

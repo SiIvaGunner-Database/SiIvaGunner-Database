@@ -1,5 +1,5 @@
 {% extends 'baseLayout.html' %}
-{% block content%}
+{% block content %}
   <h2>Search for videos in the database</h2>
   <form action="{% url 'videos:list' %}" method="post">
     {% csrf_token %}

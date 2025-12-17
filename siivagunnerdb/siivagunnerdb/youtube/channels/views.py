@@ -94,6 +94,7 @@ def channelList(request):
 
         # Return the page with the searched channels
         context = {
+            'title': 'Channels',
             'channels': channels,
             'searchUrl': search.getPathWithoutPageParameter(request),
             'resultCount': resultCount,
@@ -126,6 +127,7 @@ def channelDetails(request, id):
             video.publishedAt = video.publishedAt.strftime('%Y-%m-%d %H:%M:%S')
 
     context = {
+        'title': channel.title,
         'channel': channel,
         'videos': videos,
         'videoCount': videoCount,

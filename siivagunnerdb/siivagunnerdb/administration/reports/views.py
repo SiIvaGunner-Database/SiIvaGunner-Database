@@ -21,11 +21,15 @@ def reportAdd(request):
                 instance.author = request.user
 
             instance.save()
-            return redirect('videos:list')
+            return redirect('home')
     else:
         form = ReportAddForm()
 
-    return render(request, 'reports/reportAdd.html', { 'form':form })
+    context = {
+        'title': 'Reports'
+        'form': form,
+    }
+    return render(request, 'reports/reportAdd.html', context)
 
 
 class ReportViewSet(viewsets.ModelViewSet):

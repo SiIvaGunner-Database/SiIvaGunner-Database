@@ -1,6 +1,6 @@
 {% extends 'baseLayout.html' %}
-{% block content%}
-  <h2>Signup</h2>
+{% block content %}
+  <h2>Sign Up</h2>
   <form class="siteForm" action="{% url 'accounts:signup' %}" method="post">
     {% csrf_token %}
     {{ form }}

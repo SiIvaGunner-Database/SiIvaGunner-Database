@@ -49,15 +49,15 @@ def index(request):
 
 
 def generate(request):
-    return render(request, 'generate.html')
+    return render(request, 'generate.html', { 'title':'Rip Templates' })
 
 
 def reports(request):
-    return render(request, 'reports.html')
+    return render(request, 'reports.html', { 'title':'Forms' })
 
 
 def token(request):
-    return render(request, 'token.html')
+    return render(request, 'token.html', { 'title':'Authentication Tokens' })
 
 
 def jsonExceptionHandler(exc, context):

@@ -108,6 +108,7 @@ def videoList(request):
 
         # Return the page with the searched videos
         context = {
+            'title': 'Videos',
             'videos': videos,
             'first50Ids': ','.join(first50Ids),
             'searchUrl': search.getPathWithoutPageParameter(request),
@@ -129,7 +130,11 @@ def videoDetails(request, id):
     if video.publishedAt:
         video.publishedAt = video.publishedAt.strftime('%Y-%m-%d %H:%M:%S')
 
-    return render(request, 'videos/videoDetails.html', { 'video':video })
+    context = {
+        'title': video.title,
+        'video': video,
+    }
+    return render(request, 'videos/videoDetails.html', context)
 
 
 class VideoViewSet(MultipleModelViewSet):
