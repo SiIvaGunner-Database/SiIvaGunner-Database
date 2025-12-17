@@ -1,6 +1,6 @@
 {% extends 'baseLayout.html' %}
 {% load static %}
-{% block content%}
+{% block content %}
   <div class="channel">
     {% if channel.channelStatus == "Public" and thumbnail != "" or channel.channelStatus == "Public" and channel.bannerExternalUrl != "" %}
       <div id="channelImageDiv">

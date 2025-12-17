@@ -1,6 +1,6 @@
 {% extends 'baseLayout.html' %}
 {% load static %}
-{% block content%}
+{% block content %}
   <div class="video">
     <h2>
       {{ video.title }}
@@ -21,7 +21,10 @@
     <div class="gridDiv">
       <fieldset>
         <legend class="boldText">Video</legend>
-        <iframe id="videoEmbed" width="100%" height="315px" src="https://www.youtube.com/embed/{{ video.id }}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <iframe id="videoEmbed" width="100%" height="315px"
+          src="https://www.youtube.com/embed/{{ video.id }}" frameborder="0"
+          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+          referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
       </fieldset>
       <fieldset>
         <legend class="boldText">Description</legend>
