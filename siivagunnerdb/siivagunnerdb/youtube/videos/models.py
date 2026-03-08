@@ -53,6 +53,13 @@ class Video(StandardModel):
     def __str__(self):
         return self.title
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['publishedAt']),
+            models.Index(fields=["title"]),
+            models.Index(fields=["viewCount"]),
+        ]
+
 
 # # To be implemented later
 # class VideoCategory(StandardModel):

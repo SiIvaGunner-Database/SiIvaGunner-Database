@@ -47,3 +47,10 @@ class Channel(StandardModel):
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["publishedAt"]),
+            models.Index(fields=["title"]),
+            models.Index(fields=["subscriberCount"]),
+        ]
