@@ -58,6 +58,7 @@ class Video(StandardModel):
             models.Index(fields=['publishedAt']),
             models.Index(fields=["title"]),
             models.Index(fields=["viewCount"]),
+            models.Index(fields=['channel']),
         ]
 
 
