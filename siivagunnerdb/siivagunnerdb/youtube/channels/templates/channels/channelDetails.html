@@ -48,35 +48,10 @@
         <p>Country: <b>{{ channel.country|default:"N/A" }}</b></p>
         <p>Default Language: <b>{{ channel.defaultLanguage|default:"N/A" }}</b></p>
         <p>Hidden Subscriber Count: <b>{{ channel.hiddenSubscriberCount|default:False }}</b></p>
-        <p>Video Count: <b>{{ channel.videoCount|default:"N/A" }}</b></p>
+        <p>Video Count: <b>{{ channel.videoCount|default:"N/A" }}</b> (<a href="{% url 'videos:list' %}?channel={{ channel.id }}">View All</a>)</p>
         <p>View Count: <b>{{ channel.viewCount|default:"N/A" }}</b></p>
         <p>Subscriber Count: <b>{{ channel.subscriberCount|default:"N/A" }}</b></p>
       </fieldset>
     </div>
-    <h4>Recent Uploads (<a href="{% url 'videos:list' %}?channel={{ channel.id }}">View All</a>)</h4>
-    <table class="videos">
-      <tr class="video">
-        <th>Video Title</th>
-        <th>Video ID</th>
-        <th>Wiki Status</th>
-        <th>Video Status</th>
-        <th>Upload Date</th>
-        <th>Channel</th>
-        <th>Length</th>
-        <th>Views</th>
-      </tr>
-      {% for video in videos %}
-        <tr class="video">
-          <td><a href="{% url 'videos:details' video.id %}">{{ video.title }}</a></td>
-          <td><a href="https://www.youtube.com/watch?v={{ video.id }}" target="_blank">{{ video.id }}</a></td>
-          <td>{{ video.wikiStatus }}</td>
-          <td>{{ video.videoStatus }}</td>
-          <td>{{ video.publishedAt }}</td>
-          <td><a href="{% url 'channels:details' video.channel_id %}">{{ channel.title }}</a></td>
-          <td>{{ video.duration }}</td>
-          <td>{{ video.viewCount }}</td>
-        </tr>
-      {% endfor %}
-    </table>
   </div>
 {% endblock %}

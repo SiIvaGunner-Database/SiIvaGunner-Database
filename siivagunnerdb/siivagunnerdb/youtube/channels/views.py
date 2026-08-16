@@ -113,7 +113,6 @@ def channelDetails(request, id):
     channel = Channel.objects.get(visible=True, id=id)
     videos = Video.objects.filter(visible=True, channel__id=id)
     videoCount = videos.count()
-    videos = videos.order_by('-publishedAt')[:10]
     thumbnail = ""
 
     if channel.thumbnails and channel.thumbnails != "":
@@ -122,14 +121,9 @@ def channelDetails(request, id):
     if channel.publishedAt:
         channel.publishedAt = channel.publishedAt.strftime('%Y-%m-%d %H:%M:%S')
 
-    for video in videos:
-        if video.publishedAt:
-            video.publishedAt = video.publishedAt.strftime('%Y-%m-%d %H:%M:%S')
-
     context = {
         'title': channel.title,
         'channel': channel,
-        'videos': videos,
         'videoCount': videoCount,
         'thumbnail': thumbnail
     }
