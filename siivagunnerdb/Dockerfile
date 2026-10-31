@@ -1,11 +1,18 @@
 # Use an official lightweight Python image.
 # https://hub.docker.com/_/python
-FROM python:3.8-slim
+FROM python:3.14-slim
 
 ARG ENV_NAME
 
 ENV APP_HOME /app
 WORKDIR $APP_HOME
+
+# Install build-essential, GCC, and PostgreSQL development libraries
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install dependencies.
 COPY requirements.txt .
