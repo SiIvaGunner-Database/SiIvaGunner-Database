@@ -7,6 +7,13 @@ ARG ENV_NAME
 ENV APP_HOME /app
 WORKDIR $APP_HOME
 
+# Install build-essential, GCC, and PostgreSQL development libraries
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install dependencies.
 COPY requirements.txt .
 RUN pip install -r requirements.txt
