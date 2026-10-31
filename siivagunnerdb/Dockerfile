@@ -1,6 +1,6 @@
 # Use an official lightweight Python image.
 # https://hub.docker.com/_/python
-FROM python:3.8-slim
+FROM python:3.14-slim
 
 ARG ENV_NAME
 
