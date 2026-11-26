@@ -6,6 +6,7 @@ from django.db.models.functions import Lower
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
+from siivagunnerdb.administration.accounts.models import Favorite
 from siivagunnerdb.views import MultipleModelViewSet
 from siivagunnerdb.youtube.videos.models import Video
 from siivagunnerdb import search
@@ -124,6 +125,7 @@ def channelDetails(request, id):
     context = {
         'title': channel.title,
         'channel': channel,
+        'isFavorite': request.user.is_authenticated and Favorite.objects.filter(user=request.user, channel=channel).exists(),
         'videoCount': videoCount,
         'thumbnail': thumbnail
     }

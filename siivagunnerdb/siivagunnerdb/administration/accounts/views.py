@@ -3,9 +3,15 @@ from django.contrib.auth import login, logout, authenticate, update_session_auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordChangeForm
 from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
+from django.http import Http404
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.http import require_POST
+
+from siivagunnerdb.youtube.channels.models import Channel
+from siivagunnerdb.youtube.videos.models import Video
 
 from .forms import UsernameChangeForm
+from .models import Favorite
 
 
 def signupView(request):
@@ -101,5 +107,40 @@ def myAccountView(request):
         'title': 'Account',
         'usernameForm': UsernameChangeForm(),
         'passwordForm': PasswordChangeForm(request.user),
+        'favoriteChannels': Favorite.objects.filter(user=request.user, channel__visible=True).select_related('channel').order_by('-addDate'),
+        'favoriteVideos': Favorite.objects.filter(user=request.user, video__visible=True, video__channel__visible=True).select_related('video').order_by('-addDate'),
     }
     return render(request, 'accounts/myAccount.html', context)
+
+
+def getFavoriteTarget(objectType, id):
+    """
+    Return the favorite field name, the favorited object, and its details page URL name.
+    """
+    if objectType == 'video':
+        return 'video', get_object_or_404(Video, visible=True, channel__visible=True, id=id), 'videos:details'
+    elif objectType == 'channel':
+        return 'channel', get_object_or_404(Channel, visible=True, id=id), 'channels:details'
+    raise Http404()
+
+
+@require_POST
+@login_required()
+def addFavoriteView(request, objectType, id):
+    """
+    The add favorite redirect.
+    """
+    field, target, detailsUrlName = getFavoriteTarget(objectType, id)
+    Favorite.objects.get_or_create(user=request.user, **{field: target})
+    return redirect(detailsUrlName, id)
+
+
+@require_POST
+@login_required()
+def removeFavoriteView(request, objectType, id):
+    """
+    The remove favorite redirect.
+    """
+    field, target, detailsUrlName = getFavoriteTarget(objectType, id)
+    Favorite.objects.filter(user=request.user, **{field: target}).delete()
+    return redirect(detailsUrlName, id)

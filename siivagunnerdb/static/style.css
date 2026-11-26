@@ -222,6 +222,14 @@ p {
   background-color: #DDDDDD;
 }
 
+.favoriteDiv {
+  margin-bottom: 8px;
+}
+
+.favoriteList li {
+  margin-bottom: 6px;
+}
+
 .pageDiv {
   display: grid;
   grid-template-columns: 3fr 1fr;
