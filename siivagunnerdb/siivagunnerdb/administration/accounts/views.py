@@ -5,6 +5,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, Pass
 from django.contrib.auth.models import User
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from siivagunnerdb.youtube.channels.models import Channel
@@ -49,8 +50,11 @@ def loginView(request):
             user = form.get_user()
             login(request, user)
 
-            if 'next' in request.POST:
-                return redirect(request.POST.get('next'))
+            nextUrl = request.POST.get('next')
+
+            # Only follow the next URL if it points to this site
+            if nextUrl and url_has_allowed_host_and_scheme(nextUrl, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+                return redirect(nextUrl)
             else:
                 return redirect('home')
     else:

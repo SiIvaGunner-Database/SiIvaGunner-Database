@@ -53,3 +53,22 @@ class FavoriteTests(TestCase):
         self.client.force_login(self.user)
         self.assertEqual(self.client.post(reverse('accounts:addFavorite', args=['playlist', 'x'])).status_code, 404)
         self.assertEqual(self.client.get(reverse('accounts:addFavorite', args=['video', self.video.id])).status_code, 405)
+
+
+class LoginRedirectTests(TestCase):
+    def setUp(self):
+        User.objects.create_user(username='tester', password='pass12345!')
+
+    def login(self, nextUrl):
+        return self.client.post(reverse('accounts:login'), {'username': 'tester', 'password': 'pass12345!', 'next': nextUrl})
+
+    def test_local_next_is_followed(self):
+        self.assertRedirects(self.login('/accounts/myaccount/'), '/accounts/myaccount/', fetch_redirect_response=False)
+
+    def test_external_next_is_ignored(self):
+        for nextUrl in ['https://evil.example.com/', '//evil.example.com/', 'https:evil.example.com', r'\\evil.example.com', r'/\evil.example.com']:
+            self.client.logout()
+            self.assertRedirects(self.login(nextUrl), reverse('home'), fetch_redirect_response=False)
+
+    def test_missing_next_goes_home(self):
+        self.assertRedirects(self.client.post(reverse('accounts:login'), {'username': 'tester', 'password': 'pass12345!'}), reverse('home'), fetch_redirect_response=False)
