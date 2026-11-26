@@ -100,3 +100,83 @@ class LoginRedirectTests(TestCase):
 
     def test_missing_next_goes_home(self):
         self.assertRedirects(self.client.post(reverse('accounts:login'), {'username': 'tester', 'password': 'pass12345!'}), reverse('home'), fetch_redirect_response=False)
+
+
+class BlacklistSearchTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='tester', password='pass12345!')
+        self.otherUser = User.objects.create_user(username='other', password='pass12345!')
+        self.channelA = Channel.objects.create(id='UCaaaaaaaaaaaaaaaaaaaaaa', title='Channel A', visible=True)
+        self.channelB = Channel.objects.create(id='UCbbbbbbbbbbbbbbbbbbbbbb', title='Channel B', visible=True)
+        self.videoA1 = Video.objects.create(id='aaaaaaaaaa1', title='Rip A1', visible=True, channel=self.channelA)
+        self.videoA2 = Video.objects.create(id='aaaaaaaaaa2', title='Rip A2', visible=True, channel=self.channelA)
+        self.videoB1 = Video.objects.create(id='bbbbbbbbbb1', title='Rip B1', visible=True, channel=self.channelB)
+
+    def channelIds(self, query=''):
+        return {c.id for c in self.client.get(reverse('channels:list') + query).context['channels']}
+
+    def videoIds(self, query=''):
+        return {v.id for v in self.client.get(reverse('videos:list') + query).context['videos']}
+
+    def test_anonymous_sees_everything(self):
+        self.assertEqual(self.channelIds(), {self.channelA.id, self.channelB.id})
+        self.assertEqual(self.videoIds(), {self.videoA1.id, self.videoA2.id, self.videoB1.id})
+
+    def test_blacklisted_channel_hidden_with_its_videos(self):
+        BlacklistItem.objects.create(user=self.user, channel=self.channelA)
+        self.client.force_login(self.user)
+        self.assertEqual(self.channelIds(), {self.channelB.id})
+        self.assertEqual(self.videoIds(), {self.videoB1.id})
+        # Also when searching or filtering by that channel directly
+        self.assertEqual(self.videoIds('?search=Rip'), {self.videoB1.id})
+        self.assertEqual(self.videoIds('?channel=' + self.channelA.id), set())
+        self.assertEqual(self.channelIds('?search=Channel'), {self.channelB.id})
+
+    def test_blacklisted_video_hidden(self):
+        BlacklistItem.objects.create(user=self.user, video=self.videoA1)
+        self.client.force_login(self.user)
+        self.assertEqual(self.videoIds(), {self.videoA2.id, self.videoB1.id})
+        self.assertEqual(self.channelIds(), {self.channelA.id, self.channelB.id})
+
+    def test_other_users_blacklist_ignored(self):
+        BlacklistItem.objects.create(user=self.otherUser, channel=self.channelA)
+        BlacklistItem.objects.create(user=self.otherUser, video=self.videoB1)
+        self.client.force_login(self.user)
+        self.assertEqual(self.channelIds(), {self.channelA.id, self.channelB.id})
+        self.assertEqual(self.videoIds(), {self.videoA1.id, self.videoA2.id, self.videoB1.id})
+
+    def test_result_count_excludes_blacklist(self):
+        BlacklistItem.objects.create(user=self.user, channel=self.channelA)
+        self.client.force_login(self.user)
+        self.assertEqual(self.client.get(reverse('videos:list')).context['resultCount'], 1)
+
+
+class BlacklistIndexTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='tester', password='pass12345!')
+        fields = dict(visible=True, subscriberCount=1000, channelStatus='Public', channelType='Original')
+        self.channelA = Channel.objects.create(id='UCaaaaaaaaaaaaaaaaaaaaaa', title='Channel A', **fields)
+        self.channelB = Channel.objects.create(id='UCbbbbbbbbbbbbbbbbbbbbbb', title='Channel B', **fields)
+        Video.objects.create(id='aaaaaaaaaa1', title='Rip A1', visible=True, channel=self.channelA, videoStatus='Public')
+        Video.objects.create(id='bbbbbbbbbb1', title='Rip B1', visible=True, channel=self.channelB, videoStatus='Public')
+
+    def test_random_channel_excludes_blacklist(self):
+        BlacklistItem.objects.create(user=self.user, channel=self.channelA)
+        self.client.force_login(self.user)
+        for _ in range(20):
+            response = self.client.get(reverse('home'))
+            self.assertEqual(response.context['channel'].id, self.channelB.id)
+            self.assertEqual(response.context['video'].channel_id, self.channelB.id)
+
+    def test_random_video_excludes_blacklist(self):
+        Video.objects.create(id='aaaaaaaaaa2', title='Rip A2', visible=True, channel=self.channelA, videoStatus='Public')
+        BlacklistItem.objects.create(user=self.user, channel=self.channelB)
+        BlacklistItem.objects.create(user=self.user, video_id='aaaaaaaaaa1')
+        self.client.force_login(self.user)
+        for _ in range(20):
+            self.assertEqual(self.client.get(reverse('home')).context['video'].id, 'aaaaaaaaaa2')
+
+    def test_anonymous_can_get_any_channel(self):
+        BlacklistItem.objects.create(user=self.user, channel=self.channelA)
+        seen = {self.client.get(reverse('home')).context['channel'].id for _ in range(40)}
+        self.assertEqual(seen, {self.channelA.id, self.channelB.id})

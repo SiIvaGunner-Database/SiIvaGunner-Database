@@ -8,7 +8,6 @@ from django.urls import reverse
 
 from siivagunnerdb.administration.accounts.models import BlacklistItem, Favorite
 from siivagunnerdb.views import MultipleModelViewSet
-from siivagunnerdb.youtube.videos.models import Video
 from siivagunnerdb import search
 
 from .models import Channel
@@ -51,6 +50,9 @@ def channelList(request):
 
         # Query the search using any given filters or sorting
         channels = Channel.objects.filter(visible=True)
+        if request.user.is_authenticated:
+            blacklistedChannelIds = BlacklistItem.objects.filter(user=request.user, channel__isnull=False).values('channel_id')
+            channels = channels.exclude(id__in=blacklistedChannelIds)
         if searchTerms:
             channelsByTitle = channels.filter(title__icontains=searchTerms)
             channelsById = channels.filter(id__icontains=searchTerms)
@@ -112,8 +114,6 @@ def channelDetails(request, id):
     The channel details page.
     """
     channel = Channel.objects.get(visible=True, id=id)
-    videos = Video.objects.filter(visible=True, channel__id=id)
-    videoCount = videos.count()
     thumbnail = ""
 
     if channel.thumbnails and channel.thumbnails != "":
@@ -127,7 +127,6 @@ def channelDetails(request, id):
         'channel': channel,
         'isFavorite': request.user.is_authenticated and Favorite.objects.filter(user=request.user, channel=channel).exists(),
         'isBlacklisted': request.user.is_authenticated and BlacklistItem.objects.filter(user=request.user, channel=channel).exists(),
-        'videoCount': videoCount,
         'thumbnail': thumbnail
     }
     return render(request, 'channels/channelDetails.html', context)

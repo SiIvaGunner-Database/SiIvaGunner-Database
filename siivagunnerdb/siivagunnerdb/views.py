@@ -11,6 +11,7 @@ from rest_framework.views import exception_handler
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 
+from siivagunnerdb.administration.accounts.models import BlacklistItem
 from siivagunnerdb.settings import DEBUG
 from siivagunnerdb.youtube.channels.models import Channel
 from siivagunnerdb.youtube.videos.models import Video
@@ -19,6 +20,8 @@ from siivagunnerdb.youtube.videos.models import Video
 def index(request):
     # Find a random channel
     channels = Channel.objects.filter(visible=True, subscriberCount__gte=100, channelStatus='Public', channelType__in=['Original', 'Derivative'])
+    blacklist = BlacklistItem.objects.filter(user=request.user) if request.user.is_authenticated else BlacklistItem.objects.none()
+    channels = channels.exclude(id__in=blacklist.filter(channel__isnull=False).values('channel_id'))
     channel = None
     if channels.count() > 0:
         channel = channels[random.randrange(channels.count())]
@@ -27,6 +30,7 @@ def index(request):
 
     # Find a random video
     videos = Video.objects.filter(visible=True, channel__id=channel.id, videoStatus__in=['Public', 'Unlisted'])
+    videos = videos.exclude(id__in=blacklist.filter(video__isnull=False).values('video_id'))
     video = None
     if videos.count() > 0:
         video = videos[random.randrange(videos.count())]

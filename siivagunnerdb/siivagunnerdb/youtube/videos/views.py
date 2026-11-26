@@ -55,6 +55,11 @@ def videoList(request):
 
         # Query the search using any given filters or sorting
         videos = Video.objects.filter(visible=True, channel__visible=True)
+        if request.user.is_authenticated:
+            blacklist = BlacklistItem.objects.filter(user=request.user)
+            blacklistedVideoIds = blacklist.filter(video__isnull=False).values('video_id')
+            blacklistedChannelIds = blacklist.filter(channel__isnull=False).values('channel_id')
+            videos = videos.exclude(id__in=blacklistedVideoIds).exclude(channel__id__in=blacklistedChannelIds)
         if searchTerms:
             videosByTitle = videos.filter(title__icontains=searchTerms)
             videosByChannel = videos.filter(channel__title__icontains=searchTerms)
