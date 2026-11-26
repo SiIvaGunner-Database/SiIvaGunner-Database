@@ -34,19 +34,33 @@
         </a>
       {% endif %}
     </h2>
-    <div class="favoriteDiv">
+    <div class="userListButtons">
       {% if not user.is_authenticated %}
         <a class="buttonStyleLink" href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">Add favorite</a>
-      {% elif isFavorite %}
-        <form action="{% url 'accounts:removeFavorite' 'channel' channel.id %}" method="post">
-          {% csrf_token %}
-          <button type="submit">Remove favorite</button>
-        </form>
+        <a class="buttonStyleLink" href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">Add to blacklist</a>
       {% else %}
-        <form action="{% url 'accounts:addFavorite' 'channel' channel.id %}" method="post">
-          {% csrf_token %}
-          <button type="submit">Add favorite</button>
-        </form>
+        {% if isFavorite %}
+          <form action="{% url 'accounts:removeListItem' 'favorites' 'channel' channel.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Remove favorite</button>
+          </form>
+        {% else %}
+          <form action="{% url 'accounts:addListItem' 'favorites' 'channel' channel.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Add favorite</button>
+          </form>
+        {% endif %}
+        {% if isBlacklisted %}
+          <form action="{% url 'accounts:removeListItem' 'blacklist' 'channel' channel.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Remove from blacklist</button>
+          </form>
+        {% else %}
+          <form action="{% url 'accounts:addListItem' 'blacklist' 'channel' channel.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Add to blacklist</button>
+          </form>
+        {% endif %}
       {% endif %}
     </div>
     <hr />

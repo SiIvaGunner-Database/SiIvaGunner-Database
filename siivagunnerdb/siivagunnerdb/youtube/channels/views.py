@@ -6,7 +6,7 @@ from django.db.models.functions import Lower
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
-from siivagunnerdb.administration.accounts.models import Favorite
+from siivagunnerdb.administration.accounts.models import BlacklistItem, Favorite
 from siivagunnerdb.views import MultipleModelViewSet
 from siivagunnerdb.youtube.videos.models import Video
 from siivagunnerdb import search
@@ -126,6 +126,7 @@ def channelDetails(request, id):
         'title': channel.title,
         'channel': channel,
         'isFavorite': request.user.is_authenticated and Favorite.objects.filter(user=request.user, channel=channel).exists(),
+        'isBlacklisted': request.user.is_authenticated and BlacklistItem.objects.filter(user=request.user, channel=channel).exists(),
         'videoCount': videoCount,
         'thumbnail': thumbnail
     }

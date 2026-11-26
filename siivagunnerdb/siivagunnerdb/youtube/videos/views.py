@@ -4,7 +4,7 @@ from django.db.models.functions import Lower
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
-from siivagunnerdb.administration.accounts.models import Favorite
+from siivagunnerdb.administration.accounts.models import BlacklistItem, Favorite
 from siivagunnerdb.views import MultipleModelViewSet
 from siivagunnerdb import search
 
@@ -135,6 +135,7 @@ def videoDetails(request, id):
         'title': video.title,
         'video': video,
         'isFavorite': request.user.is_authenticated and Favorite.objects.filter(user=request.user, video=video).exists(),
+        'isBlacklisted': request.user.is_authenticated and BlacklistItem.objects.filter(user=request.user, video=video).exists(),
     }
     return render(request, 'videos/videoDetails.html', context)
 

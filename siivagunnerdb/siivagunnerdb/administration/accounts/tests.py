@@ -5,54 +5,82 @@ from django.urls import reverse
 from siivagunnerdb.youtube.channels.models import Channel
 from siivagunnerdb.youtube.videos.models import Video
 
-from .models import Favorite
+from .models import BlacklistItem, Favorite
+
+# (list type in URL, model, add label, remove label, account context prefix)
+LISTS = [
+    ('favorites', Favorite, 'Add favorite', 'Remove favorite', 'favorite'),
+    ('blacklist', BlacklistItem, 'Add to blacklist', 'Remove from blacklist', 'blacklist'),
+]
 
 
-class FavoriteTests(TestCase):
+class UserListTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='tester', password='pass12345!')
         self.channel = Channel.objects.create(id='UC9ecwl3FTG66jIKA9JRDtmg', title='SiIvaGunner', visible=True)
         self.video = Video.objects.create(id='abcdefghijk', title='Test Rip', visible=True, channel=self.channel)
 
-    def test_anonymous_sees_login_link(self):
+    def addUrl(self, listType, objectType, id):
+        return reverse('accounts:addListItem', args=[listType, objectType, id])
+
+    def removeUrl(self, listType, objectType, id):
+        return reverse('accounts:removeListItem', args=[listType, objectType, id])
+
+    def test_anonymous_sees_login_links(self):
         for url in [reverse('videos:details', args=[self.video.id]), reverse('channels:details', args=[self.channel.id])]:
             response = self.client.get(url)
-            self.assertContains(response, reverse('accounts:login') + '?next=')
+            self.assertContains(response, reverse('accounts:login') + '?next=', count=2)
             self.assertContains(response, 'Add favorite')
+            self.assertContains(response, 'Add to blacklist')
 
     def test_anonymous_post_redirects_to_login(self):
-        response = self.client.post(reverse('accounts:addFavorite', args=['video', self.video.id]))
-        self.assertRedirects(response, reverse('accounts:login') + '?next=' + reverse('accounts:addFavorite', args=['video', self.video.id]), fetch_redirect_response=False)
-        self.assertFalse(Favorite.objects.exists())
+        for listType, model, *_ in LISTS:
+            url = self.addUrl(listType, 'video', self.video.id)
+            self.assertRedirects(self.client.post(url), reverse('accounts:login') + '?next=' + url, fetch_redirect_response=False)
+            self.assertFalse(model.objects.exists())
 
-    def test_add_and_remove_video_favorite(self):
+    def test_add_and_remove_video(self):
         self.client.force_login(self.user)
         detailsUrl = reverse('videos:details', args=[self.video.id])
-        self.assertContains(self.client.get(detailsUrl), 'Add favorite')
+        for listType, model, addLabel, removeLabel, _ in LISTS:
+            with self.subTest(listType=listType):
+                self.assertContains(self.client.get(detailsUrl), addLabel)
 
-        self.assertRedirects(self.client.post(reverse('accounts:addFavorite', args=['video', self.video.id])), detailsUrl)
-        self.client.post(reverse('accounts:addFavorite', args=['video', self.video.id]))  # duplicate is a no-op
-        self.assertEqual(Favorite.objects.filter(user=self.user, video=self.video).count(), 1)
-        self.assertContains(self.client.get(detailsUrl), 'Remove favorite')
+                self.assertRedirects(self.client.post(self.addUrl(listType, 'video', self.video.id)), detailsUrl)
+                self.client.post(self.addUrl(listType, 'video', self.video.id))  # duplicate is a no-op
+                self.assertEqual(model.objects.filter(user=self.user, video=self.video).count(), 1)
+                self.assertContains(self.client.get(detailsUrl), removeLabel)
 
-        self.client.post(reverse('accounts:removeFavorite', args=['video', self.video.id]))
-        self.assertFalse(Favorite.objects.exists())
+                self.client.post(self.removeUrl(listType, 'video', self.video.id))
+                self.assertFalse(model.objects.exists())
 
-    def test_add_channel_favorite_and_account_page(self):
+    def test_lists_are_independent(self):
         self.client.force_login(self.user)
-        self.client.post(reverse('accounts:addFavorite', args=['channel', self.channel.id]))
-        self.client.post(reverse('accounts:addFavorite', args=['video', self.video.id]))
-        self.assertContains(self.client.get(reverse('channels:details', args=[self.channel.id])), 'Remove favorite')
+        self.client.post(self.addUrl('favorites', 'channel', self.channel.id))
+        response = self.client.get(reverse('channels:details', args=[self.channel.id]))
+        self.assertContains(response, 'Remove favorite')
+        self.assertContains(response, 'Add to blacklist')
+        self.assertFalse(BlacklistItem.objects.exists())
+
+    def test_account_page_lists(self):
+        self.client.force_login(self.user)
+        for listType, *_ in LISTS:
+            self.client.post(self.addUrl(listType, 'channel', self.channel.id))
+            self.client.post(self.addUrl(listType, 'video', self.video.id))
 
         response = self.client.get(reverse('accounts:myAccount'))
-        self.assertEqual(list(response.context['favoriteChannels'].values_list('channel_id', flat=True)), [self.channel.id])
-        self.assertEqual(list(response.context['favoriteVideos'].values_list('video_id', flat=True)), [self.video.id])
+        for _, _, _, _, prefix in LISTS:
+            self.assertEqual(list(response.context[prefix + 'Channels'].values_list('channel_id', flat=True)), [self.channel.id])
+            self.assertEqual(list(response.context[prefix + 'Videos'].values_list('video_id', flat=True)), [self.video.id])
+        self.assertContains(response, 'Blacklisted Channels')
+        self.assertContains(response, 'Blacklisted Videos')
         self.assertNotContains(response, 'early stages')
 
     def test_invalid_type_and_get_rejected(self):
         self.client.force_login(self.user)
-        self.assertEqual(self.client.post(reverse('accounts:addFavorite', args=['playlist', 'x'])).status_code, 404)
-        self.assertEqual(self.client.get(reverse('accounts:addFavorite', args=['video', self.video.id])).status_code, 405)
+        self.assertEqual(self.client.post(self.addUrl('favorites', 'playlist', 'x')).status_code, 404)
+        self.assertEqual(self.client.post(self.addUrl('watchlist', 'video', self.video.id)).status_code, 404)
+        self.assertEqual(self.client.get(self.addUrl('blacklist', 'video', self.video.id)).status_code, 405)
 
 
 class LoginRedirectTests(TestCase):

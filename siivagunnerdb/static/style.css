@@ -222,11 +222,22 @@ p {
   background-color: #DDDDDD;
 }
 
-.favoriteDiv {
+.userListButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-bottom: 8px;
 }
 
-.favoriteList li {
+.userListButtons form, .userListButtons button, .userListButtons a {
+  margin: 0;
+}
+
+.userListButtons a, .userListButtons a:hover {
+  color: black;
+}
+
+.userList li {
   margin-bottom: 6px;
 }
 

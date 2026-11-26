@@ -8,6 +8,6 @@ urlpatterns = [
     path('login/', views.loginView, name='login'),
     path('logout/', views.logoutView, name='logout'),
     path('myaccount/', views.myAccountView, name='myAccount'),
-    path('favorites/<str:objectType>/<slug:id>/add/', views.addFavoriteView, name='addFavorite'),
-    path('favorites/<str:objectType>/<slug:id>/remove/', views.removeFavoriteView, name='removeFavorite'),
+    path('<str:listType>/<str:objectType>/<slug:id>/add/', views.addListItemView, name='addListItem'),
+    path('<str:listType>/<str:objectType>/<slug:id>/remove/', views.removeListItemView, name='removeListItem'),
 ]

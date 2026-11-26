@@ -12,7 +12,7 @@ from siivagunnerdb.youtube.channels.models import Channel
 from siivagunnerdb.youtube.videos.models import Video
 
 from .forms import UsernameChangeForm
-from .models import Favorite
+from .models import BlacklistItem, Favorite
 
 
 def signupView(request):
@@ -113,38 +113,49 @@ def myAccountView(request):
         'passwordForm': PasswordChangeForm(request.user),
         'favoriteChannels': Favorite.objects.filter(user=request.user, channel__visible=True).select_related('channel').order_by('-addDate'),
         'favoriteVideos': Favorite.objects.filter(user=request.user, video__visible=True, video__channel__visible=True).select_related('video').order_by('-addDate'),
+        'blacklistChannels': BlacklistItem.objects.filter(user=request.user, channel__visible=True).select_related('channel').order_by('-addDate'),
+        'blacklistVideos': BlacklistItem.objects.filter(user=request.user, video__visible=True, video__channel__visible=True).select_related('video').order_by('-addDate'),
     }
     return render(request, 'accounts/myAccount.html', context)
 
 
-def getFavoriteTarget(objectType, id):
+LIST_MODELS = {
+    'favorites': Favorite,
+    'blacklist': BlacklistItem,
+}
+
+
+def getListItemTarget(listType, objectType, id):
     """
-    Return the favorite field name, the favorited object, and its details page URL name.
+    Return the list model, the item field name, the target object, and its details page URL name.
     """
+    model = LIST_MODELS.get(listType)
+    if model is None:
+        raise Http404()
     if objectType == 'video':
-        return 'video', get_object_or_404(Video, visible=True, channel__visible=True, id=id), 'videos:details'
+        return model, 'video', get_object_or_404(Video, visible=True, channel__visible=True, id=id), 'videos:details'
     elif objectType == 'channel':
-        return 'channel', get_object_or_404(Channel, visible=True, id=id), 'channels:details'
+        return model, 'channel', get_object_or_404(Channel, visible=True, id=id), 'channels:details'
     raise Http404()
 
 
 @require_POST
 @login_required()
-def addFavoriteView(request, objectType, id):
+def addListItemView(request, listType, objectType, id):
     """
-    The add favorite redirect.
+    The add favorite / blacklist item redirect.
     """
-    field, target, detailsUrlName = getFavoriteTarget(objectType, id)
-    Favorite.objects.get_or_create(user=request.user, **{field: target})
+    model, field, target, detailsUrlName = getListItemTarget(listType, objectType, id)
+    model.objects.get_or_create(user=request.user, **{field: target})
     return redirect(detailsUrlName, id)
 
 
 @require_POST
 @login_required()
-def removeFavoriteView(request, objectType, id):
+def removeListItemView(request, listType, objectType, id):
     """
-    The remove favorite redirect.
+    The remove favorite / blacklist item redirect.
     """
-    field, target, detailsUrlName = getFavoriteTarget(objectType, id)
-    Favorite.objects.filter(user=request.user, **{field: target}).delete()
+    model, field, target, detailsUrlName = getListItemTarget(listType, objectType, id)
+    model.objects.filter(user=request.user, **{field: target}).delete()
     return redirect(detailsUrlName, id)

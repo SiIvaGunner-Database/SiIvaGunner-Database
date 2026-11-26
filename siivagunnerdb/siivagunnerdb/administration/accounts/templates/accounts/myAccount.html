@@ -6,7 +6,7 @@
     <div class="gridDiv">
       <fieldset>
         <legend class="boldText">Favorite Channels</legend>
-        <ul class="favoriteList">
+        <ul class="userList">
           {% for favorite in favoriteChannels %}
             <li><a href="{% url 'channels:details' favorite.channel_id %}">{{ favorite.channel.title|default:favorite.channel_id }}</a></li>
           {% empty %}
@@ -16,11 +16,34 @@
       </fieldset>
       <fieldset>
         <legend class="boldText">Favorite Videos</legend>
-        <ul class="favoriteList">
+        <ul class="userList">
           {% for favorite in favoriteVideos %}
             <li><a href="{% url 'videos:details' favorite.video_id %}">{{ favorite.video.title|default:favorite.video_id }}</a></li>
           {% empty %}
             <li class="smallText">No favorite videos yet.</li>
+          {% endfor %}
+        </ul>
+      </fieldset>
+    </div>
+    <hr />
+    <div class="gridDiv">
+      <fieldset>
+        <legend class="boldText">Blacklisted Channels</legend>
+        <ul class="userList">
+          {% for item in blacklistChannels %}
+            <li><a href="{% url 'channels:details' item.channel_id %}">{{ item.channel.title|default:item.channel_id }}</a></li>
+          {% empty %}
+            <li class="smallText">No blacklisted channels yet.</li>
+          {% endfor %}
+        </ul>
+      </fieldset>
+      <fieldset>
+        <legend class="boldText">Blacklisted Videos</legend>
+        <ul class="userList">
+          {% for item in blacklistVideos %}
+            <li><a href="{% url 'videos:details' item.video_id %}">{{ item.video.title|default:item.video_id }}</a></li>
+          {% empty %}
+            <li class="smallText">No blacklisted videos yet.</li>
           {% endfor %}
         </ul>
       </fieldset>
