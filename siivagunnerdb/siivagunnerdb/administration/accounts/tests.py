@@ -207,3 +207,130 @@ class IndexQueryTests(TestCase):
             self.assertEqual(self.client.get(reverse('home')).status_code, 200)
         counts = [q['sql'] for q in queries.captured_queries if 'COUNT(' in q['sql']]
         self.assertEqual(len(counts), 2)  # one for channels, one for that channel's videos
+
+
+class SignupTests(TestCase):
+    def test_signup_creates_user_and_logs_in(self):
+        response = self.client.post(reverse('accounts:signup'), {
+            'username': 'newuser', 'password1': 'a-Strong-pass-123', 'password2': 'a-Strong-pass-123',
+        })
+        self.assertRedirects(response, reverse('home'), fetch_redirect_response=False)
+        self.assertTrue(User.objects.filter(username='newuser').exists())
+        self.assertEqual(self.client.get(reverse('accounts:myAccount')).status_code, 200)
+
+    def test_signup_rejects_weak_or_mismatched_passwords(self):
+        for password1, password2 in [('123', '123'), ('a-Strong-pass-123', 'different-pass-456'), ('password', 'password')]:
+            with self.subTest(password1=password1):
+                response = self.client.post(reverse('accounts:signup'), {
+                    'username': 'newuser', 'password1': password1, 'password2': password2,
+                })
+                self.assertEqual(response.status_code, 200)
+        self.assertFalse(User.objects.filter(username='newuser').exists())
+
+    def test_signup_rejects_taken_username(self):
+        User.objects.create_user(username='taken', password='pass12345!')
+        response = self.client.post(reverse('accounts:signup'), {
+            'username': 'taken', 'password1': 'a-Strong-pass-123', 'password2': 'a-Strong-pass-123',
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(User.objects.filter(username='taken').count(), 1)
+
+
+class LoginTests(TestCase):
+    def test_wrong_password_is_rejected(self):
+        User.objects.create_user(username='tester', password='pass12345!')
+        response = self.client.post(reverse('accounts:login'), {'username': 'tester', 'password': 'wrong'})
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('_auth_user_id', self.client.session)
+
+    def test_login_page_keeps_next_parameter(self):
+        response = self.client.get(reverse('accounts:login') + '?next=/videos/abc/')
+        self.assertContains(response, 'name="next" value="/videos/abc/"')
+
+
+class AccountSettingsTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='tester', password='old-Pass-12345')
+        self.client.force_login(self.user)
+
+    def test_account_page_requires_login(self):
+        self.client.logout()
+        response = self.client.get(reverse('accounts:myAccount'))
+        self.assertRedirects(response, reverse('accounts:login') + '?next=' + reverse('accounts:myAccount'), fetch_redirect_response=False)
+
+    def test_change_username(self):
+        response = self.client.post(reverse('accounts:myAccount'), {'saveUsername': '1', 'username': 'renamed'}, follow=True)
+        self.assertContains(response, 'Your username was successfully changed!')
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.username, 'renamed')
+
+    def test_change_username_rejects_taken_or_invalid_names(self):
+        User.objects.create_user(username='taken', password='pass12345!')
+        for username in ['taken', 'bad name!']:
+            with self.subTest(username=username):
+                response = self.client.post(reverse('accounts:myAccount'), {'saveUsername': '1', 'username': username}, follow=True)
+                self.assertContains(response, 'The username you entered is either taken or contains invalid characters.')
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.username, 'tester')
+
+    def test_change_password_keeps_session(self):
+        response = self.client.post(reverse('accounts:myAccount'), {
+            'savePassword': '1', 'old_password': 'old-Pass-12345',
+            'new_password1': 'new-Pass-67890', 'new_password2': 'new-Pass-67890',
+        }, follow=True)
+        self.assertContains(response, 'Your password was successfully changed!')
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password('new-Pass-67890'))
+        self.assertEqual(self.client.get(reverse('accounts:myAccount')).status_code, 200)  # still logged in
+
+    def test_change_password_requires_old_password(self):
+        response = self.client.post(reverse('accounts:myAccount'), {
+            'savePassword': '1', 'old_password': 'wrong',
+            'new_password1': 'new-Pass-67890', 'new_password2': 'new-Pass-67890',
+        }, follow=True)
+        self.assertContains(response, 'Please make sure the password fits the criteria.')
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password('old-Pass-12345'))
+
+
+class UserListModelTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='tester', password='pass12345!')
+        self.channel = Channel.objects.create(id='UC9ecwl3FTG66jIKA9JRDtmg', title='SiIvaGunner', visible=True)
+        self.video = Video.objects.create(id='abcdefghijk', title='Test Rip', visible=True, channel=self.channel)
+
+    def test_item_must_have_exactly_one_target(self):
+        from django.db import IntegrityError, transaction
+        for model in [Favorite, BlacklistItem]:
+            for kwargs in [{}, {'video': self.video, 'channel': self.channel}]:
+                with self.subTest(model=model.__name__, kwargs=list(kwargs)):
+                    with self.assertRaises(IntegrityError), transaction.atomic():
+                        model.objects.create(user=self.user, **kwargs)
+
+    def test_items_are_unique_per_user(self):
+        from django.db import IntegrityError, transaction
+        other = User.objects.create_user(username='other', password='pass12345!')
+        for model in [Favorite, BlacklistItem]:
+            with self.subTest(model=model.__name__):
+                model.objects.create(user=self.user, video=self.video)
+                model.objects.create(user=other, video=self.video)  # another user may save the same video
+                with self.assertRaises(IntegrityError), transaction.atomic():
+                    model.objects.create(user=self.user, video=self.video)
+
+    def test_items_are_deleted_with_their_user_or_target(self):
+        for model in [Favorite, BlacklistItem]:
+            model.objects.create(user=self.user, video=self.video)
+            model.objects.create(user=self.user, channel=self.channel)
+        self.video.delete()
+        self.assertFalse(Favorite.objects.filter(video__isnull=False).exists())
+        self.assertEqual(BlacklistItem.objects.count(), 1)
+        self.user.delete()
+        self.assertFalse(Favorite.objects.exists() or BlacklistItem.objects.exists())
+
+    def test_admin_lists_render(self):
+        admin = User.objects.create_superuser('admin', 'admin@example.com', 'pass12345!')
+        Favorite.objects.create(user=self.user, video=self.video)
+        self.client.force_login(admin)
+        for name in ['favorite', 'blacklistitem']:
+            with self.subTest(model=name):
+                self.assertEqual(self.client.get(reverse(f'admin:accounts_{name}_changelist')).status_code, 200)
