@@ -9,7 +9,7 @@ from .models import BlacklistItem, Favorite
 
 # (list type in URL, model, add label, remove label, account context prefix)
 LISTS = [
-    ('favorites', Favorite, 'Add favorite', 'Remove favorite', 'favorite'),
+    ('favorites', Favorite, 'Add to favorites', 'Remove from favorites', 'favorite'),
     ('blacklist', BlacklistItem, 'Add to blacklist', 'Remove from blacklist', 'blacklist'),
 ]
 
@@ -30,7 +30,7 @@ class UserListTests(TestCase):
         for url in [reverse('videos:details', args=[self.video.id]), reverse('channels:details', args=[self.channel.id])]:
             response = self.client.get(url)
             self.assertContains(response, reverse('accounts:login') + '?next=', count=2)
-            self.assertContains(response, 'Add favorite')
+            self.assertContains(response, 'Add to favorites')
             self.assertContains(response, 'Add to blacklist')
 
     def test_anonymous_post_redirects_to_login(self):
@@ -58,7 +58,7 @@ class UserListTests(TestCase):
         self.client.force_login(self.user)
         self.client.post(self.addUrl('favorites', 'channel', self.channel.id))
         response = self.client.get(reverse('channels:details', args=[self.channel.id]))
-        self.assertContains(response, 'Remove favorite')
+        self.assertContains(response, 'Remove from favorites')
         self.assertContains(response, 'Add to blacklist')
         self.assertFalse(BlacklistItem.objects.exists())
 

@@ -19,7 +19,7 @@
     </h2>
     <div class="userListButtons">
       {% if not user.is_authenticated %}
-        <a class="buttonStyleLink" href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">Add favorite</a>
+        <a class="buttonStyleLink" href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">Add to favorites</a>
         <a class="buttonStyleLink" href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">Add to blacklist</a>
       {% else %}
         {% if isFavorite %}

@@ -28,6 +28,10 @@ env.read_env(io.StringIO(payload))
 DEBUG = False
 SECRET_KEY = env('SECRET_KEY')
 DATABASES = {'default': env.db()}
+# Reuse database connections across requests instead of opening one per request.
+# Values set in the DATABASE_URL (e.g. ?conn_max_age=0) take precedence.
+DATABASES['default'].setdefault('CONN_MAX_AGE', 60)
+DATABASES['default'].setdefault('CONN_HEALTH_CHECKS', True)
 
 # App settings
 INSTALLED_APPS += ['storages'] # for django-storages
