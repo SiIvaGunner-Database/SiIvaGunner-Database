@@ -42,12 +42,12 @@
         {% if isFavorite %}
           <form action="{% url 'accounts:removeListItem' 'favorites' 'channel' channel.id %}" method="post">
             {% csrf_token %}
-            <button type="submit">Remove favorite</button>
+            <button type="submit">Remove from favorites</button>
           </form>
         {% else %}
           <form action="{% url 'accounts:addListItem' 'favorites' 'channel' channel.id %}" method="post">
             {% csrf_token %}
-            <button type="submit">Add favorite</button>
+            <button type="submit">Add to favorites</button>
           </form>
         {% endif %}
         {% if isBlacklisted %}
