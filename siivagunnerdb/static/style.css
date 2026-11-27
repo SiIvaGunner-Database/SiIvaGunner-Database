@@ -222,15 +222,12 @@ p {
   background-color: #DDDDDD;
 }
 
-.userListButtons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 8px;
+.userListButtons form {
+  display: inline;
 }
 
-.userListButtons form, .userListButtons button, .userListButtons a {
-  margin: 0;
+.userListButtons button, .userListButtons a {
+  display: inline-block;
 }
 
 .userListButtons a, .userListButtons a:hover {
