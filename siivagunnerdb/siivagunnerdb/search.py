@@ -13,7 +13,7 @@ def convertFormParamsToQueryParams(request, parameterNames):
 
     # Check for POST parameters and encode them as strings in the format "param=value"
     for name in parameterNames:
-        if request.POST[name] is not None:
+        if request.POST.get(name) is not None:
             queryMap = { name: request.POST[name] }
             queryString =  urlencode(queryMap)
             parameters.append(queryString)
@@ -27,6 +27,24 @@ def convertFormParamsToQueryParams(request, parameterNames):
         paramChar = '&'
 
     return queryParamsString
+
+
+def parseInteger(value):
+    """
+    Return the value as an integer, or None if it is missing or not a whole number.
+    """
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def parsePageNumber(value):
+    """
+    Return the page number from a query parameter, defaulting to 1 when it is missing, invalid, or below 1.
+    """
+    page = parseInteger(value)
+    return page if page is not None and page >= 1 else 1
 
 
 def getPageNumbers(resultCount, currentPage):
@@ -92,7 +110,7 @@ def getPathWithoutPageParameter(request):
     else:
         # Else return "/path/?param=value&param=value&"
         url = request.get_full_path()
-        url = re.sub('\?.*', '?', url, flags=re.DOTALL)
+        url = re.sub(r'\?.*', '?', url, flags=re.DOTALL)
 
         # Add each individual "parameter=value&"
         for name in request.GET:

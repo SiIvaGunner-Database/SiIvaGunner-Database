@@ -49,13 +49,14 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'siivagunnerdb.middleware.ApiGZipMiddleware', # first, so it compresses the final response
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.middleware.security.SecurityMiddleware',
 ]
 
 ROOT_URLCONF = 'siivagunnerdb.urls'

@@ -26,7 +26,7 @@ def reportAdd(request):
         form = ReportAddForm()
 
     context = {
-        'title': 'Reports'
+        'title': 'Reports',
         'form': form,
     }
     return render(request, 'reports/reportAdd.html', context)

@@ -1,10 +1,13 @@
 from datetime import datetime
 
+from django.db.models import Q
 from django.db.models.functions import Lower
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
+from siivagunnerdb.administration.accounts.models import BlacklistItem, Favorite
 from siivagunnerdb.views import MultipleModelViewSet
+from siivagunnerdb.youtube.channels.models import Channel
 from siivagunnerdb import search
 
 from .models import Video
@@ -32,9 +35,9 @@ def videoList(request):
         order = request.GET.get('order')
         filter = request.GET.get('filter')
         channelType = request.GET.get('channelType')
-        minimumSubscribers = request.GET.get('minimumSubscribers')
+        minimumSubscribers = search.parseInteger(request.GET.get('minimumSubscribers'))
         channelId = request.GET.get('channel')
-        currentPage = request.GET.get('page')
+        currentPage = search.parsePageNumber(request.GET.get('page'))
 
         # Set applicable default parameter values
         sortOptions = ['publishedAt', 'title', 'viewCount',]
@@ -45,20 +48,21 @@ def videoList(request):
             filter = None
         else:
             filter = filter.capitalize()
-        if currentPage:
-            currentPage = abs(int(currentPage))
-        else:
-            currentPage = 1
         executionTime = (datetime.utcnow() - startTime).total_seconds()
         print('Video search paramater execution time in seconds: ' + str(executionTime))
 
         # Query the search using any given filters or sorting
         videos = Video.objects.filter(visible=True, channel__visible=True)
+        if request.user.is_authenticated:
+            blacklist = BlacklistItem.objects.filter(user=request.user)
+            blacklistedVideoIds = blacklist.filter(video__isnull=False).values('video_id')
+            blacklistedChannelIds = blacklist.filter(channel__isnull=False).values('channel_id')
+            videos = videos.exclude(id__in=blacklistedVideoIds).exclude(channel__id__in=blacklistedChannelIds)
         if searchTerms:
-            videosByTitle = videos.filter(title__icontains=searchTerms)
-            videosByChannel = videos.filter(channel__title__icontains=searchTerms)
-            videosById = videos.filter(id__icontains=searchTerms)
-            videos = (videosByTitle | videosById | videosByChannel)
+            # Match channel titles with a subquery on the small channel table so that every condition
+            # is on the video table, letting the database combine the video title and ID indexes
+            matchingChannelIds = Channel.objects.filter(title__icontains=searchTerms).values('id')
+            videos = videos.filter(Q(title__icontains=searchTerms) | Q(id__icontains=searchTerms) | Q(channel__id__in=matchingChannelIds))
         if channelId:
             videos = videos.filter(channel__id=channelId)
         elif channelType == 'original':
@@ -70,7 +74,7 @@ def videoList(request):
                 videos = videos.filter(wikiStatus=filter)
             else:
                 videos = videos.filter(videoStatus=filter)
-        if minimumSubscribers:
+        if minimumSubscribers is not None:
             videos = videos.filter(channel__subscriberCount__gte=minimumSubscribers)
         if order == 'ascending':
             if sort != 'title':
@@ -82,6 +86,9 @@ def videoList(request):
                 videos = videos.order_by('-' + sort)
             else:
                 videos = videos.order_by(Lower(sort).desc())
+
+        # Load only the columns shown in the results table
+        videos = videos.only('id', 'title', 'wikiStatus', 'videoStatus', 'publishedAt', 'channel', 'channelTitle', 'duration', 'viewCount')
         executionTime = (datetime.utcnow() - startTime).total_seconds()
         print('Video search filter execution time in seconds: ' + str(executionTime))
 
@@ -125,7 +132,7 @@ def videoDetails(request, id):
     """
     The video details page.
     """
-    video = Video.objects.get(visible=True, channel__visible=True, id=id)
+    video = get_object_or_404(Video, visible=True, channel__visible=True, id=id)
 
     if video.publishedAt:
         video.publishedAt = video.publishedAt.strftime('%Y-%m-%d %H:%M:%S')
@@ -133,6 +140,8 @@ def videoDetails(request, id):
     context = {
         'title': video.title,
         'video': video,
+        'isFavorite': request.user.is_authenticated and Favorite.objects.filter(user=request.user, video=video).exists(),
+        'isBlacklisted': request.user.is_authenticated and BlacklistItem.objects.filter(user=request.user, video=video).exists(),
     }
     return render(request, 'videos/videoDetails.html', context)
 

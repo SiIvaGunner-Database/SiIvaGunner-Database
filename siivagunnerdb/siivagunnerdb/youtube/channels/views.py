@@ -3,11 +3,11 @@ import json
 from datetime import datetime
 
 from django.db.models.functions import Lower
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
+from siivagunnerdb.administration.accounts.models import BlacklistItem, Favorite
 from siivagunnerdb.views import MultipleModelViewSet
-from siivagunnerdb.youtube.videos.models import Video
 from siivagunnerdb import search
 
 from .models import Channel
@@ -34,22 +34,21 @@ def channelList(request):
         sort = request.GET.get('sort')
         order = request.GET.get('order')
         channelType = request.GET.get('channelType')
-        minimumSubscribers = request.GET.get('minimumSubscribers')
-        currentPage = request.GET.get('page')
+        minimumSubscribers = search.parseInteger(request.GET.get('minimumSubscribers'))
+        currentPage = search.parsePageNumber(request.GET.get('page'))
 
         # Set applicable default parameter values
         sortOptions = ['publishedAt', 'title', 'subscriberCount',]
         if sort is None or sort not in sortOptions:
             sort = 'publishedAt'
-        if currentPage:
-            currentPage = abs(int(currentPage))
-        else:
-            currentPage = 1
         executionTime = (datetime.utcnow() - startTime).total_seconds()
         print('Channel search paramater execution time in seconds: ' + str(executionTime))
 
         # Query the search using any given filters or sorting
         channels = Channel.objects.filter(visible=True)
+        if request.user.is_authenticated:
+            blacklistedChannelIds = BlacklistItem.objects.filter(user=request.user, channel__isnull=False).values('channel_id')
+            channels = channels.exclude(id__in=blacklistedChannelIds)
         if searchTerms:
             channelsByTitle = channels.filter(title__icontains=searchTerms)
             channelsById = channels.filter(id__icontains=searchTerms)
@@ -58,7 +57,7 @@ def channelList(request):
             channels = channels.filter(channelType='Original')
         elif channelType == 'derivative':
             channels = channels.exclude(channelType='Influenced')
-        if minimumSubscribers:
+        if minimumSubscribers is not None:
             channels = channels.filter(subscriberCount__gte=minimumSubscribers)
         if order == 'ascending':
             if sort != 'title':
@@ -70,6 +69,9 @@ def channelList(request):
                 channels = channels.order_by('-' + sort)
             else:
                 channels = channels.order_by(Lower(sort).desc())
+
+        # Load only the columns shown in the results table
+        channels = channels.only('id', 'title', 'channelStatus', 'publishedAt', 'subscriberCount')
         executionTime = (datetime.utcnow() - startTime).total_seconds()
         print('Channel search filter execution time in seconds: ' + str(executionTime))
 
@@ -110,9 +112,7 @@ def channelDetails(request, id):
     """
     The channel details page.
     """
-    channel = Channel.objects.get(visible=True, id=id)
-    videos = Video.objects.filter(visible=True, channel__id=id)
-    videoCount = videos.count()
+    channel = get_object_or_404(Channel, visible=True, id=id)
     thumbnail = ""
 
     if channel.thumbnails and channel.thumbnails != "":
@@ -124,7 +124,8 @@ def channelDetails(request, id):
     context = {
         'title': channel.title,
         'channel': channel,
-        'videoCount': videoCount,
+        'isFavorite': request.user.is_authenticated and Favorite.objects.filter(user=request.user, channel=channel).exists(),
+        'isBlacklisted': request.user.is_authenticated and BlacklistItem.objects.filter(user=request.user, channel=channel).exists(),
         'thumbnail': thumbnail
     }
     return render(request, 'channels/channelDetails.html', context)

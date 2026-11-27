@@ -222,6 +222,25 @@ p {
   background-color: #DDDDDD;
 }
 
+.userListButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.userListButtons form, .userListButtons button, .userListButtons a {
+  margin: 0;
+}
+
+.userListButtons a, .userListButtons a:hover {
+  color: black;
+}
+
+.userList li {
+  margin-bottom: 6px;
+}
+
 .pageDiv {
   display: grid;
   grid-template-columns: 3fr 1fr;

@@ -34,6 +34,35 @@
         </a>
       {% endif %}
     </h2>
+    <div class="userListButtons">
+      {% if not user.is_authenticated %}
+        <a class="buttonStyleLink" href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">Add to favorites</a>
+        <a class="buttonStyleLink" href="{% url 'accounts:login' %}?next={{ request.path|urlencode }}">Add to blacklist</a>
+      {% else %}
+        {% if isFavorite %}
+          <form action="{% url 'accounts:removeListItem' 'favorites' 'channel' channel.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Remove from favorites</button>
+          </form>
+        {% else %}
+          <form action="{% url 'accounts:addListItem' 'favorites' 'channel' channel.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Add to favorites</button>
+          </form>
+        {% endif %}
+        {% if isBlacklisted %}
+          <form action="{% url 'accounts:removeListItem' 'blacklist' 'channel' channel.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Remove from blacklist</button>
+          </form>
+        {% else %}
+          <form action="{% url 'accounts:addListItem' 'blacklist' 'channel' channel.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Add to blacklist</button>
+          </form>
+        {% endif %}
+      {% endif %}
+    </div>
     <hr />
     <div class="gridDiv">
       <fieldset>
