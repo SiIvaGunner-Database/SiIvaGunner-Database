@@ -180,3 +180,30 @@ class BlacklistIndexTests(TestCase):
         BlacklistItem.objects.create(user=self.user, channel=self.channelA)
         seen = {self.client.get(reverse('home')).context['channel'].id for _ in range(40)}
         self.assertEqual(seen, {self.channelA.id, self.channelB.id})
+
+
+class LogoutTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='tester', password='pass12345!')
+        self.client.force_login(self.user)
+
+    def test_get_redirects_home_without_logging_out(self):
+        self.assertRedirects(self.client.get(reverse('accounts:logout')), reverse('home'), fetch_redirect_response=False)
+        self.assertEqual(self.client.get(reverse('accounts:myAccount')).status_code, 200)
+
+    def test_post_logs_out(self):
+        self.assertRedirects(self.client.post(reverse('accounts:logout')), reverse('home'), fetch_redirect_response=False)
+        self.assertEqual(self.client.get(reverse('accounts:myAccount')).status_code, 302)
+
+
+class IndexQueryTests(TestCase):
+    def test_home_page_counts_each_queryset_once(self):
+        channel = Channel.objects.create(id='UC9ecwl3FTG66jIKA9JRDtmg', title='SiIvaGunner', visible=True,
+                                         subscriberCount=1000, channelStatus='Public', channelType='Original')
+        Video.objects.create(id='NzoneDE0A2o', title='The Inn', visible=True, channel=channel, videoStatus='Public')
+        from django.db import connection
+        from django.test.utils import CaptureQueriesContext
+        with CaptureQueriesContext(connection) as queries:
+            self.assertEqual(self.client.get(reverse('home')).status_code, 200)
+        counts = [q['sql'] for q in queries.captured_queries if 'COUNT(' in q['sql']]
+        self.assertEqual(len(counts), 2)  # one for channels, one for that channel's videos

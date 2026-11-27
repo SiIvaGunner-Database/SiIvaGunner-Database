@@ -155,3 +155,26 @@ class VideoApiTests(TestCase):
         self.assertFalse(browsable.has_header('Content-Encoding'))
         page = self.client.get(reverse('videos:list'), HTTP_ACCEPT_ENCODING='gzip')
         self.assertFalse(page.has_header('Content-Encoding'))
+
+
+class VideoErrorHandlingTests(TestCase):
+    def setUp(self):
+        self.channel = Channel.objects.create(id='UC9ecwl3FTG66jIKA9JRDtmg', title='SiIvaGunner', visible=True, subscriberCount=500)
+        hidden = Channel.objects.create(id='UChiddenhiddenhiddenhidd', title='Hidden', visible=False)
+        Video.objects.create(id='visibleRip1', title='Rip', visible=True, channel=self.channel)
+        Video.objects.create(id='hiddenChan1', title='Rip', visible=True, channel=hidden)
+
+    def test_missing_or_hidden_video_is_404(self):
+        for id in ['doesNotExis', 'hiddenChan1']:
+            with self.subTest(id=id):
+                self.assertEqual(self.client.get(reverse('videos:details', args=[id])).status_code, 404)
+
+    def test_invalid_parameters_fall_back_to_defaults(self):
+        for query in ['?page=0', '?page=-3', '?page=abc', '?minimumSubscribers=abc', '?page=999']:
+            with self.subTest(query=query):
+                self.assertEqual(self.client.get(reverse('videos:list') + query).status_code, 200)
+        self.assertEqual(len(self.client.get(reverse('videos:list') + '?minimumSubscribers=1000').context['videos']), 0)
+
+    def test_search_post_with_missing_fields_redirects(self):
+        response = self.client.post(reverse('videos:list'), {'search': 'rip'})
+        self.assertRedirects(response, reverse('videos:list') + '?search=rip', fetch_redirect_response=False)

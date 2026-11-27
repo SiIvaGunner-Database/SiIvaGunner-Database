@@ -27,6 +27,19 @@ env.read_env(io.StringIO(payload))
 # Security settings
 DEBUG = False
 SECRET_KEY = env('SECRET_KEY')
+
+# HTTPS enforcement. Cloud Run terminates TLS and forwards requests over HTTP with an
+# X-Forwarded-Proto header, so Django must read that header to know a request was secure
+# (without it, SECURE_SSL_REDIRECT would redirect forever).
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+# Browsers remember HSTS for this long, so start short and raise it (e.g. to 31536000)
+# once HTTPS is confirmed working. Subdomains aren't included until each is confirmed HTTPS-only.
+SECURE_HSTS_SECONDS = 3600
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
 DATABASES = {'default': env.db()}
 # Reuse database connections across requests instead of opening one per request.
 # Values set in the DATABASE_URL (e.g. ?conn_max_age=0) take precedence.

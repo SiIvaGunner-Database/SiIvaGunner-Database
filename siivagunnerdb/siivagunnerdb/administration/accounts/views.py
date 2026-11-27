@@ -73,7 +73,7 @@ def logoutView(request):
     """
     if request.method == 'POST':
         logout(request)
-        return redirect('home')
+    return redirect('home')
 
 
 @login_required()

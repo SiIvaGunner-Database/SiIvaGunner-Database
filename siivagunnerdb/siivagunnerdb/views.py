@@ -28,8 +28,9 @@ def index(request):
     blacklist = BlacklistItem.objects.filter(user=request.user) if request.user.is_authenticated else BlacklistItem.objects.none()
     channels = channels.exclude(id__in=blacklist.filter(channel__isnull=False).values('channel_id'))
     channel = None
-    if channels.count() > 0:
-        channel = channels[random.randrange(channels.count())]
+    channelCount = channels.count()
+    if channelCount > 0:
+        channel = channels[random.randrange(channelCount)]
     else:
         channel = Channel.objects.get(visible=True, id='UC9ecwl3FTG66jIKA9JRDtmg') # SiIvaGunner
 
@@ -37,8 +38,9 @@ def index(request):
     videos = Video.objects.filter(visible=True, channel__id=channel.id, videoStatus__in=['Public', 'Unlisted'])
     videos = videos.exclude(id__in=blacklist.filter(video__isnull=False).values('video_id'))
     video = None
-    if videos.count() > 0:
-        video = videos[random.randrange(videos.count())]
+    videoCount = videos.count()
+    if videoCount > 0:
+        video = videos[random.randrange(videoCount)]
     else:
         channel = Channel.objects.get(visible=True, id='UC9ecwl3FTG66jIKA9JRDtmg') # SiIvaGunner
         video = Video.objects.get(visible=True, id='NzoneDE0A2o') # The Inn - Fire Emblem

@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.db.models import Q
 from django.db.models.functions import Lower
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
 from siivagunnerdb.administration.accounts.models import BlacklistItem, Favorite
@@ -35,9 +35,9 @@ def videoList(request):
         order = request.GET.get('order')
         filter = request.GET.get('filter')
         channelType = request.GET.get('channelType')
-        minimumSubscribers = request.GET.get('minimumSubscribers')
+        minimumSubscribers = search.parseInteger(request.GET.get('minimumSubscribers'))
         channelId = request.GET.get('channel')
-        currentPage = request.GET.get('page')
+        currentPage = search.parsePageNumber(request.GET.get('page'))
 
         # Set applicable default parameter values
         sortOptions = ['publishedAt', 'title', 'viewCount',]
@@ -48,10 +48,6 @@ def videoList(request):
             filter = None
         else:
             filter = filter.capitalize()
-        if currentPage:
-            currentPage = abs(int(currentPage))
-        else:
-            currentPage = 1
         executionTime = (datetime.utcnow() - startTime).total_seconds()
         print('Video search paramater execution time in seconds: ' + str(executionTime))
 
@@ -78,7 +74,7 @@ def videoList(request):
                 videos = videos.filter(wikiStatus=filter)
             else:
                 videos = videos.filter(videoStatus=filter)
-        if minimumSubscribers:
+        if minimumSubscribers is not None:
             videos = videos.filter(channel__subscriberCount__gte=minimumSubscribers)
         if order == 'ascending':
             if sort != 'title':
@@ -136,7 +132,7 @@ def videoDetails(request, id):
     """
     The video details page.
     """
-    video = Video.objects.get(visible=True, channel__visible=True, id=id)
+    video = get_object_or_404(Video, visible=True, channel__visible=True, id=id)
 
     if video.publishedAt:
         video.publishedAt = video.publishedAt.strftime('%Y-%m-%d %H:%M:%S')
