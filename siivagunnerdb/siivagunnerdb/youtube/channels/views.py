@@ -73,6 +73,9 @@ def channelList(request):
                 channels = channels.order_by('-' + sort)
             else:
                 channels = channels.order_by(Lower(sort).desc())
+
+        # Load only the columns shown in the results table
+        channels = channels.only('id', 'title', 'channelStatus', 'publishedAt', 'subscriberCount')
         executionTime = (datetime.utcnow() - startTime).total_seconds()
         print('Channel search filter execution time in seconds: ' + str(executionTime))
 

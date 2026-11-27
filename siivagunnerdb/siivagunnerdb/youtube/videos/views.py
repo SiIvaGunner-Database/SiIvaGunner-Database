@@ -1,11 +1,13 @@
 from datetime import datetime
 
+from django.db.models import Q
 from django.db.models.functions import Lower
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
 from siivagunnerdb.administration.accounts.models import BlacklistItem, Favorite
 from siivagunnerdb.views import MultipleModelViewSet
+from siivagunnerdb.youtube.channels.models import Channel
 from siivagunnerdb import search
 
 from .models import Video
@@ -61,10 +63,10 @@ def videoList(request):
             blacklistedChannelIds = blacklist.filter(channel__isnull=False).values('channel_id')
             videos = videos.exclude(id__in=blacklistedVideoIds).exclude(channel__id__in=blacklistedChannelIds)
         if searchTerms:
-            videosByTitle = videos.filter(title__icontains=searchTerms)
-            videosByChannel = videos.filter(channel__title__icontains=searchTerms)
-            videosById = videos.filter(id__icontains=searchTerms)
-            videos = (videosByTitle | videosById | videosByChannel)
+            # Match channel titles with a subquery on the small channel table so that every condition
+            # is on the video table, letting the database combine the video title and ID indexes
+            matchingChannelIds = Channel.objects.filter(title__icontains=searchTerms).values('id')
+            videos = videos.filter(Q(title__icontains=searchTerms) | Q(id__icontains=searchTerms) | Q(channel__id__in=matchingChannelIds))
         if channelId:
             videos = videos.filter(channel__id=channelId)
         elif channelType == 'original':
@@ -88,6 +90,9 @@ def videoList(request):
                 videos = videos.order_by('-' + sort)
             else:
                 videos = videos.order_by(Lower(sort).desc())
+
+        # Load only the columns shown in the results table
+        videos = videos.only('id', 'title', 'wikiStatus', 'videoStatus', 'publishedAt', 'channel', 'channelTitle', 'duration', 'viewCount')
         executionTime = (datetime.utcnow() - startTime).total_seconds()
         print('Video search filter execution time in seconds: ' + str(executionTime))
 

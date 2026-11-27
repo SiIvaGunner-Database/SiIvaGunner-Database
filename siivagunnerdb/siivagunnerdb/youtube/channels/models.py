@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.functions import Lower
 
 from siivagunnerdb.models import StandardModel
 from siivagunnerdb.community.collectives.models import Collective
@@ -52,5 +53,6 @@ class Channel(StandardModel):
         indexes = [
             models.Index(fields=["publishedAt"]),
             models.Index(fields=["title"]),
+            models.Index(Lower("title"), name="channels_channel_lower_title"),
             models.Index(fields=["subscriberCount"]),
         ]
